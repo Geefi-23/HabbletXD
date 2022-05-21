@@ -1,0 +1,27 @@
+.skeleton{
+  animation: infinite gradientAnim ease 6s;
+  background-image: linear-gradient(45deg, #dddde9, #dddde9, #fbfbff, #dddde9, #dddde9);
+  background-size: 400% 400%;
+  border-radius: .5rem;
+  border: none !important;
+}
+
+.skeleton::before{
+  display: none !important;
+}
+
+.skeleton::after{
+  display: none !important;
+}
+
+@keyframes gradientAnim {
+  0% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 0% 50%;
+  }
+  100%{
+    background-position: 100% 50%;
+  }
+}

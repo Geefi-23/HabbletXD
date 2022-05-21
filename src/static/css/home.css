@@ -1,0 +1,109 @@
+@import url('./skeleton.css');
+
+.section{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.section .section__header{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  line-height: 1.1;
+}
+
+.section .section__content{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-content: space-between;
+  width: 100%;
+  padding-top: 20px;
+}
+
+.section .section__title{
+  margin-bottom: 0;
+}
+
+.section__nav-tools{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+  max-width: 156px;
+}
+
+.section__nav-tools button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(var(--hxd-theme-color));
+  color: white;
+  width: 40px;
+  height: 32px;
+  border: none;
+  border-radius: 7px;
+}
+
+button.arrow-left::after{
+  content: url('../icons/chevron-left.svg');
+  height: 17px;
+}
+
+button.reload::after{
+  content: url('https://img.icons8.com/ios-glyphs/17/000000/refresh--v1.png');
+}
+button.arrow-right::after{
+  content: url('../icons/chevron-right.svg');
+  height: 17px;
+}
+
+.section__nav-tools button.reload{
+  background-color: rgb(var(--hxd-color-gray));
+  color: black;
+}
+
+.section__nav-tools button:disabled{
+  opacity: .8;
+}
+
+#toTop-btn{
+  position: fixed;
+  background-color: rgb(var(--hxd-theme-colorLight));
+  color: white;
+  bottom: 50px;
+  right: 50px;
+  border: none;
+  border-radius: 7px;
+  padding: 10px;
+}
+
+.container{
+  padding-left: 132px !important;
+  padding-right: 132px !important;
+}
+
+@media screen and (max-width: 1280px){
+  .container{
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+
+  .section .section__header{
+    font-size: 12px;
+  }
+
+  .section__nav-tools button{
+    height: 30px;
+    width: 32px
+  }
+}
+
+@media screen and (max-width: 1024px){
+  .container{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}

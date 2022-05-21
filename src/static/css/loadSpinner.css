@@ -1,0 +1,23 @@
+.spinner{
+  height: 60px;
+  width: 60px;
+  z-index: 1000;
+}
+
+.spinner .track{
+  height: 100%;
+  width: 100%;
+  border: 10px solid #dee2e6;
+  border-top-color: rgb(var(--hxd-theme-color));
+  border-radius: 50%;
+  animation: spin infinite 1s ease;
+}
+
+@keyframes spin {
+  0%{
+    transform: rotateZ(0deg)
+  }
+  100%{
+    transform: rotateZ(360deg)
+  }
+}

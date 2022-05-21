@@ -1,0 +1,12 @@
+*[contenteditable]:focus, input, textarea{
+  outline: 0;
+  resize: none;
+}
+
+button:hover{
+  cursor: pointer
+}
+
+.dropdown-toggle.caret-off::after{
+  display: none;
+}

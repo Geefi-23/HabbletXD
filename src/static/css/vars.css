@@ -1,0 +1,10 @@
+:root{
+  --hxd-theme-color: 48, 51, 107;
+  --hxd-theme-colorLight: 83, 86, 134;
+  --hxd-theme-colorDark: 19, 13, 63;
+  --hxd-theme-icon-color: 42, 42, 90;
+  --hxd-theme-iconHover-color: 55, 55, 114;
+  --hxd-theme-text-color: 58, 60, 102;
+  --hxd-theme-text-secondaryColor: 89, 92, 137;
+  --hxd-color-gray: 200, 200, 215;
+}
