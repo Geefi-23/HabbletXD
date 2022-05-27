@@ -3,8 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import slider from "../../static/js/slider";
 import api from '../../static/js/api';
 
-const Profile = ({ type }) => {
-  const [user, setUser] = useState({});
+const Profile = ({ type, isAuth }) => {
+  const [profile, setProfile] = useState({});
   let { name } = useParams();
 
   const getProfile = useCallback(async (nome) => {
@@ -14,22 +14,32 @@ const Profile = ({ type }) => {
     let res = await api.user('get', {
       method: 'POST',
       body: JSON.stringify({
-        nick: nome
+        usuario: nome
       })
     });
-    if (res.success) {
-      setUser(res.user);
+    if (res.error) {
+      setProfile({ error: true });
+    }else if (res.success) {
+      setProfile(res.user);
     }
-  }, [setUser]);
+  }, []);
+
+  if (type === 'myself' && !isAuth) {
+    window.location.href = '/';
+  }
 
   useEffect(() => {
-    getProfile(name);
-    slider.create({ slider: '#mobis-slider', slidesToShow: 4, gap: 8, arrows: { left: '#mobs-arrowLeft', right: '#mobs-arrowRight' }})
+    console.log(isAuth)
+    if (type === 'myself') {
+      setProfile(JSON.parse(localStorage.getItem('hxd-user-object')));
+    } else {
+      getProfile(name);
+    }
+    //slider.create({ slider: '#mobis-slider', slidesToShow: 4, gap: 8, arrows: { left: '#mobs-arrowLeft', right: '#mobs-arrowRight' }})
   }, []);
   return (
     <>
     {
-      user ?
       <div className="container">
         <div id="my-profile" className="hxd-bg-color w-100" style={{ borderRadius: '7px'}}>
           <div className="d-flex align-items-center justify-content-between w-100 px-2 text-white" style={{height: '50px'}}>
@@ -42,7 +52,6 @@ const Profile = ({ type }) => {
               :
               null
             }
-            
           </div>
           <div className="d-flex bg-white w-100 p-3" style={{borderRadius: '7px'}}>
             <div className="row gx-0 w-100 gap-1">
@@ -51,7 +60,7 @@ const Profile = ({ type }) => {
                   <div className="hxd-bg-color d-flex align-items-center justify-content-center fw-bold text-white"
                     style={{height: '35px'}}
                   >
-                    {user.nome}
+                    {profile.usuario}
                   </div>
                   <div style={{flex: '1 0 0'}}></div>
                 </div>
@@ -162,7 +171,7 @@ const Profile = ({ type }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+                    {profile.missao}
                   </small>
                 </div>
                 <div className="hxd-border rounded">
@@ -170,7 +179,7 @@ const Profile = ({ type }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    {user.twitter}
+                    {profile.twitter}
                   </small>
                 </div>
                 <div className="hxd-border rounded">
@@ -194,8 +203,6 @@ const Profile = ({ type }) => {
           </div>
         </div>
       </div>
-      :
-      <h3>404<br />Perfil não encontrado!</h3>
     }
     </>
   );

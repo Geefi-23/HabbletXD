@@ -8,7 +8,8 @@ const Alert = (props) => {
     paddingRight: '17px',
     top: 0,
     left: 0,
-    zIndex: 1067
+    zIndex: 1067,
+    pointerEvent: 'none'
   };
 
   const alertStyle = {

@@ -1,8 +1,6 @@
 import { BrowserRouter as Router } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Modal } from 'react-bootstrap';
-//import LoadingBar from 'react-top-loading-bar';
-import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 
 import Header from "./view/components/Header";
@@ -19,7 +17,7 @@ import api from "./static/js/api";
 
 const AuthModal = (props) => {
   const [type, setType] = useState('login');
-  const { setAuth, loadingBar, hideModal, sendAlert, showProgress, hideProgress } = props;
+  const { setIsAuth, hideModal, sendAlert, showProgress, hideProgress } = props;
 
   const regex = {
     nick: /^[A-Za-z0-9 ]{5,40}$/,
@@ -53,8 +51,8 @@ const AuthModal = (props) => {
         sendAlert('danger', res.error);
       } else {
         sendAlert('success', res.success);
-        setAuth(res.token);
-        localStorage.setItem('user', JSON.stringify(res.user))
+        localStorage.setItem('hxd-user-object', JSON.stringify(res.user));
+        setIsAuth(true);
         hideModal();
       }
     };
@@ -165,7 +163,7 @@ const AuthModal = (props) => {
 };
 
 const App = () => {
-  const [auth, setAuth] = useState(null);
+  const [isAuth, setIsAuth] = useState(null);
   const [isModalShowing, setIsModalShowing] = useState(false);
   const [isProgressShowing, setIsProgressShowing] = useState(false);
   const [alert, setAlert] = useState({type: 'success', content: '', visible: false});
@@ -201,17 +199,18 @@ const App = () => {
       <Alert type={alert.type} content={alert.content} visible={alert.visible} />
       <Modal show={isModalShowing} backdrop={true}>
         <AuthModal
-          setAuth={setAuth} sendAlert={sendAlert} hideModal={handleModalHide}
+          setIsAuth={setIsAuth} sendAlert={sendAlert} hideModal={handleModalHide}
           alertRef={alertRef} showProgress={handleProgressShow} 
           hideProgress={handleProgressHide}
         />
       </Modal>
-      <Header isAuth={auth} setAuth={setAuth} showModal={handleModalShow}/>
+      <Header isAuth={isAuth} setIsAuth={setIsAuth} showModal={handleModalShow}/>
       <Approutes 
-        isAuth={auth} 
+        isAuth={isAuth} 
         sendAlert={sendAlert} 
         showProgress={handleProgressShow} 
-        hideProgress={handleProgressHide} />
+        hideProgress={handleProgressHide} 
+      />
       <Footer />
     </Router>
   );

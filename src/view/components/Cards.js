@@ -26,7 +26,7 @@ const NewsCard = (props) => {
   const { refer, onClick } = props;
 
   const getImage = async (url) => {
-    let blob = await api.getMedia(`images/${url}`);
+    let blob = await api.media('get', url);
     setThumb(URL.createObjectURL(blob));
   };
   

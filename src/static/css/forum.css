@@ -12,7 +12,7 @@
 
 .info{
     flex: 1 0 0;
-    max-width: 520px;
+    overflow: hidden;
 }
 
 .info > h2 {
@@ -38,7 +38,11 @@
     min-height: 327px;
     background-color: #ffffff;
     border: solid 1px #bcbdd4;
-    border-radius: 10px;
+    border-radius: .5rem;
+    padding: 1rem;
+}
+.forum .container-conteudo img {
+    max-width: 100%;
 }
 .particle {
     position: fixed;

@@ -1,0 +1,25 @@
+.hi-menu__label {
+  display: flex;
+}
+
+.hi-menu__label > span{
+  background-color: rgb(var(--hxd-theme-color));
+  color: #fff;
+  padding: .5rem 1.25rem;
+  border-top-left-radius: .25rem;
+  border-bottom-left-radius: .25rem;
+}
+
+.hi-menu__label .hi-menu__input{
+  background-color: transparent;
+  flex: 1 0 0;
+  padding-left: .5rem;
+  border: 1px solid rgb(var(--hxd-theme-color));
+  border-top-right-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+  transition:all ease-in-out .15s;
+}
+
+.hi-menu__input:focus{
+  background-color: #fff;
+}

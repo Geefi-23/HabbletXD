@@ -57,6 +57,12 @@ const Home = (props) => {
    * Função que configura os sliders da página
    */
   const configureSliders = useCallback(() => {
+    let newsSlider = new Glide('#news-slider', {
+      type: 'slider',
+      perView: 3,
+      gap: 8
+    });
+
     let lojaoXD = new Glide('#ljxd-slider', {
       type: 'slider',
       perView: 6,
@@ -75,9 +81,11 @@ const Home = (props) => {
 
     slidersArrowsSetListener(lojaoXD, '#ljxd-arrowPrev', '#ljxd-arrowNext');
     slidersArrowsSetListener(lojaoEmblemas, '#ljem-arrowPrev', '#ljem-arrowNext');
+    slidersArrowsSetListener(newsSlider, '#news-arrowPrev', '#news-arrowNext');
 
     lojaoXD.mount();
     lojaoEmblemas.mount();
+    newsSlider.mount();
   }, []);
 
   /**
@@ -117,15 +125,8 @@ const Home = (props) => {
   useEffect(() => {
     // esconde a barra de loading
     hideProgress();
-    configureSliders();
-    /*(async () => {
-      setBadges((await api.getBadges()));
-      slider.create({ slider: '#emblemasGratis-slider', slidesToShow: 8, gap: 8, arrows: { left: '#egs-arrowLeft', right: '#egs-arrowRight' }});
-      slider.create({ slider: '#emblemasNovos-slider', slidesToShow: 8, gap: 8, arrows: { left: '#ens-arrowLeft', right: '#ens-arrowRight' }});
-    })();
-    slider.create({ slider: '#ljxd-slider', slidesToShow: 6, gap: 16, arrows: { left: '#ljxd-arrowLeft', right: '#ljxd-arrowRight' }});
-    slider.create({ slider: '#ljem-slider', slidesToShow: 6, gap: 16, arrows: { left: '#ljem-arrowLeft', right: '#ljem-arrowRight' }});*/
     pool();
+    configureSliders();
     document.onscroll = handleScrollTopBtn;
     window.scrollTo(0, 0);
   }, [pool, configureSliders]);
@@ -145,32 +146,63 @@ const Home = (props) => {
                 <span className="hxd-secondary-text">Aqui você encontra notícias fresquinhas do mundo de pixels!</span>
               </div>
               <div className="section__nav-tools">
-                <button>
+                <button id="news-arrowPrev">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
                   </svg>
                 </button>
                 <button className="reload"></button>
-                <button>
+                <button id="news-arrowNext">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
                   </svg>
                 </button>
               </div>
             </div>
-            <div className="section__content gap-3">
-              {
-                allNews.length === 0 ?
-                <>
-                  <div className='news-card skeleton'></div>
-                  <div className='news-card skeleton'></div>
-                  <div className='news-card skeleton'></div>
-                </>
-                :
-                allNews.map((news, i) => (
-                  <NewsCard refer={news} key={i} onClick={() => showProgress()} />
-                ))
-              }
+            <div className="section__content">
+              <div id="news-slider" className='glide'>
+                <div className="glide__track" data-glide-el="track">
+                  <div className="glide__slides pt-3" style={{height: '300px'}}>
+                  {
+                    allNews.length === 0 ?
+                    <>
+                      <div className='news-card skeleton'></div>
+                      <div className='news-card skeleton'></div>
+                      <div className='news-card skeleton'></div>
+                    </>
+                    :
+                    (() => {
+                      let slides = [];
+                      let y = 0;
+                      let iterations = Math.round(allNews.length / 2);
+
+                      for (let i = 0; i < iterations; i++){
+                        let news1 = allNews[y++];
+                        let news2 = allNews[y++];
+
+                        let slide;
+
+                        if (news2 === undefined) {
+                          slide = [news1];
+                        } else {
+                          slide = [news1, news2];
+                        }
+
+                        slides.push((
+                          <div className="glide__slide d-flex flex-column gap-2">
+                            {slide.map((news) => (
+                              <NewsCard refer={news} key={y-1} onClick={() => showProgress()} />
+                            ))}
+                          </div>
+                        ));
+                      }
+
+                      return slides;
+                    })()
+                  }
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="section">

@@ -1,4 +1,4 @@
-*[contenteditable]:focus, input, textarea{
+*[contenteditable]:focus, input, textarea, select{
   outline: 0;
   resize: none;
 }

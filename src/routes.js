@@ -6,6 +6,7 @@ import Profile from "./view/pages/Profile";
 import SearchResults from "./view/pages/SearchResults";
 import Forum from "./view/pages/Forum";
 import Team from "./view/pages/Team";
+import HabbletImager from "./view/pages/HabbletImager";
 
 const approutes = (props) => {
   const { isAuth, sendAlert, showProgress, hideProgress } = props;
@@ -16,25 +17,44 @@ const approutes = (props) => {
       <Route path="/" element={<Home showProgress={showProgress} hideProgress={hideProgress} />} />
       <Route path="/search" element={<SearchResults />} />
       <Route path="/equipe" element={<Team />} />
-      <Route path="/meuperfil" element={<Profile type="myself" />} />
-      <Route path="/editarperfil" element={<ProfileEdit />} />
+      <Route path="/habbletimager" element={<HabbletImager />} />
+      <Route path="/meuperfil" element={<Profile type="myself" isAuth={isAuth} />} />
+      <Route 
+        path="/editarperfil" 
+        element={
+          <ProfileEdit 
+            isAuth={isAuth} 
+            sendAlert={sendAlert} 
+            showProgress={showProgress} 
+            hideProgress={hideProgress} 
+          />
+        } 
+      />
       <Route path="/perfil/*">
         <Route path=":name" element={<Profile />} />
       </Route>
       <Route path="/noticia/*" >
         <Route 
-          path=":key" element={<Forum isAuth={isAuth} 
-          sendAlert={sendAlert} 
-          showProgress={showProgress} 
-          hideProgress={hideProgress} type='news' />} 
+          path=":key" 
+          element={
+            <Forum 
+              isAuth={isAuth} 
+              sendAlert={sendAlert} 
+              showProgress={showProgress} 
+              hideProgress={hideProgress} type='news' 
+            />
+          }
         />
       </Route>
       <Route path="/timeline/*" >
         <Route 
-          path=":key" element={<Forum isAuth={isAuth} 
-          sendAlert={sendAlert} 
-          showProgress={showProgress} 
-          hideProgress={hideProgress} type='timeline' />}
+          path=":key" element={
+          <Forum 
+            isAuth={isAuth} 
+            sendAlert={sendAlert} 
+            showProgress={showProgress} 
+            hideProgress={hideProgress} type='timeline' 
+          />}
         />
       </Route>
     </Routes>

@@ -68,22 +68,46 @@ ul.horizontal-navbar-menu{
 .navbar-menu__item__popover{
   position: relative;
   display: none;
-  background-color: white;
-  top: 10px;
   
+  
+  
+  top: -4px
 }
 
-.navbar-menu__item__popover::after{
-  content: "";
-  position: absolute;
-  border: 10px solid transparent;
-  border-bottom-color: white;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
+.navbar-menu__item__popover ul{
+  background-color: white;
+  border-radius: .25rem;
+  padding: .5rem 2px;
+  border: 1px solid rgb(var(--hxd-theme-color));
 }
 
-.navbar-menu__item *:not(.navbar-menu__item__popover){
+.navbar-menu__item__popover ul li{
+  height: 30px;
+  width: 100%;
+  border-radius: .25rem;
+}
+
+.navbar-menu__item__popover ul li:hover{
+  background-color: rgb(var(--hxd-theme-color));
+  color: #fff !important;
+  cursor: pointer;
+}
+
+.navbar-menu__item__popover ul li a{
+  display: flex;
+  align-items: center;
+  color: #000;
+  height: 100%;
+  width: 100%;
+  text-decoration: none;
+  padding: 0 1rem;
+}
+
+.navbar-menu__item__popover ul li a:hover{
+  color: #fff;
+}
+
+.navbar-menu__item > *:not(.navbar-menu__item__popover){
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,7 +117,7 @@ ul.horizontal-navbar-menu{
   vertical-align: middle;
 }
 
-.navbar-menu__item *:not(.navbar-menu__item__popover):hover{
+.navbar-menu__item > *:not(.navbar-menu__item__popover):hover{
   color: rgb(85, 85, 85);
 }
 

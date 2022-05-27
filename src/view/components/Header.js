@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import Glide from '@glidejs/glide'
 import { Link } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
@@ -12,7 +12,7 @@ import api from '../../static/js/api';
 
 const Header = (props) => {
 
-  const { isAuth, setAuth } = props;
+  const { isAuth, setIsAuth } = props;
 
   const rgbToHex = (rgbString) => {
     let values = rgbString.replaceAll(',', '').split(' ');
@@ -29,9 +29,8 @@ const Header = (props) => {
 
   const checkAuthentication = useCallback(async () => {
     let res = await api.user('authenticate', {credentials: 'include'});
-    console.log(res.authenticated)
-    setAuth(res.authenticated);
-  }, [setAuth]);
+    setIsAuth(res.authenticated);
+  }, [setIsAuth]);
 
   useEffect(() => {
     checkAuthentication();
@@ -68,7 +67,8 @@ const Header = (props) => {
           onClick={() => {
             document.cookie = 'hxd-auth=deleted; path=/; expires='+new Date().toUTCString();
             api.user('logout');
-            setAuth(null);
+            setIsAuth(false);
+            window.location.href = '/';
           }}
         >
           <img src="https://img.icons8.com/material-sharp/24/000000/exit.png" alt=""/>
@@ -152,8 +152,20 @@ const Header = (props) => {
   };
 
   const RadioPlayer = (props) => {
+    const [isPaused, setIsPaused] = useState(false);
+    const stream = useRef(null);
+
+    const handleStreamPP = () => {
+      setIsPaused(!isPaused);
+      if (!isPaused) stream.current.play();
+      else stream.current.pause();
+    };
+
     return (
       <div id="radio-player">
+        <audio preload="auto" className="d-none" ref={stream}>
+          <source src="http://192.95.30.147/8180/stream" type="audio/mpeg" />
+        </audio>
         <div className="d-flex flex-row hxd-bg-color w-100 mt-2 rounded overflow-hidden" 
         style={{height: '60px'}}>
           <div className="h-100 w-25"></div>
@@ -190,35 +202,44 @@ const Header = (props) => {
         </div>
         <div className="d-flex flex-row w-100" style={{height: '30px'}}>
           <div className="w-50 h-100 rounded bg-white">
-            <img 
-              className="ms-3"
-              src={
-                `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/pause--v1.png`
-              } 
-              alt=""
-            />
-            <img 
-              className="ms-3"
-              src={
-                `https://img.icons8.com/ios-filled/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/room-sound.png`
-              }  
-              alt=""
-            />
-            <img 
-              className="ms-3"
-              src={
-              `https://img.icons8.com/android/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/paper-plane.png`
-              } 
-              style={{transform: 'rotateZ(-45deg)'}}  
-              alt=""
-            />
-            <img 
-              className="ms-3"
-              src={
-                `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/filled-star.png`
-              }
-              alt=""
-            />
+            <button className="bg-transparent border-0"
+            onClick={() => handleStreamPP()}>
+              <img 
+                src={
+                  isPaused ?
+                  `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/pause--v1.png`
+                  :
+                  `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/play--v1.png`
+                } 
+                alt=""
+              />
+            </button>
+            <button className="bg-transparent border-0">
+              <img 
+                src={
+                  `https://img.icons8.com/ios-filled/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/room-sound.png`
+                }  
+                alt=""
+              />
+            </button>
+            <button className="bg-transparent border-0">
+              <img 
+                src={
+                `https://img.icons8.com/android/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/paper-plane.png`
+                } 
+                style={{transform: 'rotateZ(-45deg)'}}  
+                alt=""
+              />
+            </button>
+            <button className="bg-transparent border-0">
+              <img 
+                src={
+                  `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/filled-star.png`
+                }
+                alt=""
+              />
+            </button>
+            
           </div>
           <div className="w-50 h-100 ps-2 text-white">
             <span className="fw-bold">100</span>
@@ -466,8 +487,13 @@ const Header = (props) => {
                 <li className="navbar-menu__item especial">
                   <button className="bg-transparent border-0">EXTRAS</button>
                   <div className="navbar-menu__item__popover">
-                    <ul className="unstyled p-0 px-2">
-                      <li>Habblet Imager</li>
+                    <ul className="list-unstyled">
+                      <li>
+                        <Link to="/habbletimager">Habblet Imager</Link>
+                      </li>
+                      <li>
+                        <Link to="/ticket">Ticket</Link>
+                      </li>
                     </ul>
                   </div>
                 </li>

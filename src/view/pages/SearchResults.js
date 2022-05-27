@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../static/js/api';
 import '../../static/css/search-results.css';
 
@@ -39,7 +40,7 @@ const SearchResults = () => {
         <section className="d-flex flex-wrap gap-3 pt-2">
           {
             results.usuarios.map(usuario => (
-              <div className="container-geral">
+              <Link to={`/perfil/${usuario.usuario}`} className="container-geral">
                 <div className="container-nome-perfill">
                   <span style={{color: '#fff', fontSize: '15px'}}>Perfil</span>
                 </div>
@@ -54,10 +55,10 @@ const SearchResults = () => {
                     <h1>{usuario.usuario}</h1>
                   </div>
                   <div className="container-infos">
-                    <p>Sobre Mim: {usuario.assinatura}</p>
+                    <p>Sobre Mim: {usuario.missao}</p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           }
           {

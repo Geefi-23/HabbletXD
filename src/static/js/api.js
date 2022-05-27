@@ -3,7 +3,7 @@
  * @description Módulo que controla a requisição de dados ao servidor da aplicação
  */
 
-const URL = /*window.location.href+*/'http://localhost:8000/api/';
+const URL = 'http://localhost:8000/api/';
 
 // Cada váriavel representa uma rota de dados
 const userPath = 'user/';
@@ -43,8 +43,8 @@ const api = {
     let res = await (await fetch(URL+timelinePath+action+`.php${id ? '?id='+id : ''}`, init)).json();
     return res;
   },
-  getMedia: async (filename) => {
-    let blob = await (await fetch(URL+mediaPath+filename)).blob();
+  media: async (action, filename = null, init = {}) => {
+    let blob = await (await fetch(URL+mediaPath+action+`.php${filename !== null ? '?filename='+filename : ''}`)).blob();
     return blob;
   },
   search: async (q) => {

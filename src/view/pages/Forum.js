@@ -32,7 +32,7 @@ const Comment = (props) => {
   return (
     <div className="comentario">
       <img 
-        src="https://www.habbo.com.br/habbo-imaging/avatarimage?img_format=png&user=marc&direction=6&head_direction=3&size=m&headonly=1" alt=""
+        src={`https://avatar.blet.in/${comment.autor}&action=std&size=l&head_direction=3&direction=2&gesture=std&headonly=1`} alt=""
         style={{height: '62px'}}
       />
       <div className="d-flex flex-column" style={{flex: '1 0 0'}}>
@@ -90,10 +90,11 @@ const Forum = (props) => {
       return sendAlert('danger', 'Você não digitou nada!');
     }
 
+    let user = JSON.parse(localStorage.getItem('hxd-user-object'));
     let date = new Date();
     let comment = {
       urlNoticia: key,
-      autor: JSON.parse(localStorage.getItem('user')).nick,
+      autor: user.usuario,
       comentario: comentario.value,
       data: date.getTime() / 1000
     };
@@ -122,7 +123,7 @@ const Forum = (props) => {
         <div className="container">
           <div className="forum-header">
             <div className="info ms-3">
-              <h2 className="m-0">{article.titulo}</h2>
+              <h2 className="m-0 text-nowrap text-truncate">{article.titulo}</h2>
               <div className="text-nowrap text-truncate">{article.resumo}</div>
             </div>
             <div className="d-flex flex-row">
@@ -159,7 +160,7 @@ const Forum = (props) => {
                 <form idaction="#" className="write-comment"
                   onSubmit={handleCommentSender}
                 >
-                  <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?img_format=png&user=marc&direction=6&head_direction=3&size=m&headonly=1" alt="" />
+                  <img src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).avatar}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} alt="" />
                   <input id="txtComment" name="q" type="text" placeholder="Digite o seu comentário" />
                   <input id="btnComment" type="submit" value="Comentar" />
                 </form>
