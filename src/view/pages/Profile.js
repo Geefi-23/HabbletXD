@@ -3,8 +3,13 @@ import { Link, useParams } from "react-router-dom";
 import slider from "../../static/js/slider";
 import api from '../../static/js/api';
 
+import '@glidejs/glide/dist/css/glide.core.css';
+
+import Glide from '@glidejs/glide';
+
 const Profile = ({ type, isAuth }) => {
   const [profile, setProfile] = useState({});
+  const [badges, setBadges] = useState([]);
   let { name } = useParams();
 
   const getProfile = useCallback(async (nome) => {
@@ -29,7 +34,12 @@ const Profile = ({ type, isAuth }) => {
   }
 
   useEffect(() => {
-    console.log(isAuth)
+
+    if (badges.length !== 0)
+      new Glide('#badges-slider', {
+        type: 'slider',
+        perView: 4
+      }).mount();
     if (type === 'myself') {
       setProfile(JSON.parse(localStorage.getItem('hxd-user-object')));
     } else {
@@ -64,22 +74,51 @@ const Profile = ({ type, isAuth }) => {
                   </div>
                   <div style={{flex: '1 0 0'}}></div>
                 </div>
-                <div id="mobis-slider" className="slider d-flex gap-1 w-100 pt-2">
-                  <div className="slider__track d-flex flex-wrap gap-2 p-0" style={{width: '224px'}}>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
-                    <div className="slider__item hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
+                {
+                  badges.length === 0 ?
+                  <h6 className="mt-4">Este usuário não tem emblemas</h6>
+                  :
+                  <div id="badges-slider" className="glide d-flex gap-1 w-100 pt-2">
+                    <div className="glide__track" data-glide-el="track" style={{width: '230px'}}>
+                      <div className="glide__slides" >
+                        {
+                          (() => {
+                            let slides = [];
+                            let y = 0;
+                            let iterations = Math.round(badges.length / 2);
+      
+                            for (let i = 0; i < iterations; i++){
+                              let news1 = badges[y++];
+                              let news2 = badges[y++];
+      
+                              let slide;
+      
+                              if (news2 === undefined) {
+                                slide = [news1];
+                              } else {
+                                slide = [news1, news2];
+                              }
+      
+                              slides.push((
+                                <div className="glide__slide d-flex flex-column gap-2">
+                                  {slide.map(() => (
+                                    <div className="hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
+                                  ))}
+                                </div>
+                              ));
+                            }
+      
+                            return slides;
+                          })()
+                        }
+                      </div>
+                    </div>
+                    <div className="d-flex flex-column justify-content-end" style={{height: '100px'}} data-glide-el="controls">
+                      <button className="slider__arrow arrow-left" data-glide-dir="<" style={{height: '50px'}}></button>
+                      <button className="slider__arrow arrow-right" data-glide-dir=">" style={{height: '50px'}}></button>
+                    </div>
                   </div>
-                  <div className="d-flex flex-column justify-content-end" style={{height: '100px'}}>
-                    <button id="mobs-arrowLeft" className="slider__arrow arrow-left" style={{height: '50px'}}></button>
-                    <button id="mobs-arrowRight" className="slider__arrow arrow-right" style={{height: '50px'}}></button>
-                  </div>
-                </div>
+                }
               </div>
               <div className="col-6 gx-0 h-100">
                 <div>

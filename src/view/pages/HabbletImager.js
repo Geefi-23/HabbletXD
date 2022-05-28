@@ -53,7 +53,7 @@ const HabbletImager = () => {
                 <span className="text-white">Habblet Hotel</span>
               </div>
               <div className="mt-2 hxd-border rounded overflow-hidden text-center" style={{height: '250px', backgroundImage: 'url(https://i.imgur.com/PAIFiy5.png)'}}>
-                <img src={url} />
+                <img src={url} alt="" />
               </div>
               <div className="d-flex justify-content-between hxd-border mt-1">
                 <button className="hxd-bg-color border-0 rounded text-white"

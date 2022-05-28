@@ -100,3 +100,11 @@
 .hxd-btn:hover{
   background-color: rgba(var(--hxd-theme-color), .9);
 }
+
+.dropdown-caret-off::after{
+  display: none;
+}
+
+.bs-btn-shadow-off:focus{
+  box-shadow: none !important;
+}

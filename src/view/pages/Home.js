@@ -11,7 +11,7 @@ import { NewsCard, ArtCard, TimelineCard, SpotlightCard } from '../components/Ca
 import Glide from '@glidejs/glide';
 
 const Home = (props) => {
-  const { showProgress, hideProgress } = props;
+  const { showProgress, hideProgress, sendAlert } = props;
   
   const [badges, setBadges] = useState([]);
   const [allNews, setAllNews] = useState([]);
@@ -94,6 +94,8 @@ const Home = (props) => {
   const timelinePost = async () => {
     let texto = timelineWriterRef.current.textContent;
 
+    showProgress();
+
     let data = {
       texto
     };
@@ -103,6 +105,11 @@ const Home = (props) => {
       body: JSON.stringify(data),
       credentials: 'include'
     });
+    hideProgress();
+    if (res.sucess)
+      sendAlert('success', res.success);
+    else if (res.error)
+      sendAlert('danger', res.error);
   };
 
   let allArts = [];

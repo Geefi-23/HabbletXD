@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState, useRef } from 'react';
-import Glide from '@glidejs/glide'
+//import Glide from '@glidejs/glide'
 import { Link } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import { Dropdown } from 'react-bootstrap';
@@ -57,12 +57,32 @@ const Header = (props) => {
           </Dropdown.Menu>
         </Dropdown>
       </> : <>
-        <Link to="/meuperfil" className="d-flex align-items-center bg-transparent h-100 border-0">
-          <img src="https://img.icons8.com/pastel-glyph/24/000000/person-male--v3.png" alt=""/>
-        </Link>
         <button className="bg-transparent h-100 border-0">
-          <img src="https://img.icons8.com/material-sharp/24/000000/appointment-reminders--v1.png" alt=""/>
+          <img src="https://img.icons8.com/ios-filled/24/000000/drawing.png"/>
         </button>
+        <Link to="/meuperfil" className="d-flex align-items-center bg-transparent h-100 border-0">
+          <img 
+            src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).avatar}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
+            alt=""
+            style={{
+              height: '100%',
+              width: '64px',
+              objectFit: 'none',
+              objectPosition: '0 -15px'
+            }}
+          />
+        </Link>
+        <Dropdown className="d-flex align-items-center">
+          <Dropdown.Toggle className="dropdown-caret-off bs-btn-shadow-off bg-transparent h-100 border-0 p-0" style={{ width: '24px'}}>
+            <img src="https://img.icons8.com/material-sharp/24/000000/appointment-reminders--v1.png" alt=""/>
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="hxd-border">
+            <Dropdown.Item className="dropdown-item hxd-active">
+              
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
         <button className="bg-transparent h-100 border-0" 
           onClick={() => {
             document.cookie = 'hxd-auth=deleted; path=/; expires='+new Date().toUTCString();
