@@ -165,6 +165,7 @@ const AuthModal = (props) => {
 const App = () => {
   const [isAuth, setIsAuth] = useState(null);
   const [isModalShowing, setIsModalShowing] = useState(false);
+  const [artModalIsShowing, setArtModalIsShowing] = useState(false);
   const [isProgressShowing, setIsProgressShowing] = useState(false);
   const [alert, setAlert] = useState({type: 'success', content: '', visible: false});
   const alertRef = useRef(null);
@@ -175,13 +176,12 @@ const App = () => {
   const handleProgressShow = () => setIsProgressShowing(true);
   const handleProgressHide = () => setIsProgressShowing(false);
   
-
-  const sendAlert = (type, content) => {
+  const sendAlert = useCallback((type, content) => {
     setAlert({type, content, visible: true});
     setTimeout(() => {
       setAlert({visible: false});
     }, 5000);
-  };
+  }, [setAlert]);
   
   return (
     <Router>
@@ -189,7 +189,7 @@ const App = () => {
         backgroundColor: 'white',
         position: 'sticky',
         top: 0,
-        zIndex: 1001
+        zIndex: 1061
       }}>
         <LinearProgress sx={{
           visibility: isProgressShowing ? 'visible' : 'hidden'
@@ -204,12 +204,21 @@ const App = () => {
           hideProgress={handleProgressHide}
         />
       </Modal>
-      <Header isAuth={isAuth} setIsAuth={setIsAuth} showModal={handleModalShow}/>
+      <Header 
+        isAuth={isAuth} setIsAuth={setIsAuth} showModal={handleModalShow} 
+        sendAlert={sendAlert} 
+        showProgress={handleProgressShow} 
+        hideProgress={handleProgressHide} 
+        artModalIsShowing={artModalIsShowing}
+        setArtModalIsShowing={setArtModalIsShowing}
+      />
+        
       <Approutes 
         isAuth={isAuth} 
         sendAlert={sendAlert} 
         showProgress={handleProgressShow} 
         hideProgress={handleProgressHide} 
+        
       />
       <Footer />
     </Router>

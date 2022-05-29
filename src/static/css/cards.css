@@ -186,7 +186,7 @@
   height: 200px;
   width: 320px;
   border: 2px solid white;
-  border-radius: 7px;
+  border-radius: .25rem;
   text-decoration: none;
 }
 
@@ -194,8 +194,8 @@
   position: relative;
   background-color: rgb(var(--hxd-theme-colorLight));
   height: 70%;
-  border-top-right-radius: 7px;
-  border-top-left-radius: 7px;
+  border-top-right-radius: .25rem;
+  border-top-left-radius: .25rem;
 }
 
 .art-card__thumbnail--hover{

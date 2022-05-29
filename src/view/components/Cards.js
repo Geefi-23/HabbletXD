@@ -5,7 +5,7 @@ import api from '../../static/js/api';
 const adjustDate = (toAdjust) => {
   let ad = toAdjust;
   let date = new Date(parseInt(ad.data)*1000)
-  let day = date.getUTCDate();
+  let day = date.getDate();
   day = day < 10 ? '0'+day : day;
   let month = date.getUTCMonth() + 1;
   month = month < 10 ? '0'+month : month;
@@ -26,7 +26,7 @@ const NewsCard = (props) => {
   const { refer, onClick } = props;
 
   const getImage = async (url) => {
-    let blob = await api.media('get', url);
+    let blob = await api.media('get', url, 'image');
     setThumb(URL.createObjectURL(blob));
   };
   
@@ -88,10 +88,27 @@ const TimelineCard = (props) => {
   );
 };
 
-const ArtCard = () => {
+const ArtCard = (props) => {
+  const [art, setArt] = useState({});
+  const [thumb, setThumb] = useState(null);
+  const { refer, onClick } = props;
+
+  const getImage = async (url) => {
+    let blob = await api.media('get', url, 'art');
+    setThumb(URL.createObjectURL(blob));
+  };
+
+  useEffect(() => {
+    let art = adjustDate(refer);
+    getImage(art.imagem);
+    setArt(art);
+    
+  }, [refer]);
+
   return (
-    <Link to="/" className="art-card">
-      <div className="art-card__thumbnail">
+    <Link to={"/arte/"+art.url} className="art-card">
+      <div className="art-card__thumbnail overflow-hidden">
+        <img className="w-100 h-100" src={thumb} alt="" />
         <div className="art-card__thumbnail--hover">
           <span className="display-6 fw-bold">IR</span>
           <span>100 Visualizações</span>
@@ -101,12 +118,12 @@ const ArtCard = () => {
       </div>
       <div className="art-card__info" style={{height: '30%'}}>
         <div className="d-flex flex-column h-100 overflow-hidden" style={{width: '80%'}}>
-          <h5 className="mb-0 hxd-primary-text text-truncate">Uma arte do caraio</h5>
-          <span className="hxd-secondary-text text-truncate">Arte mt foda parabens aos envolvidos</span>
-          <small className="hxd-secondary-text fw-bold">00/00 às 00:00</small>
+          <h6 className="mb-0 hxd-primary-text text-truncate fw-bold">{art.titulo}</h6>
+          <small className="hxd-secondary-text text-truncate">{art.descricao}</small>
+          <small className="hxd-secondary-text text-end pe-2">{art.data} às {art.hora}</small>
         </div>
         <div style={{flex: '1 0 0'}}>
-          <div className='w-100 h-100 bg-dark' style={{borderRadius: '7px'}}></div>
+          <div className='w-100 h-100 bg-dark rounded'></div>
         </div>
       </div>
     </Link>

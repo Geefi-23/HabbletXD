@@ -57,6 +57,17 @@ const approutes = (props) => {
           />}
         />
       </Route>
+      <Route path="/arte/*" >
+        <Route 
+          path=":key" element={
+          <Forum 
+            isAuth={isAuth} 
+            sendAlert={sendAlert} 
+            showProgress={showProgress} 
+            hideProgress={hideProgress} type='art' 
+          />}
+        />
+      </Route>
     </Routes>
     
   );

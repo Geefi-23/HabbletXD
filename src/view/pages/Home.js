@@ -17,6 +17,7 @@ const Home = (props) => {
   const [allNews, setAllNews] = useState([]);
   const [allSpotlights, setAllSpotlights] = useState([]);
   const [allTimelines, setAllTimelines] = useState([]);
+  const [allArts, setAllArts] = useState([]);
   
   const btnScrollTopRef = useRef(null);
   const timelineWriterRef = useRef(null);
@@ -112,17 +113,13 @@ const Home = (props) => {
       sendAlert('danger', res.error);
   };
 
-  let allArts = [];
-
-  for(let i = 0; i < 6; i++){
-    allArts.push(<ArtCard />)
-  }
-
   const pool = useCallback(async () => {
     let news = await api.news('getall');
     let timelines = await api.timeline('getall');
+    let arts = await api.art('getall');
     setAllNews(news);
     setAllTimelines(timelines);
+    setAllArts(arts);
   }, [setAllNews]);
 
   useInterval(() => {
@@ -198,7 +195,7 @@ const Home = (props) => {
                         slides.push((
                           <div className="glide__slide d-flex flex-column gap-2">
                             {slide.map((news) => (
-                              <NewsCard refer={news} key={y-1} onClick={() => showProgress()} />
+                              <NewsCard refer={news} key={news.id} onClick={() => showProgress()} />
                             ))}
                           </div>
                         ));
@@ -416,7 +413,12 @@ const Home = (props) => {
               </div>
             </div>
             <div className="section__content justify-content-center gap-4">
-              {allArts}
+              {
+                allArts.map((art) => (
+                  <ArtCard refer={art} onClick={() => showProgress()} />
+                ))
+              }
+
             </div>
           </div>
         </div>

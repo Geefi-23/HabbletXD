@@ -55,6 +55,7 @@ const Comment = (props) => {
 const Forum = (props) => {
   const [article, setArticle] = useState({});
   const [comentarios, setComentarios] = useState([]);
+  const [art, setArt] = useState([]); // para artes
   const { key } = useParams();
   const { isAuth, sendAlert, type, hideProgress } = props;
 
@@ -80,14 +81,19 @@ const Forum = (props) => {
     let article = adjustDate(res.object);
     
     setArticle(article);
-    setComentarios(res.comentarios);
+    //setComentarios(res.comentarios);
+    if (type === 'art') {
+      let blob = await api.media('get', article.imagem);
+      setArt(URL.createObjectURL(blob));
+    }
+
     hideProgress();
-  }, [setArticle, setComentarios, key, type, hideProgress]);
+  }, [setArticle, setArt, setComentarios, key, type, hideProgress]);
 
   const handleCommentSender = async (evt) => {
     evt.preventDefault();
 
-    let comentario = evt.target.querySelector('#txtComment')
+    let comentario = evt.target.querySelector('#txtComment input')
     if (/^[ \n]*$/.test(comentario)) {
       return sendAlert('danger', 'Você não digitou nada!');
     }
@@ -95,7 +101,7 @@ const Forum = (props) => {
     let user = JSON.parse(localStorage.getItem('hxd-user-object'));
     let date = new Date();
     let comment = {
-      urlNoticia: key,
+      url: key,
       autor: user.usuario,
       comentario: comentario.value,
       data: date.getTime() / 1000
@@ -135,16 +141,16 @@ const Forum = (props) => {
                     src="https://3.bp.blogspot.com/-XfKkzB4dZak/XEi1zdjRPEI/AAAAAAABKZ4/6DfaPGn0OqA-8E7-uWw6YLV1lL5wnKpmQCKgBGAs/s1600/roupas.png"
                     alt=""
                   />
-                  <strong className="ms-2">{article.categoria_nome}</strong>
+                  <small className="ms-2"><strong>{article.categoria_nome}</strong></small>
                 </div>
-                <strong className="text-special">
+                <small className="text-special">
                   Por <Link 
                     className="text-decoration-none text-special"
                     to={`/perfil/${article.criador}`}>{article.criador}</Link> no dia {article.data} as {article.hora}
-                </strong>
+                </small>
               </div>
               <img 
-                src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).avatar}&action=wav&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
+                src={`https://avatar.blet.in/${article.criador_avatar}&action=wav&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
                 alt=""
                 style={{
                   height: '100%',
@@ -164,8 +170,20 @@ const Forum = (props) => {
               src="http://api.habblet.city/avatar/HabbletAPI&action=sit,wav&direction=4&head_direction=3&img_format=png&gesture=std&headonly=0&size=b&dance=0&frame_num=0&effect="
               alt=""
             />
-            <div className="container-conteudo" 
-            dangerouslySetInnerHTML={{ __html: article.texto}}></div>
+            {
+              type === 'art' ?
+              <div 
+                className="container-conteudo" 
+              >
+                <img src={art} />
+              </div>
+              :
+              <div 
+                className="container-conteudo" 
+                dangerouslySetInnerHTML={{ __html: article.texto}}
+              ></div>
+            }
+            
             {
               isAuth ?
               <div id='busca'>

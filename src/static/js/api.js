@@ -12,6 +12,7 @@ const badgesPath = 'badges/';
 const newsPath = 'news/';
 const timelinePath = 'timeline/';
 const mediaPath = 'media/';
+const artPath = 'arts/';
 const searchPath = 'search.php';
 
 /* BUG: Em modo de desenvolvimento, a rota para buscar imagens ou qualquer outro tipo de mídia
@@ -27,26 +28,37 @@ const api = {
     let res = await (await fetch(URL+userPath+action+'.php', init)).json();
     return res;
   },
+
   getMobis: async () => {
     let res = await (await fetch(URL+mobisPath+'getsome.php')).json();
     return res;
   },
+
   getBadges: async () => {
     let res = await (await fetch(URL+badgesPath+'getsome.php')).json();
     return res;
   },
+
   news: async (action, key = null, init = {}) => {
     let res = await (await fetch(URL+newsPath+action+`.php${key ? '?key='+key : ''}`, init)).json();
     return res;
   },
+
   timeline: async (action, id = null, init = {}) => {
     let res = await (await fetch(URL+timelinePath+action+`.php${id ? '?id='+id : ''}`, init)).json();
     return res;
   },
-  media: async (action, filename = null, init = {}) => {
-    let blob = await (await fetch(URL+mediaPath+action+`.php${filename !== null ? '?filename='+filename : ''}`)).blob();
+
+  media: async (action, filename = null, type= null, init = {}) => {
+    let blob = await (await fetch(URL+mediaPath+action+`.php?${filename !== null ? 'filename='+filename : ''}`)).blob();
     return blob;
   },
+
+  art: async (action, key = null, init = {}) => {
+    let res = await (await fetch(URL+artPath+action+`.php${key ? '?key='+key : ''}`, init)).json();
+    return res;
+  },
+
   search: async (q) => {
     let res = await (await fetch(URL+searchPath+'?q='+q)).json();
     return res;

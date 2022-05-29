@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import { Dropdown } from 'react-bootstrap';
 
+import ArtUploadModal from './ArtUploadModal';
+
 import '@glidejs/glide/dist/css/glide.core.css';
 import slider from '../../static/js/slider';
 
@@ -11,9 +13,14 @@ import '../../static/css/header.css';
 import api from '../../static/js/api';
 
 const Header = (props) => {
+  
+  const { isAuth, setIsAuth, showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing } = props;
 
-  const { isAuth, setIsAuth } = props;
-
+  /**
+   * 
+   * @param {string} rgbString 
+   * @returns An hexadecimal color string
+   */
   const rgbToHex = (rgbString) => {
     let values = rgbString.replaceAll(',', '').split(' ');
 
@@ -32,6 +39,8 @@ const Header = (props) => {
     setIsAuth(res.authenticated);
   }, [setIsAuth]);
 
+  console.log('vai toma no seucu')
+  
   useEffect(() => {
     checkAuthentication();
   }, [checkAuthentication]);
@@ -57,12 +66,17 @@ const Header = (props) => {
           </Dropdown.Menu>
         </Dropdown>
       </> : <>
-        <button className="bg-transparent h-100 border-0">
-          <img src="https://img.icons8.com/ios-filled/24/000000/drawing.png"/>
-        </button>
+        {/* MODAL ART UPLOAD */}
+        <ArtUploadModal 
+          showProgress={showProgress} 
+          hideProgress={hideProgress} 
+          sendAlert={sendAlert} 
+          artModalIsShowing={artModalIsShowing}
+          setArtModalIsShowing={setArtModalIsShowing}
+        />
         <Link to="/meuperfil" className="d-flex align-items-center bg-transparent h-100 border-0">
           <img 
-            src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).avatar}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
+            src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object'))?.avatar}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
             alt=""
             style={{
               height: '100%',

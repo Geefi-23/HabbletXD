@@ -9,7 +9,7 @@ const Alert = (props) => {
     top: 0,
     left: 0,
     zIndex: 1067,
-    pointerEvent: 'none'
+    pointerEvents: 'none'
   };
 
   const alertStyle = {
