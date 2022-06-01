@@ -25,8 +25,11 @@ const NewsCard = (props) => {
   const [thumb, setThumb] = useState(null);
   const { refer, onClick } = props;
 
-  const getImage = async (url) => {
-    let blob = await api.media('get', url, 'image');
+  const getImage = async (filename) => {
+    let blob = await api.media('get', {
+      filename,
+      type: 'image'
+    });
     setThumb(URL.createObjectURL(blob));
   };
   
@@ -43,7 +46,7 @@ const NewsCard = (props) => {
     onClick={onClick}
     >
       <div className="news-card__thumbnail">
-        <img className="w-100 h-100" src={thumb} alt="" />
+        <img className="w-100 h-100" src={thumb} alt=" " />
         <div className="news-card__thumbnail--hover">
           <div className="h4 fw-bold">IR</div>
           <small className="d-block fw-bold">0 Visualizações</small>
@@ -62,15 +65,25 @@ const NewsCard = (props) => {
 
 const TimelineCard = (props) => {
   const [timeline, setTimeline] = useState({texto: ''});
-  const { refer } = props;
+  const { refer, onClick } = props;
 
   useEffect(() => {
     setTimeline(refer);
   }, [refer]);
   return (
-    <Link to={"/timeline/"+timeline.id} className="timeline-card">
+    <Link to={"/timeline/"+timeline.url} className="timeline-card"
+    onClick={onClick}>
       <div className="d-flex flex-row hxd-border-bottom">
-        <div className="timeline-card__avatar"></div>
+        <div className="timeline-card__avatar">
+          <img 
+            src={`https://avatar.blet.in/${timeline.autor}&action=std&size=s&head_direction=3&direction=3&gesture=std&headonly=1`}
+            className="h-100 w-100" 
+            style={{
+              objectFit: 'none',
+              objectPosition: '50% 0'
+            }}
+          />
+        </div>
         <div className="timeline-card__preview">
         {
           timeline.texto.substr(
@@ -93,8 +106,12 @@ const ArtCard = (props) => {
   const [thumb, setThumb] = useState(null);
   const { refer, onClick } = props;
 
-  const getImage = async (url) => {
-    let blob = await api.media('get', url, 'art');
+  const getImage = async (filename) => {
+    
+    let blob = await api.media('get', {
+      filename,
+      type: 'image'
+    });
     setThumb(URL.createObjectURL(blob));
   };
 
@@ -108,7 +125,7 @@ const ArtCard = (props) => {
   return (
     <Link to={"/arte/"+art.url} className="art-card">
       <div className="art-card__thumbnail overflow-hidden">
-        <img className="w-100 h-100" src={thumb} alt="" />
+        <img className="w-100 h-100" style={{objectFit: 'cover'}} src={thumb} alt="" />
         <div className="art-card__thumbnail--hover">
           <span className="display-6 fw-bold">IR</span>
           <span>100 Visualizações</span>
@@ -142,9 +159,75 @@ const SpotlightCard = () => {
   );
 };
 
+const ResultCard = (props) => {
+  const [result, setResult] = useState(null);
+  let { refer, type } = props;
+
+
+  useEffect(() => {
+    let result = refer;
+    if (type !== 'Perfil') {
+      result = adjustDate(result);
+    }
+
+    setResult(result);
+    
+  }, [refer]);
+  return (
+    <>
+    {
+      type !== 'Perfil' ?
+      <Link to={`/${type.toLowerCase()}/${result?.usuario}`} className="container-geral">
+          <div className="container-nome-perfill">
+            <span style={{color: '#fff', fontSize: '15px'}}>{type}</span>
+          </div>
+          <div className="container-foto">
+            <img src="https://img.freepik.com/vetores-gratis/sol-quente-em-um-fundo-amarelo-reflexo-da-luz-solar-estrela-branca-brilhante-com-destaques-bonitos-em-um-fundo-laranja_86826-653.jpg" alt=" "/>
+          </div>
+          <div className="container-conteudo">
+            <strong>{result?.autor || result?.criador}</strong>
+            <div className="container-infos">
+              <small>
+                <strong role="heading" aria-level="5">{result?.titulo}</strong>
+              </small>
+              <small>
+                {result?.resumo || result?.descricao}
+              </small>
+            </div>
+            <div class="container-postagem">
+              <span>Postada dia {result?.data} as {result?.hora} </span>
+            </div>
+          </div>
+      </Link>
+      :
+      <Link to={`/perfil/${result?.usuario}`} className="container-geral">
+        <div className="container-nome-perfill">
+          <span style={{color: '#fff', fontSize: '15px'}}>{type}</span>
+        </div>
+        <div className="container-foto">
+          <img src="https://img.freepik.com/vetores-gratis/sol-quente-em-um-fundo-amarelo-reflexo-da-luz-solar-estrela-branca-brilhante-com-destaques-bonitos-em-um-fundo-laranja_86826-653.jpg" alt=" "/>
+          <div className="container-boneco">
+            <img src={`https://avatar.blet.in/Geefi&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`} alt=" "/>
+          </div>
+        </div>
+        <div className="container-conteudo">
+          <strong>{result?.usuario}</strong>
+          <div className="container-infos">
+            <small>
+              {result?.missao}
+            </small>
+          </div>
+        </div>
+      </Link>
+    } 
+    </>
+  );
+};
+
 export {
   NewsCard,
   TimelineCard,
   ArtCard,
-  SpotlightCard
+  SpotlightCard,
+  ResultCard
 }

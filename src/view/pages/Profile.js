@@ -10,6 +10,7 @@ import Glide from '@glidejs/glide';
 const Profile = ({ type, isAuth }) => {
   const [profile, setProfile] = useState({});
   const [badges, setBadges] = useState([]);
+  const [timelines, setTimelines] = useState([]);
   let { name } = useParams();
 
   const getProfile = useCallback(async (nome) => {
@@ -70,7 +71,7 @@ const Profile = ({ type, isAuth }) => {
                   <div className="hxd-bg-color d-flex align-items-center justify-content-center fw-bold text-white"
                     style={{height: '35px'}}
                   >
-                    {profile.usuario}
+                    {profile?.info.usuario}
                   </div>
                   <div style={{flex: '1 0 0'}}></div>
                 </div>
@@ -124,58 +125,23 @@ const Profile = ({ type, isAuth }) => {
                 <div>
                   <div className="fw-bold hxd-primary-text" role="heading" aria-level={3}>Ultimas timelines</div>
                   <div className="d-flex flex-wrap gap-2">
-                    <Link to="/" className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '60px'}}>
-                      <div className="hxd-border-bottom p-1 overflow-hidden" 
-                      style={{
-                        wordBreak: 'break-word', display: '-webkit-box', WebkitBoxOrient: 'vertical', 
-                        lineHeight: '.7', WebkitLineClamp: 2, textOverflow: 'ellipsis'
-                      }}>
-                        oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-                      </div>
-                      <div className="d-flex justify-content-between p-1">
-                        <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
-                        <span>100</span>
-                      </div>
-                    </Link>
-                    <Link to="/" className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '60px'}}>
-                      <div className="hxd-border-bottom p-1 overflow-hidden" 
-                      style={{
-                        wordBreak: 'break-word', display: '-webkit-box', WebkitBoxOrient: 'vertical', 
-                        lineHeight: '.7', WebkitLineClamp: 2, textOverflow: 'ellipsis'
-                      }}>
-                        oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-                      </div>
-                      <div className="d-flex justify-content-between p-1">
-                        <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
-                        <span>100</span>
-                      </div>
-                    </Link>
-                    <Link to="/" className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '60px'}}>
-                      <div className="hxd-border-bottom p-1 overflow-hidden" 
-                      style={{
-                        wordBreak: 'break-word', display: '-webkit-box', WebkitBoxOrient: 'vertical', 
-                        lineHeight: '.7', WebkitLineClamp: 2, textOverflow: 'ellipsis'
-                      }}>
-                        oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-                      </div>
-                      <div className="d-flex justify-content-between p-1">
-                        <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
-                        <span>100</span>
-                      </div>
-                    </Link>
-                    <Link to="/" className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '60px'}}>
-                      <div className="hxd-border-bottom p-1 overflow-hidden" 
-                      style={{
-                        wordBreak: 'break-word', display: '-webkit-box', WebkitBoxOrient: 'vertical', 
-                        lineHeight: '.7', WebkitLineClamp: 2, textOverflow: 'ellipsis'
-                      }}>
-                        oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-                      </div>
-                      <div className="d-flex justify-content-between p-1">
-                        <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
-                        <span>100</span>
-                      </div>
-                    </Link>
+                    {
+                      profile.timelines?.map((timeline) => (
+                        <Link to={`/timeline/${timeline.url}`} className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '60px'}}>
+                          <div className="hxd-border-bottom p-1 overflow-hidden" 
+                          style={{
+                            wordBreak: 'break-word', display: '-webkit-box', WebkitBoxOrient: 'vertical', 
+                            lineHeight: '.7', WebkitLineClamp: 2, textOverflow: 'ellipsis'
+                          }}>
+                            {timeline.texto.substring(0, 30)}
+                          </div>
+                          <div className="d-flex justify-content-between p-1">
+                            <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
+                            <span>100</span>
+                          </div>
+                        </Link>
+                      ))
+                    }
                   </div>
                 </div>
                 <div className="d-flex flex-column" style={{flex: '1 0 0'}}>
@@ -210,7 +176,7 @@ const Profile = ({ type, isAuth }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    {profile.missao}
+                    {profile?.info.missao}
                   </small>
                 </div>
                 <div className="hxd-border rounded">
@@ -218,7 +184,7 @@ const Profile = ({ type, isAuth }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    {profile.twitter}
+                    {profile?.info.twitter}
                   </small>
                 </div>
                 <div className="hxd-border rounded">

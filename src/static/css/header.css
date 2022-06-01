@@ -123,7 +123,7 @@ ul.horizontal-navbar-menu{
 
 .navbar-menu__item.active{
   border: 3px solid transparent;
-  border-top-color: rgb(var(--hxd-theme-color));
+  border-bottom-color: rgb(var(--hxd-theme-color));
 }
 
 .navbar-menu__item.active *{

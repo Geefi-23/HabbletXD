@@ -166,9 +166,10 @@ const App = () => {
   const [isAuth, setIsAuth] = useState(null);
   const [isModalShowing, setIsModalShowing] = useState(false);
   const [artModalIsShowing, setArtModalIsShowing] = useState(false);
-  const [isProgressShowing, setIsProgressShowing] = useState(false);
-  const [alert, setAlert] = useState({type: 'success', content: '', visible: false});
+  const [isProgressShowing, setIsProgressShowing] = useState(true);
+  //const [alert, setAlert] = useState({type: 'success', content: '', visible: false});
   const alertRef = useRef(null);
+  const containerRef = useRef(null);
 
   const handleModalShow = () => setIsModalShowing(true);
   const handleModalHide = () => setIsModalShowing(false);
@@ -176,18 +177,40 @@ const App = () => {
   const handleProgressShow = () => setIsProgressShowing(true);
   const handleProgressHide = () => setIsProgressShowing(false);
   
-  const sendAlert = useCallback((type, content) => {
-    setAlert({type, content, visible: true});
+  /**
+   * @author Milton R. (Geefi)
+   * @param {string} type Estilo do alerta. O estilo é definido usando classes do bootstrap, por exemplo: para .alert-success, basta especificar 'success'
+   * @param {string} content Conteúdo do alerta
+   * 
+   * @description Mostra um alerta na tela
+   * 
+   * Como estamos no react deveriamos usar os states, porém foi visualizado um bug que resetava os inputs dos formulários (como o de autenticação,
+   * por exemplo) quando o alerta sumia da tela, isto porque o componente era atualizado completamente. 
+   * Para evitar esse inconveniente, foi optado por fazer um algorítimo mais 'padrão', usando apenas o useRef do React.
+   */
+  const sendAlert = (type, content) => {
+    containerRef.current.classList.remove('d-none');
+    alertRef.current.classList.add('alert-'+type);
+    alertRef.current.innerText = content;
+
     setTimeout(() => {
-      setAlert({visible: false});
-    }, 5000);
-  }, [setAlert]);
+      alertRef.current.classList.add('opacity-0');
+
+      setTimeout(() => {
+        containerRef.current.classList.add('d-none');
+        alertRef.current.classList.remove('alert-'+type, 'opacity-0');
+        alertRef.current.innerText = '';
+      }, 1000);
+
+    }, 5000)
+  };
   
   return (
     <Router>
       <div style={{
         backgroundColor: 'white',
-        position: 'sticky',
+        position: 'fixed',
+        width: '100vw',
         top: 0,
         zIndex: 1061
       }}>
@@ -196,11 +219,11 @@ const App = () => {
         }} />
       </div>
       
-      <Alert type={alert.type} content={alert.content} visible={alert.visible} />
+      <Alert alertRef={alertRef} containerRef={containerRef} />
       <Modal show={isModalShowing} backdrop={true}>
         <AuthModal
           setIsAuth={setIsAuth} sendAlert={sendAlert} hideModal={handleModalHide}
-          alertRef={alertRef} showProgress={handleProgressShow} 
+          showProgress={handleProgressShow} 
           hideProgress={handleProgressHide}
         />
       </Modal>

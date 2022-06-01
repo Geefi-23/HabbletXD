@@ -1,7 +1,8 @@
 const Alert = (props) => {
-  let { type, content, visible } = props;
+  let { containerRef, alertRef } = props;
 
   const containerStyle = {
+    display: 'flex',
     position: 'fixed',
     width: '100%',
     height: '100px',
@@ -13,13 +14,12 @@ const Alert = (props) => {
   };
 
   const alertStyle = {
-    height: '60px'
+    height: '60px',
+    transition: 'opacity ease-out .5s'
   };
   return (
-    <div className={`${visible ? 'd-flex' : 'd-none'} justify-content-center`} style={containerStyle}>
-      <div className={`alert alert-${type} position-absolute`} style={alertStyle}>
-        {content}
-      </div>
+    <div className={`d-none justify-content-center`} style={containerStyle} ref={containerRef}>
+      <div className={`alert position-absolute`} style={alertStyle} ref={alertRef}></div>
     </div>
   );
 };

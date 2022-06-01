@@ -85,6 +85,26 @@ button.arrow-right::after{
   padding-right: 132px !important;
 }
 
+.timeline-container{
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto;
+  row-gap: 1rem;
+  overflow-y: scroll;
+  max-height: 332px;
+}
+
+.timeline-container::-webkit-scrollbar{
+  background-color: rgb(var(--hxd-theme-color));
+  width: 6px;
+  border-radius: .25rem;
+}
+
+.timeline-container::-webkit-scrollbar-thumb{
+  background-color: rgb(var(--hxd-theme-colorLight));
+  border-radius: .25rem
+}
+
 @media screen and (max-width: 1280px){
   .container{
     padding-left: 2rem !important;

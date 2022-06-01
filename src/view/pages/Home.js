@@ -14,14 +14,13 @@ const Home = (props) => {
   const { showProgress, hideProgress, sendAlert } = props;
   
   const [badges, setBadges] = useState([]);
-  const [allNews, setAllNews] = useState([]);
+  const [allNews, setAllNews] = useState(null);
   const [allSpotlights, setAllSpotlights] = useState([]);
   const [allTimelines, setAllTimelines] = useState([]);
   const [allArts, setAllArts] = useState([]);
   
   const btnScrollTopRef = useRef(null);
   const timelineWriterRef = useRef(null);
-
   const handleScrollTopBtn = () => {
     try {
       if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
@@ -35,12 +34,16 @@ const Home = (props) => {
   };
 
   /**
+   * @author Milton R. (Geefi)
+   * 
+   * @param {string} glideElement O elemento glide (retornado de new Glide()) para qual as arrows estão sendo configuradas
+   * @param {string} prevSelector selector da arrow para a esquerda
+   * @param {string} nextSelector selector da arrow para a direita
+   * 
+   * @description Configura arrows especiais de fora do elemento slider
+   * 
    * O Glide.js não permite, por padrão, que as arrows de navegação dos sliders estejam fora
    * do elemento Glide. Esta função serve para configurar arrows externas.
-   * 
-   * @argument glideElement slider para qual as arrows estão sendo configuradas
-   * @argument prevSelector seletor da arrow para a esquerda
-   * @argument nextSelector seletor da arrow para a direita
    */
   const slidersArrowsSetListener = (glideElement, prevSelector, nextSelector) => {
     document.querySelector(prevSelector).addEventListener('click', () => {
@@ -50,8 +53,6 @@ const Home = (props) => {
     document.querySelector(nextSelector).addEventListener('click', () => {
       glideElement.go('>');
     });
-
-    
   };
 
   /**
@@ -90,17 +91,22 @@ const Home = (props) => {
   }, []);
 
   /**
-   * Função que controla o envio de novas timelines ao servidor
+   * @author Milton R. (Geefi)
+   * 
+   * @description Controlador de posts na timeline
    */
-  const timelinePost = async () => {
-    let texto = timelineWriterRef.current.textContent;
+  const handleTimelinePost = async (evt) => {
+    evt.preventDefault();
 
-    showProgress();
-
+    let form = document.forms['timeline_sender'];
     let data = {
-      texto
+      texto: form.querySelector('div[contenteditable]').textContent
     };
 
+    if (data.texto === '')
+      return sendAlert('danger', 'Você não escreveu nada!')
+
+    showProgress();
     let res = await api.timeline('save', null, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -120,7 +126,9 @@ const Home = (props) => {
     setAllNews(news);
     setAllTimelines(timelines);
     setAllArts(arts);
-  }, [setAllNews]);
+
+    configureSliders();
+  }, [setAllNews, setAllTimelines, setAllArts]);
 
   useInterval(() => {
     pool();
@@ -164,16 +172,19 @@ const Home = (props) => {
               </div>
             </div>
             <div className="section__content">
-              <div id="news-slider" className='glide'>
+              <div id="news-slider" className='glide' style={{pointerEvents: allNews?.length === 0 ? 'none' : 'auto'}}>
                 <div className="glide__track" data-glide-el="track">
                   <div className="glide__slides pt-3" style={{height: '300px'}}>
                   {
-                    allNews.length === 0 ?
+                    !allNews ?
                     <>
                       <div className='news-card skeleton'></div>
                       <div className='news-card skeleton'></div>
                       <div className='news-card skeleton'></div>
                     </>
+                    :
+                    allNews?.length === 0 ?
+                    <h5 className="w-100 text-center hxd-primary-text">Não há notícias para ler.</h5>
                     :
                     (() => {
                       let slides = [];
@@ -248,25 +259,34 @@ const Home = (props) => {
             </div>
             <div className="section__content">
               <div className="d-flex flex-row w-100">
-                <div className='d-flex flex-column px-2' style={{width: '70%'}}>
-                  <div className='d-flex flex-row flex-wrap align-items-start justify-content-center gap-3 w-100'>
+                <div className='d-flex flex-column pe-2' style={{width: '70%'}}>
+                  <div className='timeline-container'
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'auto auto auto',
+                    gridTemplateRows: 'auto auto auto',
+                    rowGap: '1rem',
+                    overflowY: 'scroll',
+                    maxHeight: '332px'
+                  }}>
                     {
                       allTimelines.map((timeline, i) => (
-                        <TimelineCard refer={timeline} key={i} />
+                        <TimelineCard refer={timeline} key={timeline.id} onClick={() => showProgress()} />
                       ))
                     }
                   </div>
-                  <div className='w-100 px-2 mt-2' style={{flex: '1 0 0'}}>
+                  <div className='w-100 pe-2 mt-2' style={{flex: '1 0 0'}}>
                     <div className="w-100 rounded overflow-hidden">
                       <div className="d-flex align-items-center ps-3 h-25 hxd-bg-color">
                         <h4 className="text-white">Postar timeline</h4>
                       </div>
-                      <div className="d-flex flex-column h-75 hxd-bg-color-gray">
+                      <form className="d-flex flex-column h-75 hxd-bg-color-gray" onSubmit={handleTimelinePost}
+                      name="timeline_sender">
                         <div className="w-100 p-1" style={{flex: '1 0 0%'}}>
                           <div className="d-flex flex-column h-100 w-100 rounded overflow-hidden">
                             <div className="bg-secondary" style={{height: '30px'}}></div>
-                            <div className="w-100 p-1 bg-white" style={{flex: '1 0 0%'}} contentEditable
-                            ref={timelineWriterRef}></div>
+                            <div className="w-100 p-1 bg-white" style={{minHeight: '80px', flex: '1 0 0%'}} contentEditable
+                            name="texto"></div>
                           </div>
                         </div>
                         <div className="d-flex justify-content-between p-2">
@@ -274,12 +294,12 @@ const Home = (props) => {
                             <span className="fw-bold">Nenhuma hashtag</span>
                             <button className="h-100 border-0 text-white fw-bold hxd-bg-color rounded">+</button>
                           </div>
-                          <button className="h-100 border-0 text-white fw-bold hxd-bg-color px-4 rounded"
-                          onClick={() => {
-                            timelinePost();
-                          }}>Postar</button>
+                          <button 
+                            className="h-100 border-0 text-white fw-bold hxd-bg-color px-4 rounded"
+                            type="submit"
+                          >Postar</button>
                         </div>
-                      </div>
+                      </form>
                     </div>
                   </div>
                 </div>

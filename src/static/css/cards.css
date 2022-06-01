@@ -137,25 +137,26 @@
   border-radius: .3rem;
   padding: 4px;
   text-decoration: none;
+  transition: transform ease-in-out .15s;
 }
 
 .timeline-card:hover{
   color: black;
-  font-weight: bold;
+  transform: scale(.95)
 }
 
 .timeline-card__avatar{
   background-color: rgb(var(--hxd-theme-colorLight));
-  height: 70px;
-  width: 70px;
+  height: 40px;
+  width: 40px;
   border-radius: .3rem;
 }
 
 .timeline-card__preview{
   display: -webkit-box;
-  height: 50px;
+  height: 70px;
   flex: 1 0 0%;
-  padding: 0 2px 0 2px;
+  padding: 0 .25rem;
   word-wrap: break-word;
   line-height: 1;
   overflow: hidden;

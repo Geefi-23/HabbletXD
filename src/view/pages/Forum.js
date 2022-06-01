@@ -6,10 +6,10 @@ import '../../static/css/forum.css';
 
 const Comment = (props) => {
   const [comment, setComment] = useState({});
-  const { refer } = props;
+  const { refer, type, sendAlert, showProgress, hideProgress, onDelete } = props;
 
   const adjustDate = (el) => {
-    let date = new Date(parseInt(el.data)*1000)
+    let date = new Date(parseInt(el.data)*1000);
     let day = date.getUTCDate();
     day = day < 10 ? '0'+day : day;
     let month = date.getUTCMonth() + 1;
@@ -23,6 +23,27 @@ const Comment = (props) => {
     el.hora = `${hour}:${minutes}`;
 
     return el;
+  };
+
+  const handleDelete = async () => {
+    let init = {
+      method: 'POST',
+      body: JSON.stringify({
+        id: refer.id
+      }),
+      credentials: 'include'
+    };
+
+    showProgress();
+    let res = await api[type]('deletecomment', null, init);
+
+    if (res.error) {
+      sendAlert('danger', res.error);
+    } else if (res.success) {
+      sendAlert('success', res.success);
+      onDelete();
+    }
+    hideProgress();
   };
 
   useEffect(() => {
@@ -40,8 +61,18 @@ const Comment = (props) => {
       <div className="d-flex flex-column" style={{flex: '1 0 0'}}>
         <div className="comentario-info">
           <h1>Por {comment.autor} no dia {comment.data} as {comment.hora}</h1>
+          {
+            comment.autor === JSON.parse(localStorage.getItem('hxd-user-object')).usuario ?
+            <button className="bg-transparent border-0" onClick={handleDelete}>
+              <img src="https://img.icons8.com/material-rounded/16/ffffff/trash--v1.png"/>
+            </button>
+            :
+            <button className="bg-transparent border-0">
+              <img src="https://img.icons8.com/material-rounded/16/ffffff/error--v1.png"/>
+            </button>
+          }
         </div>
-        <div className="balao">
+        <div className="balao rounded-bottom">
           {comment.comentario}
         </div>
         <div className="icone-img">
@@ -53,11 +84,12 @@ const Comment = (props) => {
 };
 
 const Forum = (props) => {
-  const [article, setArticle] = useState({});
+  const [article, setArticle] = useState(null);
   const [comentarios, setComentarios] = useState([]);
+  const [scrollToTop, setScrollToTop] = useState(true);
   const [art, setArt] = useState([]); // para artes
   const { key } = useParams();
-  const { isAuth, sendAlert, type, hideProgress } = props;
+  const { isAuth, sendAlert, type, showProgress, hideProgress } = props;
 
   const adjustDate = (el) => {
     let date = new Date(parseInt(el.data)*1000)
@@ -77,18 +109,19 @@ const Forum = (props) => {
   };
 
   const get = useCallback(async () => {
-    let res = await api[type]('get', key);
+    //showProgress();
+    let res = await api[type]('get', {key});
     let article = adjustDate(res.object);
     
     setArticle(article);
-    //setComentarios(res.comentarios);
+    setComentarios(res.comentarios);
     if (type === 'art') {
       let blob = await api.media('get', article.imagem);
       setArt(URL.createObjectURL(blob));
     }
 
     hideProgress();
-  }, [setArticle, setArt, setComentarios, key, type, hideProgress]);
+  }, [setArticle, setArt, setComentarios, showProgress, key, type, hideProgress]);
 
   const handleCommentSender = async (evt) => {
     evt.preventDefault();
@@ -98,11 +131,12 @@ const Forum = (props) => {
       return sendAlert('danger', 'Você não digitou nada!');
     }
 
-    let user = JSON.parse(localStorage.getItem('hxd-user-object'));
+    showProgress();
+    evt.target.querySelector('button[type="submit"]').disabled = true;
+
     let date = new Date();
     let comment = {
       url: key,
-      autor: user.usuario,
       comentario: comentario.value,
       data: date.getTime() / 1000
     };
@@ -113,26 +147,35 @@ const Forum = (props) => {
     };
     let res = await api[type]('sendcomment', null, init);
     if (res.error) {
-      sendAlert('danger', res.error)
+      sendAlert('danger', res.error);
+      hideProgress();
     } else {
-      sendAlert('success', res.success)
+      sendAlert('success', res.success);
       setComentarios([...comentarios, adjustDate(comment)]);
-      
+      hideProgress();
     }
+    evt.target.querySelector('button[type="submit"]').disabled = false;
   };
 
   useEffect(() => { 
     get();
-    window.scrollTo(0, 0);
+    if (scrollToTop) {
+      window.scrollTo(0, 0);
+      setScrollToTop(false);
+    }
+    
   }, [get]);
   return (
     <>
       <section className="w-100 forum">
         <div className="container">
           <div className="forum-header">
+          {
+            article !== null ?
+            <>
             <div className="info ms-3">
-              <div className="m-0 text-nowrap text-truncate h6" role="heading" aria-level="2">{article.titulo}</div>
-              <small className="text-nowrap text-truncate">{article.resumo}</small>
+              <div className="m-0 text-nowrap text-truncate h6" role="heading" aria-level="2">{article?.titulo}</div>
+              <small className="text-nowrap text-truncate">{article?.resumo}</small>
             </div>
             <div className="d-flex flex-row h-100 gap-2">
               <div className='text-center'>
@@ -146,11 +189,11 @@ const Forum = (props) => {
                 <small className="text-special">
                   Por <Link 
                     className="text-decoration-none text-special"
-                    to={`/perfil/${article.criador}`}>{article.criador}</Link> no dia {article.data} as {article.hora}
+                    to={`/perfil/${article.criador}`}>{article.criador || article.autor}</Link> no dia {article.data} as {article.hora}
                 </small>
               </div>
               <img 
-                src={`https://avatar.blet.in/${article.criador_avatar}&action=wav&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
+                src={`https://avatar.blet.in/${article.criador || article.autor}&action=wav&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
                 alt=""
                 style={{
                   height: '100%',
@@ -164,6 +207,10 @@ const Forum = (props) => {
                 <button className="rate-btn btn-danger"></button>
               </div>
             </div>
+            </>
+            :
+            <></>
+          }
           </div>
           <div className="container-objetos">
             <img
@@ -180,7 +227,7 @@ const Forum = (props) => {
               :
               <div 
                 className="container-conteudo" 
-                dangerouslySetInnerHTML={{ __html: article.texto}}
+                dangerouslySetInnerHTML={{ __html: article?.texto}}
               ></div>
             }
             
@@ -191,7 +238,7 @@ const Forum = (props) => {
                   onSubmit={handleCommentSender}
                 >
                   <img 
-                    src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).avatar}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
+                    src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).usuario}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
                     alt=""
                     style={{
                       height: '40px',
@@ -203,7 +250,7 @@ const Forum = (props) => {
                   <div id="txtComment">
                     <input name="q" type="text" placeholder="Digite o seu comentário" autoComplete='off' />
                   </div>
-                  <input id="btnComment" type="submit" value="Comentar" />
+                  <button id="btnComment" type="submit">Comentar</button>
                 </form>
               </div>
               :
@@ -211,12 +258,22 @@ const Forum = (props) => {
             }
             <div className="d-flex flex-column gap-4">
               {
-                comentarios.length === 0 ?
+                comentarios?.length === 0 ?
                   !isAuth ?
                   '' : <h3 className="text-center">Faça o primeiro comentário neste artigo!</h3>
                 :
                 comentarios.map((comentario) => (
-                  <Comment refer={comentario} />
+                  <Comment 
+                    refer={comentario} 
+                    type={type} 
+                    sendAlert={sendAlert} 
+                    showProgress={showProgress} 
+                    hideProgress={hideProgress} 
+                    onDelete={() => {
+                      let clist = comentarios.filter(c => c.id !== comentario.id);
+                      setComentarios(clist);
+                    }}
+                  />
                 ))
               }
             </div>

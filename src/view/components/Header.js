@@ -38,8 +38,6 @@ const Header = (props) => {
     let res = await api.user('authenticate', {credentials: 'include'});
     setIsAuth(res.authenticated);
   }, [setIsAuth]);
-
-  console.log('vai toma no seucu')
   
   useEffect(() => {
     checkAuthentication();
@@ -76,7 +74,7 @@ const Header = (props) => {
         />
         <Link to="/meuperfil" className="d-flex align-items-center bg-transparent h-100 border-0">
           <img 
-            src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object'))?.avatar}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
+            src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object'))?.info.usuario}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
             alt=""
             style={{
               height: '100%',
@@ -339,10 +337,10 @@ const Header = (props) => {
         <div className="row gx-0">
           <div className="col p-1">
             <div className="top-card d-flex flex-row hxd-bg-color h-100 w-100 p-1 rounded">
-              <div className="w-25 bg-dark"></div>
+              <div className="w-25 bg-dark rounded"></div>
               <div className="w-75 text-white px-1">
-                <span className='fw-bold'>Último evento</span>
-                <h6 className="mb-0">Evento de inauguração</h6>
+                <div className=''>Último evento</div>
+                <span className="mb-0">Evento de inauguração</span>
                 <small className="d-block text-truncate">Hoje inauguramos bla bla blaaaaaaaaa</small>
                 <small className="d-block text-end fw-bold">00/00 às 00:00</small>
               </div>
@@ -350,10 +348,10 @@ const Header = (props) => {
           </div>
           <div className="col p-1">
             <div className="top-card d-flex flex-row h-100 w-100 p-1 rounded" style={{backgroundColor: 'white'}}>
-            <div className="w-25 bg-dark"></div>
+            <div className="w-25 bg-dark rounded"></div>
               <div className="w-75 px-1">
-                <span className='fw-bold hxd-secondary-text'>Notícia destaque</span>
-                <h6 className="mb-0 hxd-primary-text">Agora fudeu!</h6>
+                <div className='hxd-secondary-text'>Notícia destaque</div>
+                <span className="mb-0 hxd-primary-text">Agora fudeu!</span>
                 <small className="d-block hxd-secondary-text text-truncate">O bagulho fico lokooooooo</small>
                 <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
               </div>

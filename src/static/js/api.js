@@ -39,23 +39,60 @@ const api = {
     return res;
   },
 
-  news: async (action, key = null, init = {}) => {
-    let res = await (await fetch(URL+newsPath+action+`.php${key ? '?key='+key : ''}`, init)).json();
+  news: async (action, getparams = {}, init = {}) => {
+    let url = URL+newsPath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(getparams).length !== 0) {
+      for (let param in getparams) {
+        url += `${param}=${getparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
     return res;
   },
 
-  timeline: async (action, id = null, init = {}) => {
-    let res = await (await fetch(URL+timelinePath+action+`.php${id ? '?id='+id : ''}`, init)).json();
+  timeline: async (action, getparams = {}, init = {}) => {
+
+    let url = URL+timelinePath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(getparams).length !== 0) {
+      for (let param in getparams) {
+        url += `${param}=${getparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
     return res;
   },
 
-  media: async (action, filename = null, type= null, init = {}) => {
-    let blob = await (await fetch(URL+mediaPath+action+`.php?${filename !== null ? 'filename='+filename : ''}`)).blob();
+  media: async (action, getparams = {}, init = {}) => {
+    let url = URL+mediaPath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(getparams).length !== 0) {
+      for (let param in getparams) {
+        url += `${param}=${getparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let blob = await (await fetch(url, init)).blob();
     return blob;
   },
 
-  art: async (action, key = null, init = {}) => {
-    let res = await (await fetch(URL+artPath+action+`.php${key ? '?key='+key : ''}`, init)).json();
+  art: async (action, getparams = {}, init = {}) => {
+    let url = URL+artPath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(getparams).length !== 0) {
+      for (let param in getparams) {
+        url += `${param}=${getparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
     return res;
   },
 
