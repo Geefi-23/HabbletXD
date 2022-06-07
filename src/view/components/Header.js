@@ -72,7 +72,7 @@ const Header = (props) => {
           artModalIsShowing={artModalIsShowing}
           setArtModalIsShowing={setArtModalIsShowing}
         />
-        <Link to="/meuperfil" className="d-flex align-items-center bg-transparent h-100 border-0">
+        <Link to="/meuperfil" onClick={() => showProgress()} className="d-flex align-items-center bg-transparent h-100 border-0">
           <img 
             src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object'))?.info.usuario}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
             alt=""
@@ -260,7 +260,7 @@ const Header = (props) => {
                 alt=""
               />
             </button>
-            <input className="volume-handler" defaultValue={1} onChange={evt => handleStreamVolume(evt.target.value)} type="range" min="0" max="1" step=".1" />
+            <input className="volume-handler" defaultValue={1} onChange={evt => handleStreamVolume(evt.target.value)} type="range" min="0" max="1" step=".01" />
             <button className="bg-transparent border-0">
               <img 
                 src={

@@ -170,12 +170,17 @@ const App = () => {
   //const [alert, setAlert] = useState({type: 'success', content: '', visible: false});
   const alertRef = useRef(null);
   const containerRef = useRef(null);
+  const progressRef = useRef(null);
 
   const handleModalShow = () => setIsModalShowing(true);
   const handleModalHide = () => setIsModalShowing(false);
 
-  const handleProgressShow = () => setIsProgressShowing(true);
-  const handleProgressHide = () => setIsProgressShowing(false);
+  const handleProgressShow = () => {
+    progressRef.current.classList.remove('invisible');
+  };
+  const handleProgressHide = () => {
+    progressRef.current.classList.add('invisible');
+  };
   
   /**
    * @author Milton R. (Geefi)
@@ -204,20 +209,24 @@ const App = () => {
 
     }, 5000)
   };
-  
-  return (
-    <Router>
-      <div style={{
+
+  const Progress = ({ refe }) => {
+    return (
+      <div ref={refe} className="invisible" style={{
         backgroundColor: 'white',
         position: 'fixed',
         width: '100vw',
         top: 0,
         zIndex: 1061
       }}>
-        <LinearProgress sx={{
-          visibility: isProgressShowing ? 'visible' : 'hidden'
-        }} />
+        <LinearProgress />
       </div>
+    );
+  };
+  
+  return (
+    <Router>
+      <Progress refe={progressRef} />
       
       <Alert alertRef={alertRef} containerRef={containerRef} />
       <Modal show={isModalShowing} backdrop={true}>

@@ -196,7 +196,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                 </div>
                 <div className="d-flex flex-column" style={{flex: '1 0 0'}}>
                   <div className="fw-bold hxd-primary-text" role="heading" aria-level={3}>Ultimas artes</div>
-                  <div className="d-flex gap-2" style={{flex: '1 0 0'}}>
+                  <div className="d-flex flex-wrap gap-2" style={{flex: '1 0 0'}}>
                     {
                       arts.length === 0 ?
                       <h6 className="mt-2">Este usuário não publicou nenhuma arte.</h6>

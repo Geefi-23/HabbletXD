@@ -35,7 +35,7 @@ const Comment = (props) => {
     };
 
     showProgress();
-    let res = await api[type]('deletecomment', null, init);
+    let res = await api[type]('deletecomment', {}, init);
 
     if (res.error) {
       sendAlert('danger', res.error);
@@ -62,7 +62,7 @@ const Comment = (props) => {
         <div className="comentario-info">
           <h1>Por {comment.autor} no dia {comment.data} as {comment.hora}</h1>
           {
-            comment.autor === JSON.parse(localStorage.getItem('hxd-user-object')).usuario ?
+            comment.autor === JSON.parse(localStorage.getItem('hxd-user-object'))?.info?.usuario ?
             <button className="bg-transparent border-0" onClick={handleDelete}>
               <img src="https://img.icons8.com/material-rounded/16/ffffff/trash--v1.png"/>
             </button>
@@ -147,7 +147,7 @@ const Forum = (props) => {
       body: JSON.stringify(comment),
       credentials: 'include'
     };
-    let res = await api[type]('sendcomment', null, init);
+    let res = await api[type]('sendcomment', {}, init);
     if (res.error) {
       sendAlert('danger', res.error);
       hideProgress();

@@ -131,7 +131,7 @@ const ArtCard = (props) => {
   }, [refer]);
 
   return (
-    <Link to={"/arte/"+art.url} className="art-card">
+    <Link to={"/arte/"+art.url} className="art-card" onClick={onClick}>
       <div className="art-card__thumbnail overflow-hidden">
         <img className="w-100 h-100" style={{objectFit: 'cover'}} src={thumb} alt="" />
         <div className="art-card__thumbnail--hover">

@@ -105,6 +105,7 @@ const Home = (props) => {
    */
   const handleTimelinePost = async (evt) => {
     evt.preventDefault();
+    const submit = evt.target.querySelector('button[type="submit"]');
 
     let form = document.forms['timeline_sender'];
     let data = {
@@ -115,11 +116,13 @@ const Home = (props) => {
       return sendAlert('danger', 'Você não escreveu nada!')
 
     showProgress();
-    let res = await api.timeline('save', null, {
+    submit.disabled = true;
+    let res = await api.timeline('save', {}, {
       method: 'POST',
       body: JSON.stringify(data),
       credentials: 'include'
     });
+    submit.disabled = false;
     hideProgress();
     if (res.sucess)
       sendAlert('success', res.success);
