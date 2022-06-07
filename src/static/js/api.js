@@ -3,7 +3,7 @@
  * @description Módulo que controla a requisição de dados ao servidor da aplicação
  */
 
-const URL = 'http://localhost:8000/api/';
+const URL = '/api/';
 
 // Cada váriavel representa uma rota de dados
 const userPath = 'user/';
@@ -39,12 +39,12 @@ const api = {
     return res;
   },
 
-  news: async (action, getparams = {}, init = {}) => {
-    let url = URL+newsPath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+  news: async (action, queryparams = {}, init = {}) => {
+    let url = URL+newsPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
-    if (Object.entries(getparams).length !== 0) {
-      for (let param in getparams) {
-        url += `${param}=${getparams[param]}&`;
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
       }
       url = url.substring(0, url.length - 1);
     }
@@ -53,27 +53,27 @@ const api = {
     return res;
   },
 
-  timeline: async (action, getparams = {}, init = {}) => {
+  timeline: async (action, queryparams = {}, init = {}) => {
 
-    let url = URL+timelinePath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+    let url = URL+timelinePath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
-    if (Object.entries(getparams).length !== 0) {
-      for (let param in getparams) {
-        url += `${param}=${getparams[param]}&`;
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
       }
       url = url.substring(0, url.length - 1);
-    }
+    } 
 
     let res = await (await fetch(url, init)).json();
     return res;
   },
 
-  media: async (action, getparams = {}, init = {}) => {
-    let url = URL+mediaPath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+  media: async (action, queryparams = {}, init = {}) => {
+    let url = URL+mediaPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
-    if (Object.entries(getparams).length !== 0) {
-      for (let param in getparams) {
-        url += `${param}=${getparams[param]}&`;
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
       }
       url = url.substring(0, url.length - 1);
     }
@@ -82,12 +82,12 @@ const api = {
     return blob;
   },
 
-  art: async (action, getparams = {}, init = {}) => {
-    let url = URL+artPath+action+`.php${Object.entries(getparams).length !== 0 ? '?':''}`;
+  art: async (action, queryparams = {}, init = {}) => {
+    let url = URL+artPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
-    if (Object.entries(getparams).length !== 0) {
-      for (let param in getparams) {
-        url += `${param}=${getparams[param]}&`;
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
       }
       url = url.substring(0, url.length - 1);
     }

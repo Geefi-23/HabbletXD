@@ -7,45 +7,86 @@ import '@glidejs/glide/dist/css/glide.core.css';
 
 import Glide from '@glidejs/glide';
 
-const Profile = ({ type, isAuth }) => {
+const Profile = ({ type, isAuth, hideProgress }) => {
   const [profile, setProfile] = useState({});
   const [badges, setBadges] = useState([]);
   const [timelines, setTimelines] = useState([]);
+  const [arts, setArts] = useState([]);
   let { name } = useParams();
 
-  const getProfile = useCallback(async (nome) => {
-    if (!nome) {
-      nome = JSON.parse(localStorage.getItem('user')).nick
-    }
-    let res = await api.user('get', {
-      method: 'POST',
-      body: JSON.stringify({
-        usuario: nome
-      })
-    });
-    if (res.error) {
-      setProfile({ error: true });
-    }else if (res.success) {
-      setProfile(res.user);
+  const loadProfile = useCallback(async () => {
+
+    let user = JSON.parse(localStorage.getItem('hxd-user-object'));
+
+    if (type === 'myself' && !isAuth) {
+      window.location.href = '/';
+    } else if (type === 'myself' && isAuth) {
+      let getTimelines = await api.timeline('getsome', { quantity: 4, user: user.info.usuario });
+      let getArts = await api.art('getsome', { quantity: 2, user: user.info.usuario });
+
+      if (getTimelines.success) {
+        setTimelines(getTimelines.timelines);
+      }
+
+      if (getArts.success) {
+        let pixels = getArts.arts;
+        pixels = pixels.map(async (pixel) => {
+          let blob = await api.media('get', { filename: pixel.imagem });
+          let link = URL.createObjectURL(blob);
+
+          pixel.imagem = link;
+          return pixel
+        });
+
+        setArts(pixels);
+      }
+
+      setProfile(user);
+    } else {
+    
+      let res = await api.user('get', {
+        method: 'POST',
+        body: JSON.stringify({
+          usuario: name
+        })
+      });
+      if (res.error) {
+        setProfile({ error: true });
+      }else if (res.success) {
+        setProfile(res.user);
+      }
+
+      let getTimelines = await api.timeline('getsome', { quantity: 4, user: user.info.usuario });
+      let getArts = await api.art('getsome', { quantity: 2, user: user.info.usuario });
+
+      if (getTimelines.success) {
+        setTimelines(res.timelines);
+      }
+
+      if (getArts.success) {
+        let pixels = getArts.arts;
+        pixels = pixels.map(async (pixel) => {
+          let blob = await api.media('get', { filename: pixel.imagem });
+          let link = URL.createObjectURL(blob);
+
+          pixel.linkimagem = link;
+          return pixel
+        });
+
+        setArts(pixels);
+      }
     }
   }, []);
 
-  if (type === 'myself' && !isAuth) {
-    window.location.href = '/';
-  }
-
   useEffect(() => {
 
+    hideProgress();
     if (badges.length !== 0)
       new Glide('#badges-slider', {
         type: 'slider',
         perView: 4
       }).mount();
-    if (type === 'myself') {
-      setProfile(JSON.parse(localStorage.getItem('hxd-user-object')));
-    } else {
-      getProfile(name);
-    }
+    loadProfile(); 
     //slider.create({ slider: '#mobis-slider', slidesToShow: 4, gap: 8, arrows: { left: '#mobs-arrowLeft', right: '#mobs-arrowRight' }})
   }, []);
   return (
@@ -71,9 +112,14 @@ const Profile = ({ type, isAuth }) => {
                   <div className="hxd-bg-color d-flex align-items-center justify-content-center fw-bold text-white"
                     style={{height: '35px'}}
                   >
-                    {profile?.info.usuario}
+                    {profile?.info?.usuario}
                   </div>
-                  <div style={{flex: '1 0 0'}}></div>
+                  <div className="text-center" style={{flex: '1 0 0'}}>
+                    <img 
+                      src={`https://avatar.blet.in/${profile?.info?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                      style={{objectPosition: '0 -30px' }}
+                    />
+                  </div>
                 </div>
                 {
                   badges.length === 0 ?
@@ -126,16 +172,20 @@ const Profile = ({ type, isAuth }) => {
                   <div className="fw-bold hxd-primary-text" role="heading" aria-level={3}>Ultimas timelines</div>
                   <div className="d-flex flex-wrap gap-2">
                     {
-                      profile.timelines?.map((timeline) => (
-                        <Link to={`/timeline/${timeline.url}`} className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '60px'}}>
+                      timelines.length === 0 ?
+                      <h6 className="text-center mt-2">Este usuário não tem timelines</h6>
+                      :
+                      timelines.map((timeline) => (
+                        <Link to={`/timeline/${timeline.url}`} className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '70px'}}>
                           <div className="hxd-border-bottom p-1 overflow-hidden" 
                           style={{
+                            height: '45px',
                             wordBreak: 'break-word', display: '-webkit-box', WebkitBoxOrient: 'vertical', 
-                            lineHeight: '.7', WebkitLineClamp: 2, textOverflow: 'ellipsis'
+                            lineHeight: '1.1', WebkitLineClamp: 2, textOverflow: 'ellipsis'
                           }}>
                             {timeline.texto.substring(0, 30)}
                           </div>
-                          <div className="d-flex justify-content-between p-1">
+                          <div className="d-flex justify-content-between px-2">
                             <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
                             <span>100</span>
                           </div>
@@ -147,26 +197,27 @@ const Profile = ({ type, isAuth }) => {
                 <div className="d-flex flex-column" style={{flex: '1 0 0'}}>
                   <div className="fw-bold hxd-primary-text" role="heading" aria-level={3}>Ultimas artes</div>
                   <div className="d-flex gap-2" style={{flex: '1 0 0'}}>
-                    <Link to="/" className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
-                      <div className="bg-secondary h-100 hxd-border rounded" style={{width: '70px', flexShrink: '0'}}></div>
-                      <div style={{width: '172px'}}>
-                        <div className="h-75 w-100 ps-1 hxd-border-bottom" style={{lineHeight: '1'}}>
-                          <span className="d-block w-100 fw-bold text-secondary text-truncate" >Titulo da aaaaaaaaaasssssssssssssaarte</span>  
-                          <small className="d-block w-100 text-secondary text-truncate">Descrição da arte</small>
-                        </div>
-                        <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
-                      </div>
-                    </Link>
-                    <Link to="/" className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
-                      <div className="bg-secondary h-100 hxd-border rounded" style={{width: '70px', flexShrink: '0'}}></div>
-                      <div style={{width: '172px'}}>
-                        <div className="h-75 w-100 ps-1 hxd-border-bottom" style={{lineHeight: '1'}}>
-                          <span className="d-block w-100 fw-bold text-secondary text-truncate" >Titulo da aaaaaaaaaasssssssssssssaarte</span>  
-                          <small className="d-block w-100 text-secondary text-truncate">Descrição da arte</small>
-                        </div>
-                        <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
-                      </div>
-                    </Link>
+                    {
+                      arts.length === 0 ?
+                      <h6 className="mt-2">Este usuário não publicou nenhuma arte.</h6>
+                      :
+                      arts.map((art) => {
+                        return(
+                        <Link to="/" className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
+                          <div className="bg-secondary h-100 hxd-border rounded" style={{width: '70px', flexShrink: '0'}}>
+                            <img src={`${art?.linkimagem}`} alt=" " />
+                            {console.log(art)}
+                          </div>
+                          <div style={{width: '172px'}}>
+                            <div className="h-75 w-100 ps-1 hxd-border-bottom" style={{lineHeight: '1'}}>
+                              <span className="d-block w-100 fw-bold text-secondary text-truncate" >{art.titulo}</span>  
+                              <small className="d-block w-100 text-secondary text-truncate">Descrição da arte</small>
+                            </div>
+                            <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
+                          </div>
+                        </Link>
+                      )})
+                    }
                   </div>
                 </div>
               </div>
@@ -176,7 +227,7 @@ const Profile = ({ type, isAuth }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    {profile?.info.missao}
+                    {profile?.info?.missao}
                   </small>
                 </div>
                 <div className="hxd-border rounded">
@@ -184,7 +235,7 @@ const Profile = ({ type, isAuth }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    {profile?.info.twitter}
+                    {profile?.info?.twitter}
                   </small>
                 </div>
                 <div className="hxd-border rounded">

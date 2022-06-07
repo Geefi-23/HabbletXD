@@ -168,17 +168,21 @@
 
 /*LOJAO CARD*/
 .lojao-card{
-  background-color: rgb(var(--hxd-theme-color));
-  height: 240px !important;
+  
+  height: 280px !important;
   min-width: 160px !important;
-  border-radius: .5rem;
+  overflow: hidden;
+}
+
+.lojao-card .info-wrapper, .lojao-card--square .info-wrapper{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .lojao-card--square{
-  background-color: rgb(var(--hxd-theme-color));
-  height: 150px !important;
+  height: 200px !important;
   min-width: 160px !important;
-  border-radius: .5rem;
 }
 
 /*ART CARD*/
@@ -301,16 +305,6 @@
     width: 220px;
   }
 
-  .lojao-card{
-    height: 200px !important;
-    width: 120px !important;
-  }
-
-  .lojao-card--square{
-    height: 120px !important;
-    width: 120px !important;
-  }
-
   .art-card{
     width: 270px;
     height: 170px;
@@ -319,18 +313,6 @@
 
   .ranking-card{
     width: 270px;
-  }
-}
-
-@media screen and (max-width: 1440px){
-  .lojao-card{
-    height: 180px !important;
-    width: 100px !important;
-  }
- 
-  .lojao-card--square{
-    height: 100px !important;
-    width: 100px !important;
   }
 }
 
@@ -348,16 +330,6 @@
 
   .timeline-card{
     width: 180px;
-  }
-
-  .lojao-card{
-    height: 180px !important;
-    width: 100px !important;
-  }
-
-  .lojao-card--square{
-    height: 100px !important;
-    width: 100px !important;
   }
 
   .art-card{
@@ -421,16 +393,6 @@
   .timeline-card__preview{
     height: 100%;
     -webkit-line-clamp: 4;
-  }
-
-  .lojao-card{
-    height: 190px !important;
-    width: 110px !important;
-  }
-
-  .lojao-card--square{
-    height: 120px !important;
-    width: 110px !important;
   }
 
   .art-card{

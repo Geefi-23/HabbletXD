@@ -6,18 +6,6 @@ import '../../static/css/profileEdit.css';
 const ProfileEdit = (props) => {
   let { isAuth, sendAlert, showProgress, hideProgress, notify } = props;
   const [user, setUser] = useState({});
-  const profilePicRef = useRef(null);
-
-  const handleProfilePicChange = (evt) => {
-    let img = evt.target.files[0];
-    let fr = new FileReader();
-
-    fr.onload = () => {
-      profilePicRef.current.src = fr.result;
-    };
-
-    fr.readAsDataURL(img);
-  };
 
   const setUserObject = () => {
     let usr = JSON.parse(localStorage.getItem('hxd-user-object'));
@@ -80,7 +68,10 @@ const ProfileEdit = (props) => {
               <div className="d-flex flex-column w-25 px-2">
                 <small className="hxd-primary-text fw-bold">Fundo de perfil</small>
                 <div className="hxd-border hxd-bg-colorLight overflow-hidden" style={{height: '180px', borderRadius: '4px'}}>
-                  <img ref={profilePicRef} className="w-100 h-100" src="" alt="" />
+                  <img 
+                    src={`https://avatar.blet.in/${user?.info?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                    style={{objectPosition: '0 -30px' }}
+                  />
                 </div>
                 <label>
                   <div className="d-flex justify-content-center hxd-border hxd-primary-text bg-white mt-2 p-1 rounded"
@@ -90,7 +81,7 @@ const ProfileEdit = (props) => {
                   >
                     Trocar fundo de perfil
                   </div>
-                  <input type="file" style={{display: 'none'}} onChange={handleProfilePicChange} />
+                  <input type="file" style={{display: 'none'}}  />
                 </label>
               </div>
               <div className="d-flex flex-column w-75 ps-2">

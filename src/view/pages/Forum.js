@@ -116,9 +116,11 @@ const Forum = (props) => {
     setArticle(article);
     setComentarios(res.comentarios);
     if (type === 'art') {
-      let blob = await api.media('get', article.imagem);
+      let blob = await api.media('get', { filename: article.imagem });
       setArt(URL.createObjectURL(blob));
     }
+
+      api[type]('updateviews', { key });
 
     hideProgress();
   }, [setArticle, setArt, setComentarios, showProgress, key, type, hideProgress]);
@@ -158,12 +160,12 @@ const Forum = (props) => {
   };
 
   useEffect(() => { 
-    get();
+    if (article === null)
+      get();
     if (scrollToTop) {
       window.scrollTo(0, 0);
       setScrollToTop(false);
     }
-    
   }, [get]);
   return (
     <>
@@ -184,7 +186,7 @@ const Forum = (props) => {
                     src="https://3.bp.blogspot.com/-XfKkzB4dZak/XEi1zdjRPEI/AAAAAAABKZ4/6DfaPGn0OqA-8E7-uWw6YLV1lL5wnKpmQCKgBGAs/s1600/roupas.png"
                     alt=""
                   />
-                  <small className="ms-2"><strong>{article.categoria_nome}</strong></small>
+                  <small className="ms-2"><strong>{article.categoria}</strong></small>
                 </div>
                 <small className="text-special">
                   Por <Link 
@@ -238,7 +240,7 @@ const Forum = (props) => {
                   onSubmit={handleCommentSender}
                 >
                   <img 
-                    src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).usuario}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
+                    src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).info.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
                     alt=""
                     style={{
                       height: '40px',

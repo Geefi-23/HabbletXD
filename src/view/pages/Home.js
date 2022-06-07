@@ -67,14 +67,22 @@ const Home = (props) => {
 
     let lojaoXD = new Glide('#ljxd-slider', {
       type: 'slider',
-      perView: 6,
-      gap: 16
+      perView: 5,
+      gap: 16,
+      peek: {
+        before: 0,
+        after: 64
+      }
     });
 
     let lojaoEmblemas = new Glide('#ljem-slider', {
       type: 'slider',
-      perView: 6,
-      gap: 16
+      perView: 5,
+      gap: 16,
+      peek: {
+        before: 0,
+        after: 64
+      }
     });
 
     let emblemasGratis = new Glide('#emblemasGratis-slider', {
@@ -375,15 +383,66 @@ const Home = (props) => {
               <div id="ljxd-slider" className="glide">
                 <div className="glide__track" data-glide-el="track">
                   <div className='glide__slides'>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
-                    <div className="glide__slide lojao-card"></div>
+                    <div className="glide__slide lojao-card">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -405,15 +464,66 @@ const Home = (props) => {
               <div id="ljem-slider" className="glide">
                 <div className="glide__track" data-glide-el="track">
                   <div className="glide__slides">
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
-                    <div className="glide__slide lojao-card--square"></div>
+                    <div className="glide__slide lojao-card--square">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card--square">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card--square">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card--square">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card--square">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glide__slide lojao-card--square">
+                      <div className="info-wrapper">
+                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
+                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   
                 </div>

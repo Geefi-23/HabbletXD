@@ -1,19 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 
 import FileUpload from './FileUpload';
-import API from '../../static/js/api';
+import api from '../../static/js/api';
 
 const ArtUploadModal = (props) => {
   const [showing, setShowing] = useState(false);
-  const [image, setImage] = useState(null);
+  const [upload, setUpload] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   const { showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing } = props;
 
   const handleImageInput = (file) => {
-    setImage(file);
+    setUpload(file);
   };
 
+  const poolCategories = async () => {
+    let res = await api.art('getallcategories');
+
+    if (res.success) {
+      setCategories(res.categories);
+    }
+  };
   
   const handleSubmit = async evt => {
     evt.preventDefault();
@@ -25,14 +33,13 @@ const ArtUploadModal = (props) => {
     let data = {
       titulo: form.name.value,
       descricao: form.description.value,
-      categoria: form.category.value,
-      autor: JSON.parse(localStorage.getItem('hxd-user-object')).usuario
+      categoria: form.category.value
     };
 
     formData.append('json', JSON.stringify(data));
-    formData.append('arte', image);
+    formData.append('arte', upload);
 
-    let res = await API.art('save', null, {
+    let res = await api.art('save', {}, {
       method: 'POST',
       body: formData,
       credentials: 'include'
@@ -47,6 +54,10 @@ const ArtUploadModal = (props) => {
 
     hideProgress();
   };
+
+  useEffect(() => {
+    poolCategories();
+  }, []);
 
   return (
     <>
@@ -72,7 +83,11 @@ const ArtUploadModal = (props) => {
             </label>
             <label className="w-100 hxd-input__wrapper">
               <select name="category" className="hxd-input" type="password">
-                <option value="1">Moda</option>
+                {
+                  categories.map(category => (
+                    <option value={category.id}>{category.nome}</option>
+                  ))
+                }
               </select>
               <span className="hxd-input__label mb-1">Categoria</span>
             </label>

@@ -18,7 +18,7 @@ const approutes = (props) => {
       <Route path="/search" element={<SearchResults />} />
       <Route path="/equipe" element={<Team />} />
       <Route path="/habbletimager" element={<HabbletImager />} />
-      <Route path="/meuperfil" element={<Profile type="myself" isAuth={isAuth} />} />
+      <Route path="/meuperfil" element={<Profile type="myself" isAuth={isAuth} hideProgress={hideProgress} />} />
       <Route 
         path="/editarperfil" 
         element={
@@ -31,7 +31,7 @@ const approutes = (props) => {
         } 
       />
       <Route path="/perfil/*">
-        <Route path=":name" element={<Profile />} />
+        <Route path=":name" element={<Profile hideProgress={hideProgress} />} />
       </Route>
       <Route path="/noticia/*" >
         <Route 

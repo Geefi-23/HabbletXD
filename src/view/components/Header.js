@@ -185,12 +185,18 @@ const Header = (props) => {
 
   const RadioPlayer = (props) => {
     const [isPaused, setIsPaused] = useState(false);
+    const [streamVolume, setStreamVolume] = useState(1);
     const stream = useRef(null);
 
     const handleStreamPP = () => {
       setIsPaused(!isPaused);
       if (!isPaused) stream.current.play();
       else stream.current.pause();
+    };
+
+    const handleStreamVolume = (newVol) => {
+      setStreamVolume(newVol);
+      stream.current.volume = newVol;
     };
 
     return (
@@ -254,6 +260,7 @@ const Header = (props) => {
                 alt=""
               />
             </button>
+            <input className="volume-handler" defaultValue={1} onChange={evt => handleStreamVolume(evt.target.value)} type="range" min="0" max="1" step=".1" />
             <button className="bg-transparent border-0">
               <img 
                 src={

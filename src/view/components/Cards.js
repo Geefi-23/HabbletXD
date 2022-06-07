@@ -33,11 +33,19 @@ const NewsCard = (props) => {
     setThumb(URL.createObjectURL(blob));
   };
   
+  const formatSomeInfo = (obj) => {
+    let views = obj?.visualizacao;
+    views = views === 0 ? 'nenhuma visualização' : views === 1 ? `${views} visualização` : `${views} visualizações`;
+
+    obj.visualizacao = views;
+
+    return obj;
+  };
 
   useEffect(() => {
     let news = adjustDate(refer);
     getImage(news.imagem);
-    setNews(news);
+    setNews(formatSomeInfo(news));
     
   }, [refer]);
 
@@ -49,7 +57,7 @@ const NewsCard = (props) => {
         <img className="w-100 h-100" src={thumb} alt=" " />
         <div className="news-card__thumbnail--hover">
           <div className="h4 fw-bold">IR</div>
-          <small className="d-block fw-bold">0 Visualizações</small>
+          <small className="d-block fw-bold">{news.visualizacao}</small>
           <small className="d-block fw-bold">100 Likes</small>
           <small className="mt-2">{news.categoria_nome}</small>
         </div>
