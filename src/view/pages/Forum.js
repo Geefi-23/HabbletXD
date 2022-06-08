@@ -128,7 +128,7 @@ const Forum = (props) => {
   const handleCommentSender = async (evt) => {
     evt.preventDefault();
 
-    let comentario = evt.target.querySelector('#txtComment input')
+    let comentario = evt.target.querySelector('#txtComment input');
     if (/^[ \n]*$/.test(comentario)) {
       return sendAlert('danger', 'Você não digitou nada!');
     }
@@ -155,6 +155,8 @@ const Forum = (props) => {
       sendAlert('success', res.success);
       setComentarios([...comentarios, adjustDate(comment)]);
       hideProgress();
+      console.log(res?.award);
+      comentario.value = '';
     }
     evt.target.querySelector('button[type="submit"]').disabled = false;
   };

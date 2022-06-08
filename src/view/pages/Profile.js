@@ -172,10 +172,10 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                   <div className="fw-bold hxd-primary-text" role="heading" aria-level={3}>Ultimas timelines</div>
                   <div className="d-flex flex-wrap gap-2">
                     {
-                      timelines.length === 0 ?
+                      timelines?.length === 0 ?
                       <h6 className="text-center mt-2">Este usuário não tem timelines</h6>
                       :
-                      timelines.map((timeline) => (
+                      timelines?.map((timeline) => (
                         <Link to={`/timeline/${timeline.url}`} className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '70px'}}>
                           <div className="hxd-border-bottom p-1 overflow-hidden" 
                           style={{
@@ -198,10 +198,10 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                   <div className="fw-bold hxd-primary-text" role="heading" aria-level={3}>Ultimas artes</div>
                   <div className="d-flex flex-wrap gap-2" style={{flex: '1 0 0'}}>
                     {
-                      arts.length === 0 ?
+                      arts?.length === 0 ?
                       <h6 className="mt-2">Este usuário não publicou nenhuma arte.</h6>
                       :
-                      arts.map((art) => {
+                      arts?.map((art) => {
                         return(
                         <Link to="/" className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
                           <div className="bg-secondary h-100 hxd-border rounded" style={{width: '70px', flexShrink: '0'}}>

@@ -13,7 +13,7 @@ import Glide from '@glidejs/glide';
 const Home = (props) => {
   const { showProgress, hideProgress, sendAlert } = props;
   
-  const [badges, setBadges] = useState([]);
+  const [badges, setBadges] = useState([1, 2, 3, 4, 5]);
   const [allNews, setAllNews] = useState(null);
   const [allSpotlights, setAllSpotlights] = useState([]);
   const [allTimelines, setAllTimelines] = useState([]);
@@ -86,16 +86,20 @@ const Home = (props) => {
     });
 
     let emblemasGratis = new Glide('#emblemasGratis-slider', {
-
+      type: 'slider',
+      perView: 8,
+      gap: 8,
     });
 
     slidersArrowsSetListener(lojaoXD, '#ljxd-arrowPrev', '#ljxd-arrowNext');
     slidersArrowsSetListener(lojaoEmblemas, '#ljem-arrowPrev', '#ljem-arrowNext');
     slidersArrowsSetListener(newsSlider, '#news-arrowPrev', '#news-arrowNext');
+    slidersArrowsSetListener(emblemasGratis, '#egs-arrowLeft', '#egs-arrowRight');
 
     lojaoXD.mount();
     lojaoEmblemas.mount();
     newsSlider.mount();
+    emblemasGratis.mount()
   }, []);
 
   /**
@@ -108,8 +112,9 @@ const Home = (props) => {
     const submit = evt.target.querySelector('button[type="submit"]');
 
     let form = document.forms['timeline_sender'];
+    let writer = form.querySelector('div[contenteditable]');
     let data = {
-      texto: form.querySelector('div[contenteditable]').textContent
+      texto: writer.textContent
     };
 
     if (data.texto === '')
@@ -124,9 +129,11 @@ const Home = (props) => {
     });
     submit.disabled = false;
     hideProgress();
-    if (res.sucess)
+    if (res.success){
       sendAlert('success', res.success);
-    else if (res.error)
+      console.log(res?.award)
+      writer.textContent = '';
+    } else if (res.error)
       sendAlert('danger', res.error);
   };
 
@@ -303,7 +310,7 @@ const Home = (props) => {
                         <div className="d-flex justify-content-between p-2">
                           <div className="d-flex gap-1 h-100">
                             <span className="fw-bold">Nenhuma hashtag</span>
-                            <button className="h-100 border-0 text-white fw-bold hxd-bg-color rounded">+</button>
+                            <button className="h-100 border-0 text-white fw-bold hxd-bg-color rounded" type="button">+</button>
                           </div>
                           <button 
                             className="h-100 border-0 text-white fw-bold hxd-bg-color px-4 rounded"
@@ -356,15 +363,18 @@ const Home = (props) => {
                 </div>
               </div>
               <div className="section__content">
-                <div id="emblemasGratis-slider" className="slider">
-                  <div className="slider__track">
-                    {
-                      badges.map((badge) => (
-                        <div className="slider__item justify-content-center align-items-center" onClick={() => console.log(badge)}>
-                          <img src={badge.image} alt="" />
-                        </div>
-                      ))
-                    }
+                <div id="emblemasGratis-slider" className="glide">
+                  <div className="glide__track" data-glide-el="track">
+                    <div className="glide__slides" style={{height: '60px'}}>
+                      {
+                        badges.map((badge) => (
+                          <div className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded" style={{cursor: 'pointer'}} onClick={() => console.log(badge)}>
+                            <img src={badge.image} alt="" />
+                          </div>
+                        ))
+                      }
+
+                    </div>
                   </div>
                 </div>
               </div>

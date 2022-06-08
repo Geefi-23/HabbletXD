@@ -229,7 +229,7 @@ const App = () => {
       <Progress refe={progressRef} />
       
       <Alert alertRef={alertRef} containerRef={containerRef} />
-      <Modal show={isModalShowing} backdrop={true}>
+      <Modal show={isModalShowing} onHide={() => setIsModalShowing(false)}>
         <AuthModal
           setIsAuth={setIsAuth} sendAlert={sendAlert} hideModal={handleModalHide}
           showProgress={handleProgressShow} 

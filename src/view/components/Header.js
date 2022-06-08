@@ -98,6 +98,7 @@ const Header = (props) => {
         <button className="bg-transparent h-100 border-0" 
           onClick={() => {
             document.cookie = 'hxd-auth=deleted; path=/; expires='+new Date().toUTCString();
+            localStorage.removeItem('hxd-user-object');
             api.user('logout');
             setIsAuth(false);
             window.location.href = '/';
