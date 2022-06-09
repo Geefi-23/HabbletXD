@@ -185,7 +185,10 @@ const Forum = (props) => {
               <div className='text-center'>
                 <div>
                   <img
-                    src="https://3.bp.blogspot.com/-XfKkzB4dZak/XEi1zdjRPEI/AAAAAAABKZ4/6DfaPGn0OqA-8E7-uWw6YLV1lL5wnKpmQCKgBGAs/s1600/roupas.png"
+                    src={(() => {
+                      const image = require(`../../static/icons/${article?.categoria_icone || 'category_icon_art.gif'}`);
+                      return image;
+                    })()}
                     alt=""
                   />
                   <small className="ms-2"><strong>{article.categoria}</strong></small>
