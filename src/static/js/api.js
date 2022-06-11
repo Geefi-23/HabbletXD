@@ -3,7 +3,7 @@
  * @description Módulo que controla a requisição de dados ao servidor da aplicação
  */
 
-const URL = 'http://localhost:8000/api/';
+const URL = 'https://localhost/api/';
 
 // Cada váriavel representa uma rota de dados
 const userPath = 'user/';
