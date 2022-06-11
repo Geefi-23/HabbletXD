@@ -65,6 +65,10 @@ const Header = (props) => {
         </Dropdown>
       </> : <>
         {/* MODAL ART UPLOAD */}
+        <button className="bg-transparent h-100 border-0"
+          onClick={() => setArtModalIsShowing(true)}>
+          <img src={`https://img.icons8.com/ios-filled/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/drawing.png`}/>
+        </button>
         <ArtUploadModal 
           showProgress={showProgress} 
           hideProgress={hideProgress} 
@@ -86,7 +90,8 @@ const Header = (props) => {
         </Link>
         <Dropdown className="d-flex align-items-center">
           <Dropdown.Toggle className="dropdown-caret-off bs-btn-shadow-off bg-transparent h-100 border-0 p-0" style={{ width: '24px'}}>
-            <img src="https://img.icons8.com/material-sharp/24/000000/appointment-reminders--v1.png" alt=""/>
+            <img 
+            src={`https://img.icons8.com/material-sharp/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/appointment-reminders--v1.png`} alt=""/>
           </Dropdown.Toggle>
 
           <Dropdown.Menu className="hxd-border">
@@ -104,7 +109,7 @@ const Header = (props) => {
             window.location.href = '/';
           }}
         >
-          <img src="https://img.icons8.com/material-sharp/24/000000/exit.png" alt=""/>
+          <img src={`https://img.icons8.com/material-sharp/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/exit.png`} alt=""/>
         </button>
       </>
     );

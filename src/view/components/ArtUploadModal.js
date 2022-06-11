@@ -61,10 +61,6 @@ const ArtUploadModal = (props) => {
 
   return (
     <>
-      <button className="bg-transparent h-100 border-0"
-        onClick={() => setArtModalIsShowing(true)}>
-        <img src="https://img.icons8.com/ios-filled/24/000000/drawing.png"/>
-      </button>
       <Modal show={artModalIsShowing} onHide={() => setArtModalIsShowing(false)} >
         <div className="d-flex justify-content-center align-items-center hxd-bg-color w-100 text-white fw-bold rounded-top" 
         style={{height: '50px'}}>

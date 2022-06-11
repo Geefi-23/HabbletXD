@@ -3,7 +3,7 @@
  * @description Módulo que controla a requisição de dados ao servidor da aplicação
  */
 
-const URL = '/api/';
+const URL = 'http://localhost:8000/api/';
 
 // Cada váriavel representa uma rota de dados
 const userPath = 'user/';
@@ -29,8 +29,8 @@ const api = {
     return res;
   },
 
-  getMobis: async () => {
-    let res = await (await fetch(URL+mobisPath+'getsome.php')).json();
+  mobis: async (action, init = {}) => {
+    let res = await (await fetch(URL+mobisPath+action+'.php', init)).json();
     return res;
   },
 

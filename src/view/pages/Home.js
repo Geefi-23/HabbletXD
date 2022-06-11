@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import useInterval from '../../hooks/useInterval';
 
+import BuyConfirmationModal from '../components/BuyConfirmationModal';
+import ConfirmationModal from '../components/ConfirmationModal';
+
 import api from '../../static/js/api';
 
 import '../../static/css/home.css';
@@ -12,13 +15,18 @@ import Glide from '@glidejs/glide';
 
 const Home = (props) => {
   const { showProgress, hideProgress, sendAlert } = props;
+
+  const [buyConfirmationShow, setBuyConfirmationShow] = useState(false);
+  const [confirmationForBuyShow, setConfirmationForBuyShow] = useState(false);
   
   const [badges, setBadges] = useState([1, 2, 3, 4, 5]);
+  const [mobis, setMobis] = useState([]);
   const [allNews, setAllNews] = useState(null);
   const [allSpotlights, setAllSpotlights] = useState([]);
   const [allTimelines, setAllTimelines] = useState([]);
   const [allArts, setAllArts] = useState([]);
-  
+  const [beingBought, setBeingBought] = useState({});
+
   const btnScrollTopRef = useRef(null);
   const timelineWriterRef = useRef(null);
   const handleScrollTopBtn = () => {
@@ -31,6 +39,19 @@ const Home = (props) => {
     } catch(e) {
       //do nothing
     }
+  };
+
+  const rgbToHex = (rgbString) => {
+    let values = rgbString.replaceAll(',', '').split(' ');
+
+    if (values.length !== 3) return;
+    
+    const componentToHex = (x) => {
+      var hex = x.toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    };
+
+    return componentToHex(values[0]) + componentToHex(values[1]) + componentToHex(values[2]);
   };
 
   /**
@@ -141,9 +162,11 @@ const Home = (props) => {
     let news = await api.news('getall');
     let timelines = await api.timeline('getall');
     let arts = await api.art('getall');
+    let mobis = await api.mobis('getall');
     setAllNews(news);
     setAllTimelines(timelines);
     setAllArts(arts);
+    setMobis(mobis);
 
     configureSliders();
   }, [setAllNews, setAllTimelines, setAllArts]);
@@ -164,16 +187,27 @@ const Home = (props) => {
   
   return (
     <>
+      <BuyConfirmationModal 
+        isShowing={buyConfirmationShow} 
+        setIsShowing={setBuyConfirmationShow} 
+      />
       <div className="w-100 pb-3">
         <div className="container">
           <div id="noticias-section" className="section">
             <div className="section__header justify-content-between">
-              <div>
-                <h4 className="section__title">
-                  <span className="hxd-primary-text fw-bold">Notícias</span>
-                  <span className="hxd-secondary-text"> recentes</span>
-                </h4>
-                <span className="hxd-secondary-text">Aqui você encontra notícias fresquinhas do mundo de pixels!</span>
+              <div className='d-flex'>
+                <img 
+                  className="align-self-start"
+                  src={`https://img.icons8.com/material-rounded/42/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/news.png`}
+                  alt=""
+                />
+                <div className="ms-3">
+                  <h4 className="section__title">
+                    <span className="hxd-primary-text fw-bold">Notícias</span>
+                    <span className="hxd-secondary-text"> recentes</span>
+                  </h4>
+                  <span className="hxd-secondary-text">Aqui você encontra notícias fresquinhas do mundo de pixels!</span>
+                </div>
               </div>
               <div className="section__nav-tools">
                 <button id="news-arrowPrev">
@@ -240,7 +274,12 @@ const Home = (props) => {
           </div>
           <div className="section">
             <div className="section__header">
-              <div>
+              <img 
+                className="align-self-start"
+                src={`https://img.icons8.com/ios-filled/42/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/star--v1.png`}
+                alt=""
+              />
+              <div className='ms-3'>
                 <h4 className="section__title">
                   <span className="hxd-primary-text fw-bold">Destaques</span> 
                   <span className="hxd-secondary-text"> da XD</span>
@@ -270,9 +309,14 @@ const Home = (props) => {
         <div className="container">
           <div id="timeline-section" className="section">
             <div className="section__header">
-              <div>
-                <span className="text-white"><h4 className="section__title">Timeline</h4></span>
-                <span className="text-white">Venha interagir com a timeline da Habblet XD!</span>
+              <img className="align-self-start" src={`https://img.icons8.com/material-rounded/42/ffffff/topic.png`} alt=""/>
+              <div className="text-white ms-3">
+                <span>
+                  <h4 className="section__title">
+                    <span>Timeline</span>
+                  </h4>
+                </span>
+                <span>Venha interagir com a timeline da Habblet XD!</span>
               </div>
             </div>
             <div className="section__content">
@@ -285,7 +329,7 @@ const Home = (props) => {
                     gridTemplateRows: 'auto auto auto',
                     rowGap: '1rem',
                     overflowY: 'scroll',
-                    maxHeight: '332px'
+                    height: '332px'
                   }}>
                     {
                       allTimelines.map((timeline, i) => (
@@ -326,7 +370,48 @@ const Home = (props) => {
                     <h5 className="mb-0">TrendingTopics</h5>
                     <small>Veja as Hashtags mais usadas nas timelines</small>
                   </div>
-                  <div className="hxd-bg-color-gray h-100"></div>
+                  <div className="hxd-bg-color-gray d-flex flex-column gap-2 p-2 h-100">
+                    <div className="d-flex gap-2">
+                      <button 
+                        className="bg-white rounded hxd-border hxd-primary-text"
+                        style={{ flex: '1 0 0' }}
+                      >
+                        Geral
+                      </button>
+                      <button 
+                        className="hxd-bg-color rounded border-0 text-white"
+                        style={{ flex: '1 0 0' }}
+                      >
+                        Mensal
+                      </button>
+                      <button 
+                        className="hxd-bg-color rounded border-0 text-white"
+                        style={{ flex: '1 0 0' }}
+                      >
+                        Semanal
+                      </button>
+                    </div>
+                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
+                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
+                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
+                    </div>
+                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
+                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
+                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
+                    </div>
+                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
+                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
+                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
+                    </div>
+                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
+                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
+                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
+                    </div>
+                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
+                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
+                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -334,9 +419,16 @@ const Home = (props) => {
           <div className="d-flex flex-row justify-content-between w-100">
             <div className="section" style={{width: '49%'}}>
               <div className="section__header justify-content-between">
-                <div>
-                  <h5 className="text-white mb-0"><span className="fw-bold">Novos</span> emblemas</h5>
-                  <span className="text-white">Veja todos os emblemas hospedados no Habblet Hotel.</span>
+                <div className='d-flex'>
+                  <img 
+                    className="align-self-start"
+                    src={`https://img.icons8.com/fluency-systems-filled/42/ffffff/taiwan-emblem.png`}
+                    alt=""
+                  />
+                  <div className="ms-3">
+                    <h5 className="text-white mb-0"><span className="fw-bold">Novos</span> emblemas</h5>
+                    <span className="text-white">Veja todos os emblemas hospedados no Habblet Hotel.</span>
+                  </div>
                 </div>
                 <div className="section__nav-tools">
                   <button id="ens-arrowLeft" className="slider__arrow slider__arrow--left arrow-left"></button>
@@ -353,10 +445,18 @@ const Home = (props) => {
             </div>
             <div className="section" style={{width: '49%'}}>
               <div className="section__header justify-content-between">
-                <div>
-                  <h5 className="text-white mb-0"><span className="fw-bold">Ganhe</span> gratis</h5>
-                  <span className="text-white">Veja os emblemas que são disponíveis gratuitamente.</span>
+                <div className="d-flex">
+                  <img 
+                    className="align-self-start"
+                    src={`https://img.icons8.com/ios-filled/42/ffffff/handle-with-care.png`}
+                    alt=""
+                  />
+                  <div className="ms-3">
+                    <h5 className="text-white mb-0"><span className="fw-bold">Ganhe</span> gratis</h5>
+                    <span className="text-white">Veja os emblemas que são disponíveis gratuitamente.</span>
+                  </div>
                 </div>
+                
                 <div className="section__nav-tools">
                   <button id="egs-arrowLeft" className="slider__arrow slider__arrow--left arrow-left"></button>
                   <button id="egs-arrowRight" className="slider__arrow slider__arrow--right arrow-right"></button>
@@ -382,9 +482,16 @@ const Home = (props) => {
           </div>
           <div id="loja-section" className="section">
             <div className="section__header justify-content-between">
-              <div>
-                <h4 className="mb-0 text-white"><span className="fw-bold">Lojão</span> da XD</h4>
-                <span className="text-white">Venha gastar seus XD's comprando mobs, visuais, raros e entre outros!</span>
+              <div className="d-flex">
+                <img 
+                  className="align-self-start"
+                  src={`https://img.icons8.com/material-rounded/42/ffffff/shop.png`}
+                  alt=""
+                />
+                <div className="ms-3">
+                  <h4 className="mb-0 text-white"><span className="fw-bold">Lojão</span> da XD</h4>
+                  <span className="text-white">Venha gastar seus XD's comprando mobs, visuais, raros e entre outros!</span>
+                </div>
               </div>
               <div className="section__nav-tools">
                 <button id="ljxd-arrowPrev" className="arrow-left"></button>
@@ -393,69 +500,44 @@ const Home = (props) => {
               </div>
             </div>
             <div className="section__content">
+              <ConfirmationModal 
+                isShowing={confirmationForBuyShow} 
+                text="Você tem certeza de que deseja realizar esta compra?"
+                beingBought={beingBought}
+                onAccept={() => {
+                  setBuyConfirmationShow(true);
+                  setConfirmationForBuyShow(false);
+                }}
+                onDeny={() => setConfirmationForBuyShow(false)} 
+              />
               <div id="ljxd-slider" className="glide">
                 <div className="glide__track" data-glide-el="track">
                   <div className='glide__slides'>
-                    <div className="glide__slide lojao-card">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                    {
+                      mobis.map((mobi) => (
+                        <div className="glide__slide lojao-card">
+                          <div className="info-wrapper">
+                            <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                            <div 
+                              className='d-flex align-items-center justify-content-center bg-white rounded-bottom hxd-primary-text' 
+                              style={{height: '40px'}}
+                            >
+                              <small>
+                                <strong>{mobi.nome}</strong>
+                              </small>
+                            </div>
+                            <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                              <span className="hxd-bg-color px-2 text-white rounded">{mobi.valor} XD's</span>
+                              <button className='btn btn-success p-0 px-2' 
+                              onClick={() => {
+                                setBeingBought(mobi);
+                                setConfirmationForBuyShow(true);
+                              }}>Comprar</button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
+                      ))
+                    }
                   </div>
                 </div>
               </div>
@@ -545,9 +627,14 @@ const Home = (props) => {
           </div>
           <div id="artes-section" className="section">
             <div className="section__header justify-content-between">
-              <div className="text-white">
-                <h4 className="mb-0"><span className="fw-bold">Artes</span> recentes</h4>
-                <span>Confira as artes mais recentes do nosso site!</span>
+              <div className="d-flex text-white">
+                <img className="align-self-start" src="https://img.icons8.com/ios-glyphs/42/ffffff/paint-palette--v1.png" alt="" />
+                <div className='ms-3'>
+                  <h4 className="mb-0">
+                    <span className="fw-bold">Artes</span> recentes
+                  </h4>
+                  <span>Confira as artes mais recentes do nosso site!</span>
+                </div>
               </div>
               <div className="section__nav-tools">
                 <button className="arrow-left"></button>
@@ -570,7 +657,12 @@ const Home = (props) => {
         <div className="container">
           <div className="section">
             <div className="section__header">
-              <div>
+              <img 
+                className="align-self-start"
+                src={`https://img.icons8.com/fluency-systems-filled/42/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/trophy.png`}
+                alt=""
+              />
+              <div className="ms-3">
                 <h4><span className="hxd-primary-text fw-bold mb-0">Tops</span> <span className="hxd-secondary-text">da XD</span></h4>
                 <span className="hxd-secondary-text">Veja todos os usuários que mais interagem no site.</span>
               </div>
