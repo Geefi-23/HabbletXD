@@ -166,8 +166,6 @@ const App = () => {
   const [isAuth, setIsAuth] = useState(null);
   const [isModalShowing, setIsModalShowing] = useState(false);
   const [artModalIsShowing, setArtModalIsShowing] = useState(false);
-  const [isProgressShowing, setIsProgressShowing] = useState(true);
-  //const [alert, setAlert] = useState({type: 'success', content: '', visible: false});
   const alertRef = useRef(null);
   const containerRef = useRef(null);
   const progressRef = useRef(null);

@@ -74,11 +74,12 @@ const ProfileEdit = (props) => {
                   />
                 </div>
                 <label>
-                  <div className="d-flex justify-content-center hxd-border hxd-primary-text bg-white mt-2 p-1 rounded"
+                  <div className="d-flex justify-content-center align-items-center hxd-border hxd-primary-text bg-white mt-2 p-1 rounded"
                     style={{
                       cursor: 'pointer'
                     }}
                   >
+                    <div style={{ width: '50px', height: '10px', background: '#cacad9', marginRight: '8px' }}></div>
                     Trocar fundo de perfil
                   </div>
                   <input type="file" style={{display: 'none'}}  />

@@ -19,7 +19,7 @@ const Home = (props) => {
   const [buyConfirmationShow, setBuyConfirmationShow] = useState(false);
   const [confirmationForBuyShow, setConfirmationForBuyShow] = useState(false);
   
-  const [badges, setBadges] = useState([1, 2, 3, 4, 5]);
+  const [badges, setBadges] = useState([]);
   const [mobis, setMobis] = useState([]);
   const [allNews, setAllNews] = useState(null);
   const [allSpotlights, setAllSpotlights] = useState([]);
@@ -83,12 +83,16 @@ const Home = (props) => {
     let newsSlider = new Glide('#news-slider', {
       type: 'slider',
       perView: 3,
+      rewind: false,
+      bound: true,
       gap: 8
     });
 
     let lojaoXD = new Glide('#ljxd-slider', {
       type: 'slider',
       perView: 5,
+      rewind: false,
+      bound: true,
       gap: 16,
       peek: {
         before: 0,
@@ -99,6 +103,8 @@ const Home = (props) => {
     let lojaoEmblemas = new Glide('#ljem-slider', {
       type: 'slider',
       perView: 5,
+      rewind: false,
+      bound: true,
       gap: 16,
       peek: {
         before: 0,
@@ -109,6 +115,8 @@ const Home = (props) => {
     let emblemasGratis = new Glide('#emblemasGratis-slider', {
       type: 'slider',
       perView: 8,
+      rewind: false,
+      bound: true,
       gap: 8,
     });
 
@@ -163,10 +171,12 @@ const Home = (props) => {
     let timelines = await api.timeline('getall');
     let arts = await api.art('getall');
     let mobis = await api.mobis('getall');
+    let badges = await api.badges('getall');
     setAllNews(news);
     setAllTimelines(timelines);
     setAllArts(arts);
     setMobis(mobis);
+    setBadges(badges.badges);
 
     configureSliders();
   }, [setAllNews, setAllTimelines, setAllArts]);
@@ -437,8 +447,16 @@ const Home = (props) => {
               </div>
               <div className="section__content">
                 <div id="emblemasNovos-slider" className="slider">
-                  <div className="slider__track">
-                    
+                  <div className="glide__track" data-glide-el="track">
+                    <div className="glide__slides">
+                      {
+                        badges.new?.map((badge) => (
+                          <div className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded" style={{cursor: 'pointer'}} onClick={() => console.log(badge)}>
+                            <img src={badge.imagem} alt="" />
+                          </div>
+                        ))
+                      }
+                    </div>
                   </div>
                 </div>
               </div>
@@ -467,9 +485,9 @@ const Home = (props) => {
                   <div className="glide__track" data-glide-el="track">
                     <div className="glide__slides" style={{height: '60px'}}>
                       {
-                        badges.map((badge) => (
+                        badges.free?.map((badge) => (
                           <div className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded" style={{cursor: 'pointer'}} onClick={() => console.log(badge)}>
-                            <img src={badge.image} alt="" />
+                            <img src={badge.imagem} alt="" />
                           </div>
                         ))
                       }
@@ -559,68 +577,25 @@ const Home = (props) => {
               <div id="ljem-slider" className="glide">
                 <div className="glide__track" data-glide-el="track">
                   <div className="glide__slides">
-                    <div className="glide__slide lojao-card--square">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
+                    {
+                      badges.normal?.map((badge) => (
+                        <div className="glide__slide lojao-card--square">
+                          <div className="info-wrapper">
+                            <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                            <div className='d-flex justify-content-center align-items-center bg-white rounded-bottom' style={{height: '40px'}}>
+                              <small>
+                                <strong>{badge.nome}</strong>
+                              </small>
+                            </div>
+                            <div className="d-flex flex-row align-items-center justify-content-between mt-2">
+                              <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
+                              <button className='btn btn-success p-0 px-2'>Comprar</button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card--square">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card--square">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card--square">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card--square">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="glide__slide lojao-card--square">
-                      <div className="info-wrapper">
-                        <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
-                        <div className='bg-white rounded-bottom' style={{height: '40px'}}></div>
-                        <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                          <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                          <button className='btn btn-success p-0 px-2'>Comprar</button>
-                        </div>
-                      </div>
-                    </div>
+                      ))
+                    }
                   </div>
-                  
                 </div>
               </div>
             </div>

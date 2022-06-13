@@ -120,7 +120,7 @@ const Forum = (props) => {
       setArt(URL.createObjectURL(blob));
     }
 
-      api[type]('updateviews', { key });
+      api[type]('updateviews', { key }, { credentials: 'include' });
 
     hideProgress();
   }, [setArticle, setArt, setComentarios, showProgress, key, type, hideProgress]);
@@ -239,49 +239,54 @@ const Forum = (props) => {
             }
             
             {
-              isAuth ?
-              <div id='busca'>
-                <form idaction="#" className="write-comment mb-3"
-                  onSubmit={handleCommentSender}
-                >
-                  <img 
-                    src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).info.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
-                    alt=""
-                    style={{
-                      height: '40px',
-                      width: '45px',
-                      objectFit: 'none',
-                      objectPosition: '50% -20px'
-                    }}
-                  />
-                  <div id="txtComment">
-                    <input name="q" type="text" placeholder="Digite o seu comentário" autoComplete='off' />
-                  </div>
-                  <button id="btnComment" type="submit">Comentar</button>
-                </form>
-              </div>
-              :
-              <h4 className="text-center my-4">Faça login para comentar neste artigo!</h4>
+              article?.fixo === 'nao' ?
+                isAuth ?
+                <div id='busca'>
+                  <form idaction="#" className="write-comment mb-3"
+                    onSubmit={handleCommentSender}
+                  >
+                    <img 
+                      src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object')).info.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
+                      alt=""
+                      style={{
+                        height: '40px',
+                        width: '45px',
+                        objectFit: 'none',
+                        objectPosition: '50% -20px'
+                      }}
+                    />
+                    <div id="txtComment">
+                      <input name="q" type="text" placeholder="Digite o seu comentário" autoComplete='off' />
+                    </div>
+                    <button id="btnComment" type="submit">Comentar</button>
+                  </form>
+                </div>
+                :
+                <h4 className="text-center my-4">Faça login para comentar neste artigo!</h4>
+              : <></>
             }
             <div className="d-flex flex-column gap-4">
               {
-                comentarios?.length === 0 ?
-                  !isAuth ?
-                  '' : <h3 className="text-center">Faça o primeiro comentário neste artigo!</h3>
-                :
-                comentarios.map((comentario) => (
-                  <Comment 
-                    refer={comentario} 
-                    type={type} 
-                    sendAlert={sendAlert} 
-                    showProgress={showProgress} 
-                    hideProgress={hideProgress} 
-                    onDelete={() => {
-                      let clist = comentarios.filter(c => c.id !== comentario.id);
-                      setComentarios(clist);
-                    }}
-                  />
-                ))
+                article?.fixo === 'nao' ?
+
+                  comentarios?.length === 0 ?
+                    !isAuth ?
+                    '' : <h3 className="text-center">Faça o primeiro comentário neste artigo!</h3>
+                  :
+                  comentarios.map((comentario) => (
+                    <Comment 
+                      refer={comentario} 
+                      type={type} 
+                      sendAlert={sendAlert} 
+                      showProgress={showProgress} 
+                      hideProgress={hideProgress} 
+                      onDelete={() => {
+                        let clist = comentarios.filter(c => c.id !== comentario.id);
+                        setComentarios(clist);
+                      }}
+                    />
+                  ))
+                : <></>
               }
             </div>
           </div>

@@ -1,4 +1,4 @@
-import '../../static/css/team.css'
+import '../../static/css/team.css';
 
 const Card = () => {
   return (
@@ -17,15 +17,36 @@ const Card = () => {
       </div>
       <div className="team_member-card">
         <div className="team_member-card__picture"></div>
-        <div className='d-flex gap-1'>
-          <div className='hxd-secondary-text hxd-border fw-bold rounded text-center' 
-          style={{
-            width: '160px'
-          }}>Geefi</div>
-          <div className='hxd-secondary-text hxd-border fw-bold rounded text-center'
-          style={{
-            width: '90px'
-          }}>f d t</div>
+        <div className='d-flex gap-1 mt-1'>
+          <div className='d-flex justify-content-center align-items-center hxd-primary-text hxd-border fw-bold rounded' 
+            style={{
+              width: '160px'
+            }}
+          >Geefi</div>
+          <div className='d-flex justify-content-evenly hxd-border fw-bold rounded text-center py-1'
+            style={{
+              width: '90px'
+            }}
+          >
+            <button className="bg-transparent border-0 p-0">
+              <img 
+                src="https://img.icons8.com/color/16/undefined/facebook-f.png"
+              />
+            </button>
+            <button className="bg-transparent border-0 p-0">
+              <img 
+                src="https://img.icons8.com/color/16/undefined/twitter--v1.png"
+              />
+            </button>
+            <button className="bg-transparent border-0 p-0">
+              <img 
+                src="https://img.icons8.com/color/16/undefined/discord--v2.png"
+              />
+            </button>
+            
+            
+            
+          </div>
         </div>
       </div>
     </>

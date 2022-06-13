@@ -6,13 +6,12 @@
 .team_member-card__picture{
   background-color: aquamarine;
   height: 120px;
-  padding-bottom: .5rem;
-  border-radius: .5rem;
+  border-radius: .25rem;
   overflow: hidden;
+  border: 1px solid rgb(var(--hxd-theme-color))
 }
 
 .team_member-card__picture img{
   height: 100%;
   width: 100%;
-  border: 1px solid rgb(var(--hxd-theme-color))
 }

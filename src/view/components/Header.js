@@ -102,9 +102,8 @@ const Header = (props) => {
         </Dropdown>
         <button className="bg-transparent h-100 border-0" 
           onClick={() => {
-            document.cookie = 'hxd-auth=deleted; path=/; expires='+new Date().toUTCString();
             localStorage.removeItem('hxd-user-object');
-            api.user('logout');
+            api.user('logout', {credentials: 'include'});
             setIsAuth(false);
             window.location.href = '/';
           }}
@@ -526,8 +525,47 @@ const Header = (props) => {
                 <li className="navbar-menu__item active">
                   <Link to="/">INICIO</Link>
                 </li>
-                <li className="navbar-menu__item"><Link to="/">HABBLET XD</Link></li>
-                <li className="navbar-menu__item"><Link to="/">HABBLET</Link></li>
+                <li className="navbar-menu__item especial">
+                  <button className="bg-transparent border-0">HABBLET XD</button>
+                  <div className="navbar-menu__item__popover">
+                    <ul className="list-unstyled">
+                      <li>
+                        <Link to="/equipe">Equipe</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/historia">Historia</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/seja-da-equipe">Seja da equipe</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/redes-sociais">Redes sociais</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/parceiros">Parceiros</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/escolinha-xd">Escolinha XD</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/seja-parceiro">Seja parceiro</Link>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li className="navbar-menu__item especial">
+                  <button className="bg-transparent border-0">HABBLET</button>
+                  <div className="navbar-menu__item__popover">
+                    <ul className="list-unstyled">
+                      <li>
+                        <Link to="/timeline/bb-code">BB CODE</Link>
+                      </li>
+                      <li>
+                        <Link to="/ticket">Regras do fórum</Link>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
                 <li className="navbar-menu__item"><Link to="/">RÁDIO</Link></li>
                 <li className="navbar-menu__item especial">
                   <button className="bg-transparent border-0">EXTRAS</button>

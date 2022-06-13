@@ -34,8 +34,8 @@ const api = {
     return res;
   },
 
-  getBadges: async () => {
-    let res = await (await fetch(URL+badgesPath+'getsome.php')).json();
+  badges: async (action, init ={}) => {
+    let res = await (await fetch(URL+badgesPath+action+'.php', init)).json();
     return res;
   },
 

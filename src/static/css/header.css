@@ -62,16 +62,18 @@ ul.horizontal-navbar-menu{
 }
 
 .navbar-menu__item:hover .navbar-menu__item__popover{
-  display: block;
+  max-height: 500px;
+  pointer-events: all;
+  opacity: 1;
 }
 
 .navbar-menu__item__popover{
-  position: relative;
-  display: none;
-  
-  
-  
-  top: -4px
+  position: absolute;
+  max-height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity ease-out .4s, max-height ease-in .5s;
+  overflow: hidden;
 }
 
 .navbar-menu__item__popover ul{
