@@ -590,7 +590,9 @@ const Header = (props) => {
         </div>
       </header>
       <div className="position-relative w-100" style={{height: '340px'}}>
-        <div style={{height: '268px', width: '100%', backgroundColor: 'rgb(10, 10, 10)'}}></div>
+        <div style={{height: '268px', width: '100%', background: '#000 url("https://habbletxd.com.br/media/img/header.png")', filter: 'blur(2px)' }}>
+          <div className="w-100 h-100 bg-dark opacity-75"></div>
+        </div>
         <div className="position-absolute d-flex flex-row justify-content-around w-100" style={{top: 0}}>
           <div style={{width: '450px', top: 0, left: '100px'}}>
             <RadioPlayer />
