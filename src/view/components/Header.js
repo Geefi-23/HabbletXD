@@ -558,10 +558,25 @@ const Header = (props) => {
                   <div className="navbar-menu__item__popover">
                     <ul className="list-unstyled">
                       <li>
-                        <Link to="/timeline/bb-code">BB CODE</Link>
+                        <Link to="/timeline/comandos">Comandos</Link>
                       </li>
                       <li>
-                        <Link to="/ticket">Regras do fórum</Link>
+                        <Link to="/timeline/equipe-staff">Equipe staff</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/habblet-etiqueta">Habblet etiqueta</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/enables">Enables</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/hand-items">Hand items</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/historia-do-hotel">História do hotel</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/projetos">Projetos</Link>
                       </li>
                     </ul>
                   </div>

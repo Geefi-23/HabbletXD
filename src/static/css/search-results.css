@@ -13,7 +13,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    border-radius: 10px;
+    border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
@@ -30,7 +30,7 @@
 .section-titulo {
     height: 50px;
     background-color: #30336a;
-    border-radius: 12px;
+    border-radius: .25rem;
 }
 
 .section-titulo>h1 {

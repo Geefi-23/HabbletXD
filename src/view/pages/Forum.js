@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import api from '../../static/js/api';
 
 import '../../static/css/forum.css';
@@ -88,6 +88,7 @@ const Forum = (props) => {
   const [comentarios, setComentarios] = useState([]);
   const [scrollToTop, setScrollToTop] = useState(true);
   const [art, setArt] = useState([]); // para artes
+  const location = useLocation();
   const { key } = useParams();
   const { isAuth, sendAlert, type, showProgress, hideProgress } = props;
 
@@ -162,13 +163,14 @@ const Forum = (props) => {
   };
 
   useEffect(() => { 
-    if (article === null)
-      get();
+    
+    get();
     if (scrollToTop) {
       window.scrollTo(0, 0);
       setScrollToTop(false);
     }
-  }, [get]);
+    console.log('a rota mudou caralho')
+  }, [get, location]);
   return (
     <>
       <section className="w-100 forum">
@@ -184,18 +186,22 @@ const Forum = (props) => {
             <div className="d-flex flex-row h-100 gap-2">
               <div className='text-center'>
                 <div>
-                  <img
-                    src={(() => {
-                      const image = require(`../../static/icons/${article?.categoria_icone || 'category_icon_art.gif'}`);
-                      return image;
-                    })()}
-                    alt=""
-                  />
+                  {
+                    type !== 'timeline' ?
+                    <img
+                      src={(() => {
+                        const image = require(`../../static/icons/${article?.categoria_icone || 'category_icon_art.gif'}`);
+                        return image;
+                      })()}
+                      alt=""
+                    />
+                    : <></>
+                  }
                   <small className="ms-2"><strong>{article.categoria}</strong></small>
                 </div>
-                <small className="text-special">
+                <small className="hxd-primary-text">
                   Por <Link 
-                    className="text-decoration-none text-special"
+                    className="text-decoration-none hxd-primary-text"
                     to={`/perfil/${article.criador}`}>{article.criador || article.autor}</Link> no dia {article.data} as {article.hora}
                 </small>
               </div>

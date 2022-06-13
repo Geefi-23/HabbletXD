@@ -14,7 +14,7 @@ const approutes = (props) => {
   return (
     <Routes>
       <Route path="*" element={<>Gay</>}/>
-      <Route path="/" element={<Home showProgress={showProgress} hideProgress={hideProgress} sendAlert={sendAlert}  />} />
+      <Route path="/" element={<Home showProgress={showProgress} hideProgress={hideProgress} sendAlert={sendAlert} key={Math.random()}  />} />
       <Route path="/search" element={<SearchResults />} />
       <Route path="/equipe" element={<Team />} />
       <Route path="/habbletimager" element={<HabbletImager />} />

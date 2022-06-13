@@ -6,7 +6,7 @@
     background-color: #ffffff;
     width: 100%;
     height: 66px;
-    border: solid 1px #30336b;
+    border: solid 1px rgb(var(--hxd-theme-color));
     border-radius: .25rem;
     padding: .25rem;
 }
