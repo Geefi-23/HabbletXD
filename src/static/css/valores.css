@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Poppins:ital,wght@1,300&display=swap');
+.infos {
+    width: 767px;
+    height: 44px;
+    margin-left: 220px;
+    background-color: #ececfb;
+    border: solid 2px #70729c;
+    border-radius: 5px;
+}
+span {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+color: #a9a9b4;
+}
+.value-container {
+    width: 767px;
+    height: 44px;
+    margin-left: 220px;
+    background-color: #30336b;
+    border-radius: 5px;
+    padding: -16px;
+    margin-top: 14px;
+}
+.h2-value {
+    color: white;
+    font-size: 15px;
+    margin-left: 12px;
+    padding: 10px;
+}
+.value-h1 {
+    font-weight: bolder;
+    color: #292958;
+    font-size: 20px;
+    margin-left: 241px;
+    margin-top: 41px;
+}
+.value-h2 {
+
+    color: #292958;
+    font-size: 20px;
+    margin-left: 314px;
+    margin-top: -32px;
+}
+.value-p {
+    color: #79799b;
+    font-size: 15px;
+    margin-left: 244px;
+    margin-top: -4px;
+    font-weight: bold ;
+    font-family: "Sofia", sans-serif;
+}
+.grid-1 {
+    width: 176px;
+    height: 185px;
+    background-color: #30336b;
+    margin-left: 236px;
+    margin-top: 29px;
+}
+.teste{
+    width: 17px;
+    height: 18px;
+    background-color: #0fb100;
+    margin-top: 10px;
+}
+.container-infos-raros {
+    display: flex;
+}
+.container-coluns {
+    width: 162px;
+    height: 153px;
+    background-color: #30336b;
+    margin-left: 221px;
+}
