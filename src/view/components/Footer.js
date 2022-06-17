@@ -24,7 +24,7 @@ const Footer = () => {
           </strong>
           &nbsp;e&nbsp;
           <strong>
-            <a className="hxd-primary-text text-decoration-none" href="https://github.com/marcosboni">Marcos</a>
+            <a className="hxd-primary-text text-decoration-none" href="https://github.com/marcosboni">Marcos(Indio)</a>
           </strong>
         </span>
       </div>

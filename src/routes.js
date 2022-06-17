@@ -7,6 +7,7 @@ import SearchResults from "./view/pages/SearchResults";
 import Forum from "./view/pages/Forum";
 import Team from "./view/pages/Team";
 import HabbletImager from "./view/pages/HabbletImager";
+import Valores from "./view/pages/Valores";
 
 const approutes = (props) => {
   const { isAuth, sendAlert, showProgress, hideProgress } = props;
@@ -16,6 +17,7 @@ const approutes = (props) => {
       <Route path="*" element={<>Gay</>}/>
       <Route path="/" element={<Home showProgress={showProgress} hideProgress={hideProgress} sendAlert={sendAlert} key={Math.random()}  />} />
       <Route path="/search" element={<SearchResults />} />
+      <Route path="/valores" element={<Valores />} />
       <Route path="/equipe" element={<Team />} />
       <Route path="/habbletimager" element={<HabbletImager />} />
       <Route path="/meuperfil" element={<Profile type="myself" isAuth={isAuth} hideProgress={hideProgress} />} />
