@@ -20,7 +20,7 @@ const Home = (props) => {
   const [confirmationForBuyShow, setConfirmationForBuyShow] = useState(false);
   
   const [badges, setBadges] = useState([]);
-  const [mobis, setMobis] = useState([]);
+  const [loja, setLoja] = useState([]);
   const [allNews, setAllNews] = useState(null);
   const [allSpotlights, setAllSpotlights] = useState([]);
   const [allTimelines, setAllTimelines] = useState([]);
@@ -28,7 +28,6 @@ const Home = (props) => {
   const [beingBought, setBeingBought] = useState({});
 
   const btnScrollTopRef = useRef(null);
-  const timelineWriterRef = useRef(null);
   const handleScrollTopBtn = () => {
     try {
       if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
@@ -170,16 +169,23 @@ const Home = (props) => {
     let news = await api.news('getall');
     let timelines = await api.timeline('getall');
     let arts = await api.art('getall');
-    let mobis = await api.mobis('getall');
     let badges = await api.badges('getall');
+    let buyables = await api.buyable('getall');
+
+    buyables = await Promise.all(buyables.map(async item => {
+      const blob = await api.media('get', { filename: item.imagem, type: 'buyable' });
+      item.imagem = URL.createObjectURL(blob);
+      return item;
+    }));
+
+    setLoja(buyables);
     setAllNews(news);
     setAllTimelines(timelines);
     setAllArts(arts);
-    setMobis(mobis);
     setBadges(badges.badges);
 
     configureSliders();
-  }, [setAllNews, setAllTimelines, setAllArts]);
+  }, [setAllNews, setAllTimelines, setAllArts, configureSliders]);
 
   useInterval(() => {
     pool();
@@ -192,7 +198,7 @@ const Home = (props) => {
     configureSliders();
     document.onscroll = handleScrollTopBtn;
     window.scrollTo(0, 0);
-  }, [pool, configureSliders]);
+  }, [pool, configureSliders, hideProgress]);
 
   
   return (
@@ -508,7 +514,7 @@ const Home = (props) => {
                 />
                 <div className="ms-3">
                   <h4 className="mb-0 text-white"><span className="fw-bold">Lojão</span> da XD</h4>
-                  <span className="text-white">Venha gastar seus XD's comprando mobs, visuais, raros e entre outros!</span>
+                  <span className="text-white">Venha gastar seus XD's comprando mobis, visuais, raros e entre outros!</span>
                 </div>
               </div>
               <div className="section__nav-tools">
@@ -532,23 +538,29 @@ const Home = (props) => {
                 <div className="glide__track" data-glide-el="track">
                   <div className='glide__slides'>
                     {
-                      mobis.map((mobi) => (
+                      loja.filter(item => item.tipo != 'emblema').map((item) => (
                         <div className="glide__slide lojao-card">
                           <div className="info-wrapper">
-                            <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                            <div className="hxd-bg-color rounded-top text-center" style={{flex: '1 0 0'}}>
+                              <img src={item?.imagem} alt="" />
+                            </div>
                             <div 
                               className='d-flex align-items-center justify-content-center bg-white rounded-bottom hxd-primary-text' 
                               style={{height: '40px'}}
                             >
-                              <small>
-                                <strong>{mobi.nome}</strong>
+                              <small className="text-center">
+                                <strong>
+                                  {item.tipo.toUpperCase()}
+                                  &nbsp;
+                                  {item.nome}
+                                </strong>
                               </small>
                             </div>
                             <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                              <span className="hxd-bg-color px-2 text-white rounded">{mobi.valor} XD's</span>
+                              <span className="hxd-bg-color px-2 text-white rounded">{item.valor} XD's</span>
                               <button className='btn btn-success p-0 px-2' 
                               onClick={() => {
-                                setBeingBought(mobi);
+                                setBeingBought(item);
                                 setConfirmationForBuyShow(true);
                               }}>Comprar</button>
                             </div>

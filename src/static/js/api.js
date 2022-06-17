@@ -7,7 +7,7 @@ const URL = 'https://localhost/api/';
 
 // Cada váriavel representa uma rota de dados
 const userPath = 'user/';
-const mobisPath = 'mobis/';
+const buyablePath = 'buyable/';
 const badgesPath = 'badges/';
 const newsPath = 'news/';
 const timelinePath = 'timeline/';
@@ -29,8 +29,8 @@ const api = {
     return res;
   },
 
-  mobis: async (action, init = {}) => {
-    let res = await (await fetch(URL+mobisPath+action+'.php', init)).json();
+  buyable: async (action, init = {}) => {
+    let res = await (await fetch(URL+buyablePath+action+'.php', init)).json();
     return res;
   },
 

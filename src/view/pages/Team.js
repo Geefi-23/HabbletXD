@@ -16,7 +16,9 @@ const Card = () => {
         CEO
       </div>
       <div className="team_member-card">
-        <div className="team_member-card__picture"></div>
+        <div className="team_member-card__picture">
+          <img src={`https://avatar.blet.in/HabbletXD&action=std&size=l&head_direction=3&direction=2&gesture=std&headonly=0`} />
+        </div>
         <div className='d-flex gap-1 mt-1'>
           <div className='d-flex justify-content-center align-items-center hxd-primary-text hxd-border fw-bold rounded' 
             style={{
@@ -31,16 +33,19 @@ const Card = () => {
             <button className="bg-transparent border-0 p-0">
               <img 
                 src="https://img.icons8.com/color/16/undefined/facebook-f.png"
+                alt=""
               />
             </button>
             <button className="bg-transparent border-0 p-0">
               <img 
                 src="https://img.icons8.com/color/16/undefined/twitter--v1.png"
+                alt=""
               />
             </button>
             <button className="bg-transparent border-0 p-0">
               <img 
                 src="https://img.icons8.com/color/16/undefined/discord--v2.png"
+                alt=""
               />
             </button>
             

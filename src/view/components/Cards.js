@@ -59,13 +59,23 @@ const NewsCard = (props) => {
           <div className="h4 fw-bold">IR</div>
           <small className="d-block fw-bold">{news.visualizacao}</small>
           <small className="d-block fw-bold">100 Likes</small>
+          <img
+            src={require(`../../static/icons/${news?.categoria_icone || 'category_icon_art.gif'}`)}
+          />
           <small className="mt-2">{news.categoria_nome}</small>
         </div>
       </div>
       <div className="news-card__content">
         <span className="news-card__title">{news.titulo}</span>
         <small className='news-card__resume'>{news.resumo}</small>
-        <div className="position-absolute fw-bold text-secondary" style={{bottom: 0}}>{`${news.data} às ${news.hora}`}</div>
+        <div className="d-flex w-100 justify-content-between position-absolute fw-bold text-secondary" style={{height: '20px', bottom: 0}}>
+          {`${news.data} às ${news.hora}`}
+          <img 
+            style={{ alignSelf: 'center', objectPosition: '0 5px' }}
+            src={`https://avatar.blet.in/${news.criador}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=1`} 
+            title={news.criador}
+          />
+        </div>
       </div>
     </Link>
   );
@@ -103,7 +113,13 @@ const TimelineCard = (props) => {
       </div>
       <div className="d-flex justify-content-between">
         <small className="fw-bold hxd-secondary-text">#HabbletXD</small>
-        <small className="fw-bold text-danger">100 likes</small>
+        <small className="d-flex align-items-center text-danger">
+          <img
+            className="me-1"
+            src="https://img.icons8.com/ios-glyphs/20/dc3545/like--v1.png"
+          />
+          {timeline.likes}
+        </small>
       </div>
     </Link>
   );
@@ -125,7 +141,8 @@ const ArtCard = (props) => {
 
   useEffect(() => {
     let art = adjustDate(refer);
-    getImage(art.imagem);
+    if (art.imagem !== '')
+      getImage(art.imagem);
     setArt(art);
     
   }, [refer]);
@@ -147,8 +164,19 @@ const ArtCard = (props) => {
           <small className="hxd-secondary-text text-truncate">{art.descricao}</small>
           <small className="hxd-secondary-text text-end pe-2">{art.data} às {art.hora}</small>
         </div>
-        <div style={{flex: '1 0 0'}}>
-          <div className='w-100 h-100 bg-dark rounded'></div>
+        <div className="p-1" style={{flex: '1 0 0'}}>
+          <div className='w-100 h-100 hxd-bg-colorLight rounded'>
+            <img 
+              style={{
+                height: '100%',
+                width: '100%',
+                objectFit: 'none',
+                objectPosition: 'center 5px'
+              }}
+              src={`https://avatar.blet.in/${art.autor}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=1`} 
+              title={art.autor}
+            />
+          </div>
         </div>
       </div>
     </Link>

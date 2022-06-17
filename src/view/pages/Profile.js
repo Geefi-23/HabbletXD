@@ -56,27 +56,27 @@ const Profile = ({ type, isAuth, hideProgress }) => {
         setProfile(res.user);
       }
 
-      let getTimelines = await api.timeline('getsome', { quantity: 4, user: user.info.usuario });
-      let getArts = await api.art('getsome', { quantity: 2, user: user.info.usuario });
+      let getTimelines = await api.timeline('getsome', { quantity: 4, user: name });
+      let getArts = await api.art('getsome', { quantity: 2, user: name });
 
       if (getTimelines.success) {
-        setTimelines(res.timelines);
+        setTimelines(getTimelines.timelines);
       }
 
       if (getArts.success) {
         let pixels = getArts.arts;
-        pixels = pixels.map(async (pixel) => {
+        /*pixels = await pixels.map(async (pixel) => {
           let blob = await api.media('get', { filename: pixel.imagem });
           let link = URL.createObjectURL(blob);
 
           pixel.linkimagem = link;
           return pixel
-        });
+        });*/
 
         setArts(pixels);
       }
     }
-  }, []);
+  }, [isAuth, name, type]);
 
   useEffect(() => {
 
@@ -88,7 +88,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
       }).mount();
     loadProfile(); 
     //slider.create({ slider: '#mobis-slider', slidesToShow: 4, gap: 8, arrows: { left: '#mobs-arrowLeft', right: '#mobs-arrowRight' }})
-  }, []);
+  }, [hideProgress, loadProfile, badges.length]);
   return (
     <>
     {
@@ -99,7 +99,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
             {
               type === 'myself' ?
               <Link to="/editarperfil">
-                <img src="https://img.icons8.com/ios-filled/30/ffffff/settings.png"/>
+                <img src="https://img.icons8.com/ios-filled/30/ffffff/settings.png" alt=""/>
               </Link>
               :
               null
@@ -118,6 +118,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                     <img 
                       src={`https://avatar.blet.in/${profile?.info?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
                       style={{objectPosition: '0 -30px' }}
+                      alt=""
                     />
                   </div>
                 </div>
@@ -173,7 +174,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                   <div className="d-flex flex-wrap gap-2">
                     {
                       timelines?.length === 0 ?
-                      <h6 className="text-center mt-2">Este usuário não tem timelines</h6>
+                      <h6 className="text-center hxd-secondary-text mt-2">Este usuário não tem timelines</h6>
                       :
                       timelines?.map((timeline) => (
                         <Link to={`/timeline/${timeline.url}`} className="hxd-border hxd-primary-text bg-white text-decoration-none rounded" style={{width: "252px", height: '70px'}}>
@@ -187,7 +188,13 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                           </div>
                           <div className="d-flex justify-content-between px-2">
                             <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
-                            <span>100</span>
+                            <div className="d-flex align-items-center text-danger">
+                              <img
+                                className="me-1"
+                                src="https://img.icons8.com/ios-glyphs/20/dc3545/like--v1.png"
+                              />
+                              100
+                            </div>
                           </div>
                         </Link>
                       ))
@@ -201,9 +208,8 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                       arts?.length === 0 ?
                       <h6 className="mt-2">Este usuário não publicou nenhuma arte.</h6>
                       :
-                      arts?.map((art) => {
-                        return(
-                        <Link to="/" className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
+                      arts?.map((art) => (
+                        <Link to={`/arte/${art.url}`} className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
                           <div className="bg-secondary h-100 hxd-border rounded" style={{width: '70px', flexShrink: '0'}}>
                             <img src={`${art?.linkimagem}`} alt=" " />
                             {console.log(art)}
@@ -216,7 +222,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                             <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
                           </div>
                         </Link>
-                      )})
+                      ))
                     }
                   </div>
                 </div>

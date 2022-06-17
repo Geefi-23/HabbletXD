@@ -67,7 +67,7 @@ const Header = (props) => {
         {/* MODAL ART UPLOAD */}
         <button className="bg-transparent h-100 border-0"
           onClick={() => setArtModalIsShowing(true)}>
-          <img src={`https://img.icons8.com/ios-filled/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/drawing.png`}/>
+          <img src={`https://img.icons8.com/ios-filled/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/drawing.png`} alt="" />
         </button>
         <ArtUploadModal 
           showProgress={showProgress} 
@@ -190,7 +190,6 @@ const Header = (props) => {
 
   const RadioPlayer = (props) => {
     const [isPaused, setIsPaused] = useState(false);
-    const [streamVolume, setStreamVolume] = useState(1);
     const stream = useRef(null);
 
     const handleStreamPP = () => {
@@ -200,7 +199,6 @@ const Header = (props) => {
     };
 
     const handleStreamVolume = (newVol) => {
-      setStreamVolume(newVol);
       stream.current.volume = newVol;
     };
 

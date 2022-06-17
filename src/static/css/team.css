@@ -4,14 +4,10 @@
 }
 
 .team_member-card__picture{
+  text-align: center;
   background-color: aquamarine;
   height: 120px;
   border-radius: .25rem;
   overflow: hidden;
   border: 1px solid rgb(var(--hxd-theme-color))
-}
-
-.team_member-card__picture img{
-  height: 100%;
-  width: 100%;
 }

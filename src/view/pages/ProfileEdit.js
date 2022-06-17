@@ -1,10 +1,10 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import API from '../../static/js/api';
 
 import '../../static/css/profileEdit.css';
 
 const ProfileEdit = (props) => {
-  let { isAuth, sendAlert, showProgress, hideProgress, notify } = props;
+  let { isAuth, sendAlert, showProgress, hideProgress } = props;
   const [user, setUser] = useState({});
 
   const setUserObject = () => {
@@ -71,6 +71,7 @@ const ProfileEdit = (props) => {
                   <img 
                     src={`https://avatar.blet.in/${user?.info?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
                     style={{objectPosition: '0 -30px' }}
+                    alt=""
                   />
                 </div>
                 <label>

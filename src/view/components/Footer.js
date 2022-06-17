@@ -12,12 +12,12 @@ const Footer = () => {
       <div className="w-100 m-3" style={{borderTop: '1px solid rgb(var(--hxd-theme-colorLight))'}}></div>
       <div className="hxd-primary-text">
         <span className="hxd-bg-color-gray py-2 px-4 rounded-pill">
-          <img src="https://img.icons8.com/ios-filled/24/undefined/illustrator.png" className="me-2" />
+          <img src="https://img.icons8.com/ios-filled/24/undefined/illustrator.png" alt="" className="me-2" />
           Desenhado por Paone
         </span>
         <br /><br />
         <span className="hxd-bg-color-gray py-2 px-4 rounded-pill">
-          <img src="https://img.icons8.com/metro/24/undefined/source-code.png" className="me-2" />
+          <img src="https://img.icons8.com/metro/24/undefined/source-code.png" alt="" className="me-2" />
           Desenvolvido por&nbsp;
           <strong>
             <a className="hxd-primary-text text-decoration-none" href="https://github.com/Geefi-23">Milton R.</a> 
