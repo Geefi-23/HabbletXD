@@ -8,24 +8,50 @@ import Forum from "./view/pages/Forum";
 import Team from "./view/pages/Team";
 import HabbletImager from "./view/pages/HabbletImager";
 import Valores from "./view/pages/Valores";
+import Schedules from "./view/pages/Schedules";
 
 const approutes = (props) => {
-  const { isAuth, sendAlert, showProgress, hideProgress } = props;
+  const { user, setUser, sendAlert, showProgress, hideProgress } = props;
 
+  // preload data
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values } = props;
+  
   return (
     <Routes>
-      <Route path="*" element={<>Gay</>}/>
-      <Route path="/" element={<Home showProgress={showProgress} hideProgress={hideProgress} sendAlert={sendAlert} key={Math.random()}  />} />
+      <Route path="*" element={
+      <div className="container">
+        <h2>404 - Página não encontrada</h2>
+      </div>}/>
+      <Route 
+        path="/" 
+        element={
+        <Home 
+          showProgress={showProgress} 
+          hideProgress={hideProgress} 
+          sendAlert={sendAlert} 
+          key={Math.random()}
+          badges={badges}
+          loja={loja}
+          allNews={allNews}
+          allTimelines={allTimelines}
+          allArts={allArts}
+          allSpotlights={allSpotlights}
+          values={values}
+        />
+        } 
+      />
       <Route path="/search" element={<SearchResults />} />
-      <Route path="/valores" element={<Valores />} />
-      <Route path="/equipe" element={<Team />} />
+      <Route path="/valores" element={<Valores hideProgress={hideProgress} />} />
+      <Route path="/horarios" element={<Schedules hideProgress={hideProgress} />} />
+      <Route path="/equipe" element={<Team hideProgress={hideProgress} />} />
       <Route path="/habbletimager" element={<HabbletImager />} />
-      <Route path="/meuperfil" element={<Profile type="myself" isAuth={isAuth} hideProgress={hideProgress} />} />
+      <Route path="/meuperfil" element={<Profile type="myself" user={user} hideProgress={hideProgress} />} />
       <Route 
         path="/editarperfil" 
         element={
           <ProfileEdit 
-            isAuth={isAuth} 
+            user={user} 
+            setUser={setUser}
             sendAlert={sendAlert} 
             showProgress={showProgress} 
             hideProgress={hideProgress} 
@@ -40,7 +66,7 @@ const approutes = (props) => {
           path=":key" 
           element={
             <Forum 
-              isAuth={isAuth} 
+              user={user} 
               sendAlert={sendAlert} 
               showProgress={showProgress} 
               hideProgress={hideProgress} type='news' 
@@ -52,7 +78,7 @@ const approutes = (props) => {
         <Route 
           path=":key" element={
           <Forum 
-            isAuth={isAuth} 
+            user={user} 
             sendAlert={sendAlert} 
             showProgress={showProgress} 
             hideProgress={hideProgress} type='timeline' 
@@ -63,7 +89,7 @@ const approutes = (props) => {
         <Route 
           path=":key" element={
           <Forum 
-            isAuth={isAuth} 
+            user={user} 
             sendAlert={sendAlert} 
             showProgress={showProgress} 
             hideProgress={hideProgress} type='art' 

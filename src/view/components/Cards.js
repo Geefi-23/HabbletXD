@@ -22,43 +22,51 @@ const adjustDate = (toAdjust) => {
 
 const NewsCard = (props) => {
   const [news, setNews] = useState({});
-  const [thumb, setThumb] = useState(null);
   const { refer, onClick } = props;
 
-  const getImage = async (filename) => {
-    let blob = await api.media('get', {
-      filename,
-      type: 'image'
-    });
-    setThumb(URL.createObjectURL(blob));
-  };
-  
   const formatSomeInfo = (obj) => {
     let views = obj?.visualizacao;
-    views = views === 0 ? 'nenhuma visualização' : views === 1 ? `${views} visualização` : `${views} visualizações`;
+    let likes = obj?.likes;
+    views = views === "0" ? 'Nenhuma visualização' : views === "1" ? `${views} visualização` : `${views} visualizações`;
+    likes = likes === "0" ? 'Nenhum like' : likes === "1" ? `${likes} like` : `${likes} likes`;
 
     obj.visualizacao = views;
+    obj.likes = likes;
 
     return obj;
   };
 
+  const pool = async () => {
+    /*const blob = await api.media('get', {
+      filename: news?.imagem,
+      type: 'image'
+    });
+    news.imagem = URL.createObjectURL(blob);*/
+    setNews(adjustDate(refer));
+  };
+
   useEffect(() => {
-    let news = adjustDate(refer);
-    getImage(news.imagem);
-    setNews(formatSomeInfo(news));
+    pool();
     
-  }, [refer]);
+  }, []);
 
   return (
     <Link to={'noticia/'+news.url} className="news-card"
     onClick={onClick}
     >
       <div className="news-card__thumbnail">
-        <img className="w-100 h-100" src={thumb} alt=" " />
+        <img className="w-100 h-100" src={news.imagem} alt="" onError={(evt) => evt.target.classList.add('d-none')} />
         <div className="news-card__thumbnail--hover">
           <div className="h4 fw-bold">IR</div>
-          <small className="d-block fw-bold">{news.visualizacao}</small>
-          <small className="d-block fw-bold">100 Likes</small>
+          <small className="d-block fw-bold">
+            {
+              news.visualizacao && news.visualizacao === "0" ? 'Sem visualizações' :
+              news.visualizacao === "1" ? news.visualizacao + ' visualização' : 
+              news.visualizacao + ' visualizações'
+            
+            }
+          </small>
+          <small className="d-block fw-bold">{news.likes} likes</small>
           <img
             src={require(`../../static/icons/${news?.categoria_icone || 'category_icon_art.gif'}`)}
           />
@@ -127,22 +135,10 @@ const TimelineCard = (props) => {
 
 const ArtCard = (props) => {
   const [art, setArt] = useState({});
-  const [thumb, setThumb] = useState(null);
   const { refer, onClick } = props;
-
-  const getImage = async (filename) => {
-    
-    let blob = await api.media('get', {
-      filename,
-      type: 'image'
-    });
-    setThumb(URL.createObjectURL(blob));
-  };
 
   useEffect(() => {
     let art = adjustDate(refer);
-    if (art.imagem !== '')
-      getImage(art.imagem);
     setArt(art);
     
   }, [refer]);
@@ -150,12 +146,15 @@ const ArtCard = (props) => {
   return (
     <Link to={"/arte/"+art.url} className="art-card" onClick={onClick}>
       <div className="art-card__thumbnail overflow-hidden">
-        <img className="w-100 h-100" style={{objectFit: 'cover'}} src={thumb} alt="" />
+        <img className="w-100 h-100" style={{objectFit: 'cover'}} src={art.imagem} alt="" onError={(evt) => evt.target.classList.add('d.none')} />
         <div className="art-card__thumbnail--hover">
           <span className="display-6 fw-bold">IR</span>
-          <span>100 Visualizações</span>
-          <span>100 Curtidas</span>
-          <span className="mt-2">Uma categoria</span>
+          <span>{art.visualizacao} Visualizações</span>
+          <span>{art.likes} Curtidas</span>
+          <span className="mt-2">
+            <img className="me-2" src={require('../../static/icons/category_icon_art.gif')} alt=""/>
+            {art.categoria_nome}
+          </span>
         </div>
       </div>
       <div className="art-card__info" style={{height: '30%'}}>
@@ -213,7 +212,7 @@ const ResultCard = (props) => {
     <>
     {
       type !== 'Perfil' ?
-      <Link to={`/${type.toLowerCase()}/${result?.usuario}`} className="container-geral">
+      <Link to={`/${type.toLowerCase()}/${result?.url}`} className="container-geral">
           <div className="container-nome-perfill">
             <span style={{color: '#fff', fontSize: '15px'}}>{type}</span>
           </div>

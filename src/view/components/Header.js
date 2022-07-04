@@ -1,8 +1,9 @@
 import { useEffect, useCallback, useState, useRef } from 'react';
-//import Glide from '@glidejs/glide'
+import Glide from '@glidejs/glide'
 import { Link } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import { Dropdown } from 'react-bootstrap';
+import AuthModal from './AuthModal';
 
 import ArtUploadModal from './ArtUploadModal';
 
@@ -13,8 +14,10 @@ import '../../static/css/header.css';
 import api from '../../static/js/api';
 
 const Header = (props) => {
-  
-  const { isAuth, setIsAuth, showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing } = props;
+  const { user, setUser, showProgress, hideProgress, sendAlert, artCategories, values, schedules } = props;
+
+  const [artModalIsShowing, setArtModalIsShowing] = useState(false);
+  const [isAuthModalShowing, setIsAuthModalShowing] = useState(false);
 
   /**
    * 
@@ -34,20 +37,16 @@ const Header = (props) => {
     return componentToHex(values[0]) + componentToHex(values[1]) + componentToHex(values[2]);
   };
 
-  const checkAuthentication = useCallback(async () => {
-    let res = await api.user('authenticate', {credentials: 'include'});
-    setIsAuth(res.authenticated);
-  }, [setIsAuth]);
-  
-  useEffect(() => {
-    checkAuthentication();
-  }, [checkAuthentication]);
-
   const UserArea = () => {
 
     return (
-      !isAuth ? 
+      !user ? 
       <>
+        <AuthModal 
+          setUser={setUser} sendAlert={sendAlert} showProgress={showProgress} 
+          hideProgress={hideProgress} isModalShowing={isAuthModalShowing} 
+          handleModalHide={() => setIsAuthModalShowing(false)}
+        />
         <Dropdown className="d-flex align-items-center">
           <Dropdown.Toggle
           className="dropdown-toggle caret-off hxd-bg-colorDark p-0 px-4 fw-bold text-white border-0 rounded">
@@ -57,13 +56,14 @@ const Header = (props) => {
           <Dropdown.Menu>
             <Dropdown.Item className="dropdown-item hxd-active">
               <button type="button" className="bg-transparent border-0 w-100" 
-              onClick={props.showModal}>
+              onClick={() => setIsAuthModalShowing(true)}>
                 Entrar
               </button>
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </> : <>
+        
         {/* MODAL ART UPLOAD */}
         <button className="bg-transparent h-100 border-0"
           onClick={() => setArtModalIsShowing(true)}>
@@ -75,10 +75,15 @@ const Header = (props) => {
           sendAlert={sendAlert} 
           artModalIsShowing={artModalIsShowing}
           setArtModalIsShowing={setArtModalIsShowing}
+          categories={artCategories}
         />
+        <button className="bg-transparent h-100 border-0">
+          <img src={require('../../static/icons/xd_coins_icon.jpg')} alt="" />
+          <span className='ms-2 fw-bold'>{user?.xdcoins}</span>
+        </button>
         <Link to="/meuperfil" onClick={() => showProgress()} className="d-flex align-items-center bg-transparent h-100 border-0">
           <img 
-            src={`https://avatar.blet.in/${JSON.parse(localStorage.getItem('hxd-user-object'))?.info.usuario}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
+            src={`https://avatar.blet.in/${user?.usuario}&action=std&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
             alt=""
             style={{
               height: '100%',
@@ -102,9 +107,8 @@ const Header = (props) => {
         </Dropdown>
         <button className="bg-transparent h-100 border-0" 
           onClick={() => {
-            localStorage.removeItem('hxd-user-object');
             api.user('logout', {credentials: 'include'});
-            setIsAuth(false);
+            setUser(false);
             window.location.href = '/';
           }}
         >
@@ -289,32 +293,28 @@ const Header = (props) => {
           </div>
         </div>
         <div className="d-flex flex-row justify-content-evenly w-100 py-2 text-white" style={{height: '50px'}}>
-          <div className="next-schedule__card opacity-100">
-            <div style={{width: '45px', height: '34px'}}></div>
-            <div style={{lineHeight: 1.1}}>
-              <small className="d-block text-white fw-bold opacity-75">Depois</small>
-              <span className="text-white fw-bold">Próximo</span>
-            </div>
-          </div>
-          <div className="next-schedule__card opacity-75">
-            <div style={{width: '45px', height: '34px'}}></div>
-            <div style={{lineHeight: 1.1}}>
-              <small className="d-block text-white fw-bold opacity-75">às 00:00</small>
-              <span className="text-white fw-bold">Próximo</span>
-            </div>
-          </div>
-          <div className="next-schedule__card opacity-50">
-            <div style={{width: '45px', height: '34px'}}></div>
-            <div style={{lineHeight: 1.1}}>
-              <small className="d-block text-white fw-bold opacity-75">às 00:00</small>
-              <span className="text-white fw-bold">Próximo</span>
-            </div>
-          </div>
+          {
+            schedules.map((s, i) => (
+              <div className={`next-schedule__card opacity-${i === 0 ? '100' : i === 1 ? '75' : i === 2 ? '50' : ''}`}>
+                <div className="overflow-hidden ps-2" style={{width: '45px', height: '34px'}}>
+                  <img src={`https://avatar.blet.in/${s.usuario}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=0`} />
+                </div>
+                <div style={{lineHeight: 1.1}}>
+                  <small className="d-block text-white opacity-75">
+                    {i === 0 ? 'Depois' : `às ${s.comeca}`}
+                  </small>
+                  <span className="text-white">
+                    {s.usuario}
+                  </span>
+                </div>
+              </div>
+            ))
+          }
         </div>
         <div className="d-flex justify-content-center">
-          <button className="btn shadow-none hxd-bg-color w-75 text-white rounded">
+          <Link to="/horarios" className="btn shadow-none hxd-bg-color w-75 text-white rounded">
             Visitar área de horários
-          </button>
+          </Link>
         </div>
       </div>
     );
@@ -337,9 +337,28 @@ const Header = (props) => {
       }, 4000)
     };
 
+    const configSliders = () => {
+      const carousel = new Glide('#portal-carousel', {
+        type: 'carousel',
+        perView: 1,
+        autoplay: 3000
+      });
+
+      const valores = new Glide('#valores-glide', {
+        perView: 8,
+        gap: 8,
+        peek: {
+          before: 0,
+          after: 16
+        }
+      });
+      valores.mount();
+      carousel.mount();
+      
+    };
+
     useEffect(() => {
-      slider.create({slider: '#valores-slider', slidesToShow: 7, gap: 8});
-      handleCarousel();
+      configSliders();
     }, [])
 
     return (
@@ -370,53 +389,43 @@ const Header = (props) => {
         </div>
         <div className="w-100">
           <strong className="text-white">Valores</strong>
-          <div id="valores-slider" className="slider mt-1">
-            <button className="slider__arrow slider__arrow--left">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-left" viewBox="0 0 16 16">
-                <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-              </svg>
-            </button>
-            <div className="slider__track">
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-              <div className="slider__item">
-                <div className="slider__item-popup">hhhhhhhhhh</div>
-              </div>
-
+          <div id="valores-glide" className="glide mt-1 d-flex">
+            <div data-glide-el="controls">
+              <button className="slider__arrow slider__arrow--left" data-glide-dir="<">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-left" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                </svg>
+              </button>
             </div>
-            <button className="slider__arrow slider__arrow--right">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-right" viewBox="0 0 16 16">
-                <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-              </svg>
-            </button>
+            <div className="glide__track" data-glide-el="track" style={{ flex: 1 }}>
+              <div className="glide__slides" style={{ height: '60px' }}>
+                {
+                  values?.map(v => (
+                    <Link to="/valores" className="glide__slide slider__item" title={v.nome}>
+                      <img src={v.imagem} alt="" />
+                    </Link>
+                  ))
+                }
+              </div>
+            </div>
+            <div data-glide-el="controls">
+              <button className="slider__arrow slider__arrow--right" data-glide-dir=">">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-right" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
-        <div className="carousel ">
-          <div className="carousel__track">
-            <div className="glide__slide carousel__item">1</div>
-            <div className="glide__slide carousel__item">2</div>
-            <div className="glide__slide carousel__item">3</div>
-            <div className="glide__slide carousel__item">4</div>
-            <div className="glide__slide carousel__item">5</div>
+        <div id="portal-carousel" className="glide mt-2">
+          <div className="glide__track rounded" data-glide-el="track">
+            <div className="glide__slides" style={{ height: '125px' }}>
+              <div className="glide__slide bg-secondary">1</div>
+              <div className="glide__slide bg-secondary">2</div>
+              <div className="glide__slide bg-secondary">3</div>
+              <div className="glide__slide bg-secondary">4</div>
+              <div className="glide__slide bg-secondary">5</div>
+            </div>
           </div>
         </div>
       </div>
@@ -521,7 +530,7 @@ const Header = (props) => {
             <nav className="h-100">
               <ul className="horizontal-navbar-menu h-100 list-unstyled">
                 <li className="navbar-menu__item active">
-                  <Link to="/">INICIO</Link>
+                  <Link to="/" onClick={() => showProgress()}>INICIO</Link>
                 </li>
                 <li className="navbar-menu__item especial">
                   <button className="bg-transparent border-0">HABBLET XD</button>
@@ -586,9 +595,6 @@ const Header = (props) => {
                     <ul className="list-unstyled">
                       <li>
                         <Link to="/habbletimager">Habblet Imager</Link>
-                      </li>
-                      <li>
-                        <Link to="/ticket">Ticket</Link>
                       </li>
                     </ul>
                   </div>

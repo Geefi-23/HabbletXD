@@ -7,20 +7,11 @@ import api from '../../static/js/api';
 const ArtUploadModal = (props) => {
   const [showing, setShowing] = useState(false);
   const [upload, setUpload] = useState(null);
-  const [categories, setCategories] = useState([]);
 
-  const { showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing } = props;
+  const { showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing, categories } = props;
 
   const handleImageInput = (file) => {
     setUpload(file);
-  };
-
-  const poolCategories = async () => {
-    let res = await api.art('getallcategories');
-
-    if (res.success) {
-      setCategories(res.categories);
-    }
   };
   
   const handleSubmit = async evt => {
@@ -55,10 +46,6 @@ const ArtUploadModal = (props) => {
     hideProgress();
   };
 
-  useEffect(() => {
-    poolCategories();
-  }, []);
-
   return (
     <>
       <Modal show={artModalIsShowing} onHide={() => setArtModalIsShowing(false)} >
@@ -80,8 +67,8 @@ const ArtUploadModal = (props) => {
             <label className="w-100 hxd-input__wrapper">
               <select name="category" className="hxd-input" type="password">
                 {
-                  categories.map(category => (
-                    <option value={category.id}>{category.nome}</option>
+                  categories?.map(category => (
+                    <option value={category.id} key={category.id}>{category.nome}</option>
                   ))
                 }
               </select>

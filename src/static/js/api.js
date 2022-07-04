@@ -13,6 +13,9 @@ const newsPath = 'news/';
 const timelinePath = 'timeline/';
 const mediaPath = 'media/';
 const artPath = 'arts/';
+const radioHorariosPath = 'radioHorarios/';
+const valuesPath = 'values/';
+const teamPath = 'team/';
 const searchPath = 'search.php';
 
 /* BUG: Em modo de desenvolvimento, a rota para buscar imagens ou qualquer outro tipo de mídia
@@ -69,7 +72,7 @@ const api = {
   },
 
   media: async (action, queryparams = {}, init = {}) => {
-    let url = URL+mediaPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    /*let url = URL+mediaPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
     if (Object.entries(queryparams).length !== 0) {
       for (let param in queryparams) {
@@ -79,11 +82,57 @@ const api = {
     }
 
     let blob = await (await fetch(url, init)).blob();
-    return blob;
+    return blob;*/
+  },
+
+  getMedia: (filename) => {
+    return URL+'media/'+filename;
   },
 
   art: async (action, queryparams = {}, init = {}) => {
     let url = URL+artPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
+  radioHorarios: async (action, queryparams = {}, init = {}) => {
+    let url = URL+radioHorariosPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
+  values: async (action, queryparams = {}, init = {}) => {
+    let url = URL+valuesPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
+  team: async (action, queryparams = {}, init = {}) => {
+    let url = URL+teamPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
     if (Object.entries(queryparams).length !== 0) {
       for (let param in queryparams) {

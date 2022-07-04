@@ -16,15 +16,18 @@ import Glide from '@glidejs/glide';
 const Home = (props) => {
   const { showProgress, hideProgress, sendAlert } = props;
 
+  // preload data
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values } = props;
+
   const [buyConfirmationShow, setBuyConfirmationShow] = useState(false);
   const [confirmationForBuyShow, setConfirmationForBuyShow] = useState(false);
   
-  const [badges, setBadges] = useState([]);
+  /*const [badges, setBadges] = useState([]);
   const [loja, setLoja] = useState([]);
   const [allNews, setAllNews] = useState(null);
   const [allSpotlights, setAllSpotlights] = useState([]);
   const [allTimelines, setAllTimelines] = useState([]);
-  const [allArts, setAllArts] = useState([]);
+  const [allArts, setAllArts] = useState([]);*/
   const [beingBought, setBeingBought] = useState({});
 
   const btnScrollTopRef = useRef(null);
@@ -119,15 +122,35 @@ const Home = (props) => {
       gap: 8,
     });
 
+    let emblemasNovos = new Glide('#emblemasNovos-slider', {
+      type: 'slider',
+      perView: 8,
+      rewind: false,
+      bound: true,
+      gap: 8,
+    });
+
+    let artSlider = new Glide('#artSlider', {
+      type: 'slider',
+      perView: 3,
+      rewind: false,
+      bound: true,
+      gap: 8,
+    })
+
     slidersArrowsSetListener(lojaoXD, '#ljxd-arrowPrev', '#ljxd-arrowNext');
     slidersArrowsSetListener(lojaoEmblemas, '#ljem-arrowPrev', '#ljem-arrowNext');
     slidersArrowsSetListener(newsSlider, '#news-arrowPrev', '#news-arrowNext');
     slidersArrowsSetListener(emblemasGratis, '#egs-arrowLeft', '#egs-arrowRight');
+    slidersArrowsSetListener(emblemasNovos, '#ens-arrowLeft', '#ens-arrowRight');
+    slidersArrowsSetListener(artSlider, '#artslider-arrowLeft', '#artslider-arrowRight');
 
     lojaoXD.mount();
     lojaoEmblemas.mount();
     newsSlider.mount();
-    emblemasGratis.mount()
+    emblemasGratis.mount();
+    emblemasNovos.mount();
+    artSlider.mount();
   }, []);
 
   /**
@@ -165,12 +188,18 @@ const Home = (props) => {
       sendAlert('danger', res.error);
   };
 
-  const pool = useCallback(async () => {
+  /*const pool = async () => {
     let news = await api.news('getall');
     let timelines = await api.timeline('getall');
     let arts = await api.art('getall');
     let badges = await api.badges('getall');
     let buyables = await api.buyable('getall');
+
+    badges.new = await Promise.all(badges.new.map(async badge => {
+      const blob = await api.media('get', { filename: badge.imagem, type: 'buyable' });
+      badge.imagem = URL.createObjectURL(blob);
+      return badge;
+    }));
 
     buyables = await Promise.all(buyables.map(async item => {
       const blob = await api.media('get', { filename: item.imagem, type: 'buyable' });
@@ -182,24 +211,16 @@ const Home = (props) => {
     setAllNews(news);
     setAllTimelines(timelines);
     setAllArts(arts);
-    setBadges(badges.badges);
-
-    configureSliders();
-  }, [setAllNews, setAllTimelines, setAllArts, configureSliders]);
-
-  useInterval(() => {
-    pool();
-  }, 20000);
+    setBadges(badges);
+  };*/
 
   useEffect(() => {
     // esconde a barra de loading
     hideProgress();
-    pool();
     configureSliders();
     document.onscroll = handleScrollTopBtn;
     window.scrollTo(0, 0);
-  }, [pool, configureSliders, hideProgress]);
-
+  }, [configureSliders]);
   
   return (
     <>
@@ -348,6 +369,9 @@ const Home = (props) => {
                     height: '332px'
                   }}>
                     {
+                      allTimelines.length === 0 ?
+                      new Array(9).fill(<div className='timeline-card skeleton'></div>)
+                      :
                       allTimelines.map((timeline, i) => (
                         <TimelineCard refer={timeline} key={timeline.id} onClick={() => showProgress()} />
                       ))
@@ -452,13 +476,17 @@ const Home = (props) => {
                 </div>
               </div>
               <div className="section__content">
-                <div id="emblemasNovos-slider" className="slider">
+                <div id="emblemasNovos-slider" className="glide">
                   <div className="glide__track" data-glide-el="track">
-                    <div className="glide__slides">
+                    <div className="glide__slides" style={{ height: '60px' }}>
                       {
                         badges.new?.map((badge) => (
-                          <div className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded" style={{cursor: 'pointer'}} onClick={() => console.log(badge)}>
-                            <img src={badge.imagem} alt="" />
+                          <div 
+                          className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded p-1" style={{cursor: 'pointer'}} 
+                          onClick={() => console.log(badge)}
+                          title={badge.nome}
+                          >
+                            <img className="h-100 w-100" style={{ objectFit: 'cover' }} src={badge.imagem} alt="" />
                           </div>
                         ))
                       }
@@ -526,8 +554,10 @@ const Home = (props) => {
             <div className="section__content">
               <ConfirmationModal 
                 isShowing={confirmationForBuyShow} 
+                setIsShowing={setConfirmationForBuyShow}
                 text="Você tem certeza de que deseja realizar esta compra?"
                 beingBought={beingBought}
+                userCoins={JSON.parse(localStorage.getItem('hxd-user-object'))?.info?.xdcoins}
                 onAccept={() => {
                   setBuyConfirmationShow(true);
                   setConfirmationForBuyShow(false);
@@ -538,7 +568,7 @@ const Home = (props) => {
                 <div className="glide__track" data-glide-el="track">
                   <div className='glide__slides'>
                     {
-                      loja.filter(item => item.tipo != 'emblema').map((item) => (
+                      loja.filter(item => item.tipo !== 'emblema').map((item) => (
                         <div className="glide__slide lojao-card">
                           <div className="info-wrapper">
                             <div className="hxd-bg-color rounded-top text-center" style={{flex: '1 0 0'}}>
@@ -624,17 +654,55 @@ const Home = (props) => {
                 </div>
               </div>
               <div className="section__nav-tools">
-                <button className="arrow-left"></button>
+                <button id="artslider-arrowLeft" className="arrow-left"></button>
                 <button className="reload"></button>
-                <button className="arrow-right"></button>
+                <button id="artslider-arrowRight" className="arrow-right"></button>
               </div>
             </div>
             <div className="section__content justify-content-center gap-4">
-              {
-                allArts.map((art) => (
-                  <ArtCard refer={art} onClick={() => showProgress()} />
-                ))
-              }
+              <div id="artSlider" className='glide'>
+                <div className="glide__track" data-glide-el="track">
+                  <div className="glide__slides">
+                  {
+                    allArts.length === 0 ?
+                    <>
+                      <div className='art-card skeleton'></div>
+                      <div className='art-card skeleton'></div>
+                      <div className='art-card skeleton'></div>
+                    </>
+                    :
+                    (() => {
+                      let slides = [];
+                      let y = 0;
+                      let iterations = Math.round(allArts.length / 2);
+
+                      for (let i = 0; i < iterations; i++){
+                        let art1 = allArts[y++];
+                        let art2 = allArts[y++];
+
+                        let slide;
+
+                        if (art2 === undefined) {
+                          slide = [art1];
+                        } else {
+                          slide = [art1, art2];
+                        }
+
+                        slides.push((
+                          <div className="glide__slide d-flex flex-column gap-2">
+                            {slide.map((art) => (
+                              <ArtCard refer={art} key={art.id} onClick={() => showProgress()} />
+                            ))}
+                          </div>
+                        ));
+                      }
+
+                      return slides;
+                    })()
+                  }
+                  </div>
+                </div>
+              </div>
 
             </div>
           </div>

@@ -208,6 +208,16 @@
     border-radius: .25rem;
 }
 
+.rate-btn.active:disabled {
+    opacity: 1;
+    box-shadow: 0 0 1rem rgb(var(--bs-success-rgb));
+    text-shadow: 0 0 .5rem #fff, 0 0 .5rem #fff, 0 0 .5rem #fff;
+    height: 25px;
+    width: 60px;
+    border: none;
+    border-radius: .25rem;
+}
+
 .text-special {
     color: #8284a6;
 }

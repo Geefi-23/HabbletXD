@@ -7,6 +7,11 @@ button:hover{
   cursor: pointer
 }
 
+button:disabled{
+  opacity: .5;
+  cursor: auto;
+}
+
 .dropdown-toggle.caret-off::after{
   display: none;
 }

@@ -12,6 +12,7 @@
   background-color: rgb(var(--hxd-theme-colorLight));
   color: white;
   width: 22px;
+  height: 100%;
   border: none;
   font-weight: bold;
   padding: 0;
@@ -36,20 +37,20 @@
   overflow: hidden;
 }
 
-.slider .slider__item{
+.glide .slider__item{
   position: relative;
   display: flex;
+  justify-content: center;
   background-color: rgb(var(--hxd-theme-color));
-  height: 54px;
-  width: 54px;
   border-radius: 4px;
   flex-shrink: 0;
   margin-left: 0;
+  padding: .25rem;
   transition: margin .3s ease-out;
   cursor: pointer;
 }
 
-.slider .slider__item:hover{
+.glide .slider__item:hover{
   background-color: white;
 }
 

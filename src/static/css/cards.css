@@ -7,7 +7,7 @@
   height: 108px;
   width: 100%;
   padding: 3px;
-  border-radius: 7px;
+  border-radius: .25rem;
   text-decoration: none;
 }
 
@@ -33,7 +33,7 @@
   background-color: rgb(168, 175, 190);
   height: 100%;
   width: 40%;
-  border-radius: 7px;
+  border-radius: .25rem;
   overflow: hidden;
   cursor: pointer;
 }
@@ -188,6 +188,7 @@
 /*ART CARD*/
 
 .art-card{
+  background-color: #fff;
   height: 200px;
   width: 320px;
   border: 2px solid white;
@@ -246,7 +247,7 @@
   height: 270px;
   width: 340px;
   border: 2px solid rgb(var(--hxd-theme-colorDark));
-  border-radius: 7px;
+  border-radius: .25rem;
 }
 
 /*RANK CARD*/

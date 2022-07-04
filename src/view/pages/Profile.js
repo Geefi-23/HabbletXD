@@ -7,7 +7,7 @@ import '@glidejs/glide/dist/css/glide.core.css';
 
 import Glide from '@glidejs/glide';
 
-const Profile = ({ type, isAuth, hideProgress }) => {
+const Profile = ({ type, user, hideProgress }) => {
   const [profile, setProfile] = useState({});
   const [badges, setBadges] = useState([]);
   const [timelines, setTimelines] = useState([]);
@@ -16,13 +16,11 @@ const Profile = ({ type, isAuth, hideProgress }) => {
 
   const loadProfile = useCallback(async () => {
 
-    let user = JSON.parse(localStorage.getItem('hxd-user-object'));
-
-    if (type === 'myself' && !isAuth) {
+    if (type === 'myself' && !user) {
       window.location.href = '/';
-    } else if (type === 'myself' && isAuth) {
-      let getTimelines = await api.timeline('getsome', { quantity: 4, user: user.info.usuario });
-      let getArts = await api.art('getsome', { quantity: 2, user: user.info.usuario });
+    } else if (type === 'myself' && user) {
+      let getTimelines = await api.timeline('getsome', { quantity: 4, user: user.usuario });
+      let getArts = await api.art('getsome', { quantity: 2, user: user.usuario });
 
       if (getTimelines.success) {
         setTimelines(getTimelines.timelines);
@@ -41,6 +39,9 @@ const Profile = ({ type, isAuth, hideProgress }) => {
         setArts(pixels);
       }
 
+      /*let avatar = await api.media('get', { filename: user.avatar });
+      avatar = URL.createObjectURL(avatar);
+      user.avatar = avatar;*/
       setProfile(user);
     } else {
     
@@ -76,11 +77,11 @@ const Profile = ({ type, isAuth, hideProgress }) => {
         setArts(pixels);
       }
     }
-  }, [isAuth, name, type]);
+    hideProgress();
+  }, [user, name, type]);
 
   useEffect(() => {
 
-    hideProgress();
     if (badges.length !== 0)
       new Glide('#badges-slider', {
         type: 'slider',
@@ -91,7 +92,10 @@ const Profile = ({ type, isAuth, hideProgress }) => {
   }, [hideProgress, loadProfile, badges.length]);
   return (
     <>
-    {
+    { 
+      profile?.error ?
+      <h4>Perfil não encontrado</h4>
+      :
       <div className="container">
         <div id="my-profile" className="hxd-bg-color w-100" style={{ borderRadius: '7px'}}>
           <div className="d-flex align-items-center justify-content-between w-100 px-2 text-white" style={{height: '50px'}}>
@@ -112,11 +116,19 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                   <div className="hxd-bg-color d-flex align-items-center justify-content-center fw-bold text-white"
                     style={{height: '35px'}}
                   >
-                    {profile?.info?.usuario}
+                    {user?.usuario}
                   </div>
-                  <div className="text-center" style={{flex: '1 0 0'}}>
+                  <div className="text-center" 
+                    style={{
+                      height: '125px',
+                      background: user?.avatar !== '' ? `url('${user?.avatar}')` : '#cacad9',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
+                    }}
+                  >
                     <img 
-                      src={`https://avatar.blet.in/${profile?.info?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                      src={`https://avatar.blet.in/${user?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
                       style={{objectPosition: '0 -30px' }}
                       alt=""
                     />
@@ -233,7 +245,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    {profile?.info?.missao}
+                    {profile?.missao}
                   </small>
                 </div>
                 <div className="hxd-border rounded">
@@ -241,7 +253,7 @@ const Profile = ({ type, isAuth, hideProgress }) => {
                   <small className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                    {profile?.info?.twitter}
+                    {profile?.twitter}
                   </small>
                 </div>
                 <div className="hxd-border rounded">

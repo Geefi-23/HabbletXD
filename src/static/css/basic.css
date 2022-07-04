@@ -50,7 +50,7 @@
   display: block;
   background-color: white;
   color: rgb(var(--hxd-theme-color));
-  height: 35px;
+  height: 40px;
   width: 100%;
   padding-left: 5px;
   border: 1px solid rgb(var(--hxd-theme-color));
@@ -76,7 +76,8 @@
 .hxd-input:not(:placeholder-shown) + .hxd-input__label{
   font-size: .775rem;
   font-weight: bold;
-  left: 0;
+  padding-left: .25rem;
+  padding-right: .25rem;
   bottom: 37px;
 }
 

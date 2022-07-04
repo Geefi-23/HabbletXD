@@ -1,23 +1,27 @@
-import { useEffect, useState } from 'react';
-import API from '../../static/js/api';
+import { useEffect, useState, useRef } from 'react';
+import api from '../../static/js/api';
 
 import '../../static/css/profileEdit.css';
 
 const ProfileEdit = (props) => {
-  let { isAuth, sendAlert, showProgress, hideProgress } = props;
-  const [user, setUser] = useState({});
+  let { user, setUser, sendAlert, showProgress, hideProgress } = props;
 
-  const setUserObject = () => {
-    let usr = JSON.parse(localStorage.getItem('hxd-user-object'));
-    setUser(usr);
+  const avatarImageRef = useRef();
+
+  const handleAvatarChange = evt => {
+    const image = evt.target.files[0];
+    const imageURL = URL.createObjectURL(image);
+    avatarImageRef.current.style.background = `url('${imageURL}')`;
   };
 
   const handleSaveChanges = async (evt) => {
     evt.preventDefault();
 
     let form = evt.target;
+
+    const formData = new FormData();
+
     let data = {
-      usuario: user.usuario,
       senha: form.senha.value,
       novasenha: form.novasenha.value,
       rnovasenha: form.rnovasenha.value,
@@ -33,29 +37,38 @@ const ProfileEdit = (props) => {
     if (data.novasenha !== data.rnovasenha) {
       return sendAlert('warning', 'A senha nova não corresponde com a sua repetição!');
     }
+
+    let avatar = form.fundo_perfil.files[0];
+    if (avatar !== undefined)
+      formData.append('fundo_perfil', avatar);
+    formData.append('data', JSON.stringify(data));
     
     showProgress();
-    let res = await API.user('update', { method: 'POST', body: JSON.stringify(data) });
+    let res = await api.user('update', { method: 'POST', body: formData, credentials: 'include' });
     hideProgress();
     if (res.error) {
       sendAlert('danger', res.error);
     } else {
 
-      let r = await API.user('get', { method: 'POST', body: JSON.stringify({ usuario: user.usuario }) });
-      localStorage.setItem('hxd-user-object', JSON.stringify(r.user));
+      let r = await api.user('get', { method: 'POST', body: JSON.stringify({ usuario: user.usuario }) });
+
+      let avatar = await api.media('get', { filename: r.user.avatar });
+      avatar = URL.createObjectURL(avatar);
+      r.user.avatar = avatar;
+
       setUser(r.user);
       sendAlert('success', res.success);
     }
   };
 
   useEffect(() => {
-    setUserObject();
+    hideProgress();
   }, []);
   
   return (
     <>
     { 
-      isAuth ?
+      user ?
       <div className="container">
         <div id="profile-edit" className="hxd-bg-color hxd-border w-100" style={{borderRadius: '7px'}}>
           <div className=" d-flex align-items-center w-100 ps-2 text-white" style={{height: '50px'}}>
@@ -67,9 +80,17 @@ const ProfileEdit = (props) => {
             <div className="d-flex flex-row">
               <div className="d-flex flex-column w-25 px-2">
                 <small className="hxd-primary-text fw-bold">Fundo de perfil</small>
-                <div className="hxd-border hxd-bg-colorLight overflow-hidden" style={{height: '180px', borderRadius: '4px'}}>
+                <div className="hxd-border overflow-hidden rounded text-center" 
+                  ref={avatarImageRef}
+                  style={{
+                    height: '125px', 
+                    background: user?.avatar !== '' ? `url('${user?.avatar}')` : '#cacad9',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}>
                   <img 
-                    src={`https://avatar.blet.in/${user?.info?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                    src={`https://avatar.blet.in/${user?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
                     style={{objectPosition: '0 -30px' }}
                     alt=""
                   />
@@ -81,9 +102,9 @@ const ProfileEdit = (props) => {
                     }}
                   >
                     <div style={{ width: '50px', height: '10px', background: '#cacad9', marginRight: '8px' }}></div>
-                    Trocar fundo de perfil
+                    <small>Trocar fundo de perfil</small>
                   </div>
-                  <input type="file" style={{display: 'none'}}  />
+                  <input name="fundo_perfil" type="file" accept="image/*" style={{display: 'none'}} onChange={handleAvatarChange} />
                 </label>
               </div>
               <div className="d-flex flex-column w-75 ps-2">
