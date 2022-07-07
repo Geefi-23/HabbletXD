@@ -14,7 +14,7 @@ const approutes = (props) => {
   const { user, setUser, sendAlert, showProgress, hideProgress } = props;
 
   // preload data
-  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values } = props;
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, lastEvent } = props;
   
   return (
     <Routes>
@@ -26,6 +26,7 @@ const approutes = (props) => {
         path="/" 
         element={
         <Home 
+          user={user}
           showProgress={showProgress} 
           hideProgress={hideProgress} 
           sendAlert={sendAlert} 

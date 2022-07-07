@@ -24,6 +24,8 @@ const App = () => {
   const userNotificationsRef = useRef(null);
 
   // preload data
+  const [lastEvent, setLastEvent] = useState({});
+  const [currentAnnouncer, setCurrentAnnouncer] = useState({});
   const [badges, setBadges] = useState([]);
   const [loja, setLoja] = useState([]);
   const [allNews, setAllNews] = useState(null);
@@ -91,7 +93,7 @@ const App = () => {
   };
 
   const checkAuthentication = useCallback(async () => {
-    let res = await api.user('authenticate', {credentials: 'include'});
+    let res = await api.user('authenticate', {}, {credentials: 'include'});
 
     if (res.authenticated) {
       let avatar = api.getMedia(res.authenticated.avatar);
@@ -102,6 +104,8 @@ const App = () => {
   }, [setUser]);
   
   const pool = async () => {
+    let lastEvent = await api.event('getlast');
+    let currentAnnouncer = await api.radio('getannouncer');
     let news = await api.news('getall');
     let timelines = await api.timeline('getall');
     let arts = await api.art('getall');
@@ -120,7 +124,8 @@ const App = () => {
       return item;
     });
     values = values.map(item => {
-      item.imagem = api.getMedia(item.imagem);
+      if (item.categoria_id !== "3")
+        item.imagem = api.getMedia(item.imagem);
       return item;
     });
 
@@ -137,6 +142,8 @@ const App = () => {
       return el;
     });
 
+    setLastEvent(lastEvent);
+    setCurrentAnnouncer(currentAnnouncer);
     setAllNews(news);
     setAllArts(arts);
     setLoja(buyables);
@@ -169,6 +176,8 @@ const App = () => {
         values={values}
         userNotificationsRef={userNotificationsRef}
         schedules={schedules}
+        lastEvent={lastEvent}
+        currentAnnouncer={currentAnnouncer}
       />
         
       <Approutes 
@@ -179,6 +188,7 @@ const App = () => {
         hideProgress={handleProgressHide} 
         badges={badges}
         loja={loja}
+        
         allNews={allNews}
         allArts={allArts}
         allTimelines={allTimelines}

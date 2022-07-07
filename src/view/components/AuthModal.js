@@ -31,7 +31,7 @@ const AuthModal = (props) => {
       };
       
       showProgress();
-      let res = await api.user('login', init);
+      let res = await api.user('login', {}, init);
       hideProgress();
 
       if (res.error){
@@ -99,7 +99,7 @@ const AuthModal = (props) => {
         body: JSON.stringify(user)
       };
       showProgress();
-      let res = await api.user('register', init);
+      let res = await api.user('register', {}, init);
       hideProgress();
       if (res.error){
         sendAlert('danger', res.error)

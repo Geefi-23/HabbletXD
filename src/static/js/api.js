@@ -14,8 +14,10 @@ const timelinePath = 'timeline/';
 const mediaPath = 'media/';
 const artPath = 'arts/';
 const radioHorariosPath = 'radioHorarios/';
+const radioPath = 'radio/';
 const valuesPath = 'values/';
 const teamPath = 'team/';
+const eventPath = 'event/';
 const searchPath = 'search.php';
 
 /* BUG: Em modo de desenvolvimento, a rota para buscar imagens ou qualquer outro tipo de mídia
@@ -27,8 +29,17 @@ const searchPath = 'search.php';
   facilitar o entendimento da sua função. Não é necessário específicar a extensão do arquivo quando o
   mesmo for do tipo PHP */
 const api = {
-  user: async (action, init = {}) => {
-    let res = await (await fetch(URL+userPath+action+'.php', init)).json();
+  user: async (action, queryparams = {}, init = {}) => {
+    let url = URL+userPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
     return res;
   },
 
@@ -86,7 +97,7 @@ const api = {
   },
 
   getMedia: (filename) => {
-    return URL+'media/'+filename;
+    return URL+'media/get.php?filename='+filename;
   },
 
   art: async (action, queryparams = {}, init = {}) => {
@@ -117,6 +128,20 @@ const api = {
     return res;
   },
 
+  radio: async (action, queryparams = {}, init = {}) => {
+    let url = URL+radioPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
   values: async (action, queryparams = {}, init = {}) => {
     let url = URL+valuesPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
@@ -133,6 +158,20 @@ const api = {
 
   team: async (action, queryparams = {}, init = {}) => {
     let url = URL+teamPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
+  event: async (action, queryparams = {}, init = {}) => {
+    let url = URL+eventPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
     if (Object.entries(queryparams).length !== 0) {
       for (let param in queryparams) {

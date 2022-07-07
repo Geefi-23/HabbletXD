@@ -1,8 +1,36 @@
 import { Modal } from 'react-bootstrap';
+import api from '../../static/js/api';
 
 const BuyConfirmationModal = (props) => {
 
-  const { isShowing, setIsShowing } = props;
+  const { isShowing, setIsShowing, beingBought, showProgress, hideProgress, sendAlert } = props;
+
+  const handleBuy = async evt => {
+    evt.preventDefault();
+
+    const form = evt.target;
+    const data = {
+      item: beingBought,
+      discord: form.discord.value
+    };
+
+    const init = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      credentials: 'include'
+    };
+
+    showProgress();
+    const res = await api.buyable('buy', init);
+    hideProgress();
+
+    if (res.success) {
+      sendAlert('success', res.success);
+      setIsShowing(false);
+    } else {
+      sendAlert('danger', res.error);
+    }
+  };
 
   return (
     <Modal show={isShowing}>
@@ -11,21 +39,21 @@ const BuyConfirmationModal = (props) => {
         CODIGO DE COMPRA
       </div>
       <div className="d-flex flex-column gap-2 p-2">
-        <form name="artPost" className="d-flex flex-column gap-4 mt-2" action="#">
+        <form name="artPost" className="d-flex flex-column gap-4 mt-2" action="#" onSubmit={handleBuy}>
           <div className="hxd-primary-text text-center">Obaaa! Você fez uma compra na Habblet XD!</div>
           <label className="w-100 hxd-input__wrapper">
-            <input name="name" className="hxd-input" value="Mobi super pika" autoComplete="off" readOnly/>
+            <input name="name" className="hxd-input" value={beingBought?.nome} autoComplete="off" readOnly/>
             <span className="hxd-input__label">Sua compra</span>
           </label>
           <div>
             <label className="w-100 hxd-input__wrapper">
-              <input name="name" className="hxd-input" placeholder=" " autoComplete="off"/>
+              <input name="discord" className="hxd-input" placeholder=" " autoComplete="off"/>
               <span className="hxd-input__label">Seu discord</span>
             </label>
             <small>Nossa equipe irá contacta-lo pelo discord para entregar a sua compra. Certifique-se de que o escreveu da forma correta!</small>
           </div>
           <label className="w-100 hxd-input__wrapper mt-3">
-            <input name="description" className="hxd-input" autoComplete="off" readOnly/>
+            <input name="codigo_compra" className="hxd-input" autoComplete="off" readOnly/>
             <span className="hxd-input__label">Código de compra</span>
           </label>
           <button className="hxd-btn w-100" type="submit" style={{height: '45px'}}>Pronto!</button>

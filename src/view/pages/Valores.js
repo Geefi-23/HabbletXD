@@ -22,7 +22,7 @@ const Card = props => {
         </div> {/*esse flex 1 0 0 é pra preencher o tamanho restante*/}
 
         <div style={{ height: '50px' }} className="d-flex justify-content-center align-items-center bg-white">
-          <span className="hxd-primary-text">{value?.nome}</span>
+          <span className="hxd-primary-text text-center">{value?.nome}</span>
         </div>
       </div>
       <div className="d-flex flex-column gap-1 mt-1 text-center">
@@ -42,6 +42,7 @@ const Card = props => {
 
 const Valores = ({ hideProgress }) => {
   const [values, setValues] = useState([]);
+  const [filteredValues, setFilteredValues] = useState([]);
 
   const pool = async () => {
     let res = await api.values('getall');
@@ -56,6 +57,20 @@ const Valores = ({ hideProgress }) => {
     hideProgress();
   };
 
+  const handleSearch = evt => {
+    evt.preventDefault();
+
+    let q = evt.target.q.value.toLowerCase();
+    
+    if (q !== '') {
+      let filteredValues = values.filter((v) => v?.nome.toLowerCase().search(q) !== -1);
+      setFilteredValues(filteredValues);
+      console.log(filteredValues);
+    } else {
+      setFilteredValues([]);
+    }
+  };
+
   useEffect(() => {
     pool();
   }, []);
@@ -67,20 +82,6 @@ const Valores = ({ hideProgress }) => {
           <h4 className="text-white m-0 ms-2">Valores</h4>
         </div>
         <div className="section__content">
-          <section className="section px-3">
-            <div className="section__header">
-              <div>
-                <h4 className="hxd-primary-text m-0">
-                  Valores <span className="hxd-secondary-text">destaques</span>
-                </h4>
-                <span className="hxd-secondary-text">Os raros mais destacados do Habblet Hotel.</span>
-              </div>
-            </div>
-            <div className="section__content">
-            
-
-            </div>
-          </section>
           <section className="section px-3">
             <div className="section__header justify-content-between">
               <div>
@@ -94,19 +95,24 @@ const Valores = ({ hideProgress }) => {
                   <option value="0">Mais recente</option>
                   <option value="1">Mais antigo</option>
                 </select>
-                <div className="d-flex hxd-border rounded">
+                <form action="#" onSubmit={handleSearch} className="d-flex hxd-border rounded">
                   <button className="bg-transparent border-0">
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24"viewBox="0 0 24 24" fill="currentColor">
                       <path d="M 9 2 C 5.1458514 2 2 5.1458514 2 9 C 2 12.854149 5.1458514 16 9 16 C 10.747998 16 12.345009 15.348024 13.574219 14.28125 L 14 14.707031 L 14 16 L 19.585938 21.585938 C 20.137937 22.137937 21.033938 22.137938 21.585938 21.585938 C 22.137938 21.033938 22.137938 20.137938 21.585938 19.585938 L 16 14 L 14.707031 14 L 14.28125 13.574219 C 15.348024 12.345009 16 10.747998 16 9 C 16 5.1458514 12.854149 2 9 2 z M 9 4 C 11.773268 4 14 6.2267316 14 9 C 14 11.773268 11.773268 14 9 14 C 6.2267316 14 4 11.773268 4 9 C 4 6.2267316 6.2267316 4 9 4 z" />
                     </svg>
                   </button>
-                  <input className="bg-transparent border-0" type="search" placeholder='Pesquisar' autoComplete='off'/>
-                </div>
+                  <input className="bg-transparent border-0" name="q" type="search" placeholder='Pesquisar' autoComplete='off'/>
+                </form>
               </div>
             </div>
             <div className="section__content">
               {
+                filteredValues.length === 0 ?
                 values.map(value => (
+                  <Card refer={value} key={value.id} />
+                ))
+                :
+                filteredValues.map(value => (
                   <Card refer={value} key={value.id} />
                 ))
               }

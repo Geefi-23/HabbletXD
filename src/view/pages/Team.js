@@ -18,7 +18,7 @@ const Card = props => {
       <div className="team_member-card">
         <div className="team_member-card__picture"
           style={{ 
-            background: user?.avatar !== '' ? `url('${user?.avatar}')` : '#cacad9',
+            background: user?.avatar !== '' ? `url('${user?.avatar}') center center / cover` : '#cacad9',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
@@ -62,9 +62,6 @@ const Card = props => {
                 alt=""
               />
             </a>
-            
-            
-            
           </div>
         </div>
       </div>
@@ -82,8 +79,7 @@ const Team = ({ hideProgress }) => {
 
     teamUsers = await Promise.all(teamUsers.map(async user => {
       if (user.avatar !== ''){
-        const blob = await api.media('get', { filename: user.avatar });
-        user.avatar = URL.createObjectURL(blob);
+        user.avatar = api.getMedia(user.avatar);
       }
       return user;
     }));

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import useInterval from '../../hooks/useInterval';
+import { FixedSizeList as Virtualization } from 'react-window';
 
 import BuyConfirmationModal from '../components/BuyConfirmationModal';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -14,7 +15,7 @@ import { NewsCard, ArtCard, TimelineCard, SpotlightCard } from '../components/Ca
 import Glide from '@glidejs/glide';
 
 const Home = (props) => {
-  const { showProgress, hideProgress, sendAlert } = props;
+  const { user, showProgress, hideProgress, sendAlert } = props;
 
   // preload data
   const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values } = props;
@@ -84,7 +85,7 @@ const Home = (props) => {
   const configureSliders = useCallback(() => {
     let newsSlider = new Glide('#news-slider', {
       type: 'slider',
-      perView: 3,
+      perView: 1,
       rewind: false,
       bound: true,
       gap: 8
@@ -227,6 +228,10 @@ const Home = (props) => {
       <BuyConfirmationModal 
         isShowing={buyConfirmationShow} 
         setIsShowing={setBuyConfirmationShow} 
+        showProgress={showProgress}
+        hideProgress={hideProgress}
+        sendAlert={sendAlert}
+        beingBought={beingBought}
       />
       <div className="w-100 pb-3">
         <div className="container">
@@ -263,37 +268,45 @@ const Home = (props) => {
             <div className="section__content">
               <div id="news-slider" className='glide' style={{pointerEvents: allNews?.length === 0 ? 'none' : 'auto'}}>
                 <div className="glide__track" data-glide-el="track">
-                  <div className="glide__slides pt-3" style={{height: '300px'}}>
+                  <div 
+                    className="glide__slides pt-3" 
+                    style={{
+                      height: '300px'
+                    }}
+                  >
                   {
                     !allNews ?
-                    <>
+                    <div className="glide__slide gap-2"
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, auto)',
+                        gridTemplateRows: 'auto auto',
+                      }}
+                    >
                       <div className='news-card skeleton'></div>
                       <div className='news-card skeleton'></div>
                       <div className='news-card skeleton'></div>
-                    </>
+                    </div>
                     :
                     allNews?.length === 0 ?
                     <h5 className="w-100 text-center hxd-primary-text">Não há notícias para ler.</h5>
                     :
                     (() => {
                       let slides = [];
-                      let y = 0;
-                      let iterations = Math.round(allNews.length / 2);
 
-                      for (let i = 0; i < iterations; i++){
-                        let news1 = allNews[y++];
-                        let news2 = allNews[y++];
+                      for (let i = 0; i < allNews?.length; i+=6) {
 
                         let slide;
-
-                        if (news2 === undefined) {
-                          slide = [news1];
-                        } else {
-                          slide = [news1, news2];
-                        }
-
+                        slide = allNews.slice(i, i+ 6);
                         slides.push((
-                          <div className="glide__slide d-flex flex-column gap-2">
+                          <div 
+                            className="glide__slide gap-2"
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(3, auto)',
+                              gridTemplateRows: 'auto auto',
+                            }}
+                          >
                             {slide.map((news) => (
                               <NewsCard refer={news} key={news.id} onClick={() => showProgress()} />
                             ))}
@@ -557,7 +570,7 @@ const Home = (props) => {
                 setIsShowing={setConfirmationForBuyShow}
                 text="Você tem certeza de que deseja realizar esta compra?"
                 beingBought={beingBought}
-                userCoins={JSON.parse(localStorage.getItem('hxd-user-object'))?.info?.xdcoins}
+                userCoins={user?.xdcoins}
                 onAccept={() => {
                   setBuyConfirmationShow(true);
                   setConfirmationForBuyShow(false);

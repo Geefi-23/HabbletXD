@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import { Dropdown } from 'react-bootstrap';
 import AuthModal from './AuthModal';
+import PresenceModal from './PresenceModal';
+import RequestMusicModal from './RequestMusicModal';
 
 import ArtUploadModal from './ArtUploadModal';
 
@@ -14,10 +16,12 @@ import '../../static/css/header.css';
 import api from '../../static/js/api';
 
 const Header = (props) => {
-  const { user, setUser, showProgress, hideProgress, sendAlert, artCategories, values, schedules } = props;
+  const { user, setUser, showProgress, hideProgress, sendAlert, artCategories, values, schedules, lastEvent, currentAnnouncer } = props;
 
   const [artModalIsShowing, setArtModalIsShowing] = useState(false);
   const [isAuthModalShowing, setIsAuthModalShowing] = useState(false);
+  const [showPresenceModal, setShowPresenceModal] = useState(false);
+  const [showRequestMusicModal, setShowRequestMusicModal] = useState(false);
 
   /**
    * 
@@ -213,14 +217,22 @@ const Header = (props) => {
         </audio>
         <div className="d-flex flex-row hxd-bg-color w-100 mt-2 rounded overflow-hidden" 
         style={{height: '60px'}}>
-          <div className="h-100 w-25"></div>
+          <div className="h-100 w-25 text-center">
+            <img 
+              src={`https://avatar.blet.in/${currentAnnouncer?.nome}&action=std&size=b&head_direction=3&direction=2&gesture=spk&headonly=0`} 
+              alt="" 
+              style={{
+                objectPosition: '0 -20px'
+              }}
+            />
+          </div>
           <div className="d-flex flex-column justify-content-center h-100 text-white" style={{width: '55%'}}>
             <div className="d-flex align-items-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-mic-fill" viewBox="0 0 16 16">
                 <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"/>
                 <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
               </svg>
-              <span className="ps-2 fw-bold">Locutor</span>
+              <span className="ps-2 fw-bold">{currentAnnouncer?.nome}</span>
             </div>
             <div className="d-flex align-items-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-music-note-beamed" viewBox="0 0 16 16">
@@ -268,7 +280,14 @@ const Header = (props) => {
               />
             </button>
             <input className="volume-handler" defaultValue={1} onChange={evt => handleStreamVolume(evt.target.value)} type="range" min="0" max="1" step=".01" />
-            <button className="bg-transparent border-0">
+            <RequestMusicModal 
+              show={showRequestMusicModal} 
+              setShow={setShowRequestMusicModal} 
+              sendAlert={sendAlert}
+              showProgress={showProgress}
+              hideProgress={hideProgress}
+            />
+            <button className="bg-transparent border-0" onClick={() => setShowRequestMusicModal(true)}>
               <img 
                 src={
                 `https://img.icons8.com/android/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/paper-plane.png`
@@ -277,7 +296,14 @@ const Header = (props) => {
                 alt=""
               />
             </button>
-            <button className="bg-transparent border-0">
+            <PresenceModal 
+              show={showPresenceModal} 
+              setShow={setShowPresenceModal} 
+              sendAlert={sendAlert} 
+              showProgress={showProgress}
+              hideProgress={hideProgress}
+            />
+            <button className="bg-transparent border-0" onClick={() => setShowPresenceModal(true)}>
               <img 
                 src={
                   `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/filled-star.png`
@@ -369,8 +395,8 @@ const Header = (props) => {
               <div className="w-25 bg-dark rounded"></div>
               <div className="w-75 text-white px-1">
                 <div className=''>Último evento</div>
-                <span className="mb-0">Evento de inauguração</span>
-                <small className="d-block text-truncate">Hoje inauguramos bla bla blaaaaaaaaa</small>
+                <span className="mb-0">{lastEvent?.titulo}</span>
+                <small className="d-block text-truncate">{lastEvent?.resumo}</small>
                 <small className="d-block text-end fw-bold">00/00 às 00:00</small>
               </div>
             </div>
@@ -402,7 +428,7 @@ const Header = (props) => {
                 {
                   values?.map(v => (
                     <Link to="/valores" className="glide__slide slider__item" title={v.nome}>
-                      <img src={v.imagem} alt="" />
+                      <img className="w-100 h-100 align-self-center" src={v.imagem} alt="" style={{ objectFit: 'contain' }} />
                     </Link>
                   ))
                 }
