@@ -4,12 +4,12 @@ import api from '../../static/js/api';
 
 const adjustDate = (toAdjust) => {
   let ad = toAdjust;
-  let date = new Date(parseInt(ad.data)*1000)
+  let date = new Date(parseInt(ad.data)*1000);
   let day = date.getDate();
   day = day < 10 ? '0'+day : day;
   let month = date.getUTCMonth() + 1;
   month = month < 10 ? '0'+month : month;
-  ad.data = `${day}/${month}`;
+  ad.dia = `${day}/${month}`;
 
   let hour = date.getHours();
   hour = hour < 10 ? '0'+hour : hour;
@@ -36,17 +36,9 @@ const NewsCard = (props) => {
     return obj;
   };
 
-  const pool = async () => {
-    /*const blob = await api.media('get', {
-      filename: news?.imagem,
-      type: 'image'
-    });
-    news.imagem = URL.createObjectURL(blob);*/
-    setNews(adjustDate(refer));
-  };
 
   useEffect(() => {
-    pool();
+    setNews(adjustDate(refer));
     
   }, []);
 
@@ -77,7 +69,7 @@ const NewsCard = (props) => {
         <span className="news-card__title">{news.titulo}</span>
         <small className='news-card__resume'>{news.resumo}</small>
         <div className="d-flex w-100 justify-content-between position-absolute fw-bold text-secondary" style={{height: '20px', bottom: 0}}>
-          {`${news.data} às ${news.hora}`}
+          {`${news.dia} às ${news.hora}`}
           <img 
             style={{ alignSelf: 'center', objectPosition: '0 5px' }}
             src={`https://avatar.blet.in/${news.criador}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=1`} 
@@ -161,7 +153,7 @@ const ArtCard = (props) => {
         <div className="d-flex flex-column h-100 overflow-hidden" style={{width: '80%'}}>
           <h6 className="mb-0 hxd-primary-text text-truncate fw-bold">{art.titulo}</h6>
           <small className="hxd-secondary-text text-truncate">{art.descricao}</small>
-          <small className="hxd-secondary-text text-end pe-2">{art.data} às {art.hora}</small>
+          <small className="hxd-secondary-text text-end pe-2">{art.dia} às {art.hora}</small>
         </div>
         <div className="p-1" style={{flex: '1 0 0'}}>
           <div className='w-100 h-100 hxd-bg-colorLight rounded'>

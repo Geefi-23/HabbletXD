@@ -23,12 +23,6 @@ const Home = (props) => {
   const [buyConfirmationShow, setBuyConfirmationShow] = useState(false);
   const [confirmationForBuyShow, setConfirmationForBuyShow] = useState(false);
   
-  /*const [badges, setBadges] = useState([]);
-  const [loja, setLoja] = useState([]);
-  const [allNews, setAllNews] = useState(null);
-  const [allSpotlights, setAllSpotlights] = useState([]);
-  const [allTimelines, setAllTimelines] = useState([]);
-  const [allArts, setAllArts] = useState([]);*/
   const [beingBought, setBeingBought] = useState({});
 
   const btnScrollTopRef = useRef(null);
@@ -189,39 +183,13 @@ const Home = (props) => {
       sendAlert('danger', res.error);
   };
 
-  /*const pool = async () => {
-    let news = await api.news('getall');
-    let timelines = await api.timeline('getall');
-    let arts = await api.art('getall');
-    let badges = await api.badges('getall');
-    let buyables = await api.buyable('getall');
-
-    badges.new = await Promise.all(badges.new.map(async badge => {
-      const blob = await api.media('get', { filename: badge.imagem, type: 'buyable' });
-      badge.imagem = URL.createObjectURL(blob);
-      return badge;
-    }));
-
-    buyables = await Promise.all(buyables.map(async item => {
-      const blob = await api.media('get', { filename: item.imagem, type: 'buyable' });
-      item.imagem = URL.createObjectURL(blob);
-      return item;
-    }));
-
-    setLoja(buyables);
-    setAllNews(news);
-    setAllTimelines(timelines);
-    setAllArts(arts);
-    setBadges(badges);
-  };*/
-
   useEffect(() => {
     // esconde a barra de loading
     hideProgress();
     configureSliders();
     document.onscroll = handleScrollTopBtn;
     window.scrollTo(0, 0);
-  }, [configureSliders]);
+  }, []);
   
   return (
     <>

@@ -12,7 +12,7 @@ const Card = props => {
 
   useEffect(() => {
     setValue(refer);
-  }, []);
+  }, [refer]);
 
   return (
     <article className="card-valores"> {/*tag semantica, sempre usa article para cards*/}
@@ -42,7 +42,8 @@ const Card = props => {
 
 const Valores = ({ hideProgress }) => {
   const [values, setValues] = useState([]);
-  const [filteredValues, setFilteredValues] = useState([]);
+  const [searchedValues, setSearchedValues] = useState([]);
+  const [valuesAreReversed, setValuesAreReversed] = useState(false);
 
   const pool = async () => {
     let res = await api.values('getall');
@@ -63,17 +64,24 @@ const Valores = ({ hideProgress }) => {
     let q = evt.target.q.value.toLowerCase();
     
     if (q !== '') {
-      let filteredValues = values.filter((v) => v?.nome.toLowerCase().search(q) !== -1);
-      setFilteredValues(filteredValues);
-      console.log(filteredValues);
+      let searchedValues = values.filter((v) => v?.nome.toLowerCase().search(q) !== -1);
+      setSearchedValues(searchedValues);
+      
     } else {
-      setFilteredValues([]);
+      setSearchedValues([]);
     }
+  };
+
+  const handleFilter = evt => {
+    let value = parseInt(evt.target.value);
+
+    setValuesAreReversed(!!value);
   };
 
   useEffect(() => {
     pool();
   }, []);
+
   return (
     <main className="container">
       <section className="section">
@@ -91,7 +99,7 @@ const Valores = ({ hideProgress }) => {
                 <span className="hxd-secondary-text">Veja todos os valores de todos os raros do Habblet Hotel.</span>
               </div>
               <div className="d-flex gap-2" style={{ height: '40px' }}>
-                <select className="hxd-border bg-transparent rounded p-2">
+                <select className="hxd-border bg-transparent rounded p-2" onChange={handleFilter}>
                   <option value="0">Mais recente</option>
                   <option value="1">Mais antigo</option>
                 </select>
@@ -107,12 +115,20 @@ const Valores = ({ hideProgress }) => {
             </div>
             <div className="section__content">
               {
-                filteredValues.length === 0 ?
-                values.map(value => (
-                  <Card refer={value} key={value.id} />
-                ))
+                searchedValues.length === 0 ?
+                (() => {
+                  let vs = values.map(value => (
+                    <Card refer={value} key={value.id} />
+                  ));
+
+                  if (valuesAreReversed) {
+                    vs = vs.reverse();
+                  }
+
+                  return vs;
+                })()
                 :
-                filteredValues.map(value => (
+                searchedValues.map(value => (
                   <Card refer={value} key={value.id} />
                 ))
               }
