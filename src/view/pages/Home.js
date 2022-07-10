@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import useInterval from '../../hooks/useInterval';
-import { FixedSizeList as Virtualization } from 'react-window';
 
 import BuyConfirmationModal from '../components/BuyConfirmationModal';
 import ConfirmationModal from '../components/ConfirmationModal';
