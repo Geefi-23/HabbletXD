@@ -9,7 +9,7 @@ import Team from "./view/pages/Team";
 import HabbletImager from "./view/pages/HabbletImager";
 import Valores from "./view/pages/Valores";
 import Schedules from "./view/pages/Schedules";
-
+import GridEmblem from "./view/pages/GridEmblem"; 
 const approutes = (props) => {
   const { user, setUser, sendAlert, showProgress, hideProgress, setAllTimelines, currentTheme } = props;
 
@@ -44,7 +44,8 @@ const approutes = (props) => {
           currentTheme={currentTheme}
         />
         } 
-      />
+      /> 
+      <Route path="/emblemas" element={<GridEmblem />} /> 
       <Route path="/search" element={<SearchResults />} />
       <Route path="/valores" element={<Valores hideProgress={hideProgress} />} />
       <Route path="/horarios" element={<Schedules hideProgress={hideProgress} />} />
