@@ -16,18 +16,15 @@ import '../../static/css/header.css';
 import api from '../../static/js/api';
 
 const Header = (props) => {
-  const { user, setUser, showProgress, hideProgress, sendAlert, artCategories, values, schedules, lastEvent, currentAnnouncer } = props;
+  const { user, setUser, showProgress, hideProgress, sendAlert, 
+    artCategories, values, schedules, lastEvent, currentAnnouncer,
+    setAllArts, allArts, changeTheme, currentTheme } = props;
 
   const [artModalIsShowing, setArtModalIsShowing] = useState(false);
   const [isAuthModalShowing, setIsAuthModalShowing] = useState(false);
   const [showPresenceModal, setShowPresenceModal] = useState(false);
   const [showRequestMusicModal, setShowRequestMusicModal] = useState(false);
 
-  /**
-   * 
-   * @param {string} rgbString 
-   * @returns An hexadecimal color string
-   */
   const rgbToHex = (rgbString) => {
     let values = rgbString.replaceAll(',', '').split(' ');
 
@@ -41,6 +38,13 @@ const Header = (props) => {
     return componentToHex(values[0]) + componentToHex(values[1]) + componentToHex(values[2]);
   };
 
+  /**
+   * 
+   * @param {string} rgbString 
+   * @returns An hexadecimal color string
+   */
+  
+
   const UserArea = () => {
 
     return (
@@ -48,7 +52,7 @@ const Header = (props) => {
       <>
         <AuthModal 
           setUser={setUser} sendAlert={sendAlert} showProgress={showProgress} 
-          hideProgress={hideProgress} isModalShowing={isAuthModalShowing} 
+          hideProgress={hideProgress} show={isAuthModalShowing} 
           handleModalHide={() => setIsAuthModalShowing(false)}
         />
         <Dropdown className="d-flex align-items-center">
@@ -71,7 +75,7 @@ const Header = (props) => {
         {/* MODAL ART UPLOAD */}
         <button className="bg-transparent h-100 border-0"
           onClick={() => setArtModalIsShowing(true)}>
-          <img src={`https://img.icons8.com/ios-filled/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/drawing.png`} alt="" />
+          <img src={`https://img.icons8.com/ios-filled/24/${currentTheme['theme-colorDark-hex'] || '000'}/drawing.png`} alt="" />
         </button>
         <ArtUploadModal 
           showProgress={showProgress} 
@@ -80,6 +84,9 @@ const Header = (props) => {
           artModalIsShowing={artModalIsShowing}
           setArtModalIsShowing={setArtModalIsShowing}
           categories={artCategories}
+
+          setAllArts={setAllArts}
+          allArts={allArts}
         />
         <button className="bg-transparent h-100 border-0">
           <img src={require('../../static/icons/xd_coins_icon.jpg')} alt="" />
@@ -97,26 +104,14 @@ const Header = (props) => {
             }}
           />
         </Link>
-        <Dropdown className="d-flex align-items-center">
-          <Dropdown.Toggle className="dropdown-caret-off bs-btn-shadow-off bg-transparent h-100 border-0 p-0" style={{ width: '24px'}}>
-            <img 
-            src={`https://img.icons8.com/material-sharp/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/appointment-reminders--v1.png`} alt=""/>
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu className="hxd-border">
-            <Dropdown.Item className="dropdown-item hxd-active">
-              
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
         <button className="bg-transparent h-100 border-0" 
           onClick={() => {
-            api.user('logout', {credentials: 'include'});
+            api.user('logout', {}, { credentials: 'include' });
             setUser(false);
-            window.location.href = '/';
+            //window.location.href = '/';
           }}
         >
-          <img src={`https://img.icons8.com/material-sharp/24/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/exit.png`} alt=""/>
+          <img src={`https://img.icons8.com/material-sharp/24/${currentTheme['theme-colorDark-hex'] || '000'}/exit.png`} alt=""/>
         </button>
       </>
     );
@@ -264,9 +259,9 @@ const Header = (props) => {
               <img 
                 src={
                   isPaused ?
-                  `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/pause--v1.png`
+                  `https://img.icons8.com/ios-glyphs/15/${currentTheme['theme-colorDark-hex'] || '000'}/pause--v1.png`
                   :
-                  `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/play--v1.png`
+                  `https://img.icons8.com/ios-glyphs/15/${currentTheme['theme-colorDark-hex'] || '000'}/play--v1.png`
                 } 
                 alt=""
               />
@@ -274,7 +269,7 @@ const Header = (props) => {
             <button className="bg-transparent border-0">
               <img 
                 src={
-                  `https://img.icons8.com/ios-filled/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/room-sound.png`
+                  `https://img.icons8.com/ios-filled/15/${currentTheme['theme-colorDark-hex'] || '000'}/room-sound.png`
                 }  
                 alt=""
               />
@@ -290,7 +285,7 @@ const Header = (props) => {
             <button className="bg-transparent border-0" onClick={() => setShowRequestMusicModal(true)}>
               <img 
                 src={
-                `https://img.icons8.com/android/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/paper-plane.png`
+                `https://img.icons8.com/android/15/${currentTheme['theme-colorDark-hex'] || '000'}/paper-plane.png`
                 } 
                 style={{transform: 'rotateZ(-45deg)'}}  
                 alt=""
@@ -306,7 +301,7 @@ const Header = (props) => {
             <button className="bg-transparent border-0" onClick={() => setShowPresenceModal(true)}>
               <img 
                 src={
-                  `https://img.icons8.com/ios-glyphs/15/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/filled-star.png`
+                  `https://img.icons8.com/ios-glyphs/15/${currentTheme['theme-colorDark-hex'] || '000'}/filled-star.png`
                 }
                 alt=""
               />
@@ -469,42 +464,6 @@ const Header = (props) => {
     });
   }, []);
 
-  const changeThemeColor = (themeId) => {
-    let root = document.querySelector(':root');
-
-    const PURPLE_THEME = {
-      'theme-color': '48, 51, 107',
-      'theme-colorLight': '83, 86, 134',
-      'theme-colorDark': '19, 13, 63',
-      'theme-icon-color': '42, 42, 90',
-      'theme-iconHover-color': '55, 55, 114',
-      'theme-text-color': '58, 60, 102',
-      'theme-text-secondaryColor': '89, 92, 137',
-      'color-gray': '200, 200, 215'
-    };
-    const PINK_THEME = {
-      'theme-color': '#be2edd',
-      'theme-colorDark': '#9a27b3'
-      
-    };
-    const CYAN_THEME = {
-      'theme-color': '34, 166, 179',
-      'theme-colorDark': '16, 82, 88',
-      'theme-colorLight': '67, 200, 213',
-      'theme-icon-color': '30, 121, 131',
-      'theme-iconHover-color': '36, 141, 153',
-      'theme-text-color': '28, 108, 116',
-      'theme-text-secondaryColor': '86, 147, 153'
-    };
-
-    const THEMES = [PURPLE_THEME, PINK_THEME, CYAN_THEME];
-
-    for (let key in THEMES[themeId]){
-      root.style.setProperty('--hxd-'+key, THEMES[themeId][key]);
-    }
-    localStorage.setItem('hxd-ColorTheme', themeId);
-  };
-
   const handleThemeMenu = useCallback(() => {
     let options = document.querySelectorAll('#theme-menu .theme-option');
 
@@ -512,13 +471,12 @@ const Header = (props) => {
       option.onclick = function() {
         options.forEach((option) => option.classList.remove('active'))
         this.classList.add('active');
-        changeThemeColor(this.value);
+        changeTheme(this.value);
       };
     });
   }, []);
 
   useEffect(() => {
-    changeThemeColor(localStorage.getItem('hxd-ColorTheme') || 0);
     handleNavbarMenu();
     handleThemeMenu();
   }, [handleNavbarMenu, handleThemeMenu]);
@@ -529,21 +487,21 @@ const Header = (props) => {
         <div className="toolbar">
           <div style={{width: '10%'}}>
             <div id="theme-menu" className="d-flex flex-row align-items-center justify-content-center gap-2 h-100 w-100 text-white">
-              <button className="theme-option active" style={{backgroundColor: '#30336b'}} value="0">
+              <button className="theme-option active" style={{backgroundColor: '#30336b'}} value="purple">
                 <div className="brushIcon-container">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" className="bi bi-brush-fill" viewBox="0 0 16 16">
                     <path d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896.126.007.243.025.348.048.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04z"/>
                   </svg>
                 </div>
               </button>
-              <button className="theme-option" style={{backgroundColor: '#be2edd'}} value="1">
+              <button className="theme-option" style={{backgroundColor: '#be2edd'}} value="pink">
                 <div className="brushIcon-container">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" className="bi bi-brush-fill" viewBox="0 0 16 16">
                     <path d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896.126.007.243.025.348.048.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04z"/>
                   </svg>
                 </div>
               </button>
-              <button className="theme-option" style={{backgroundColor: '#22a6b3'}} value="2">
+              <button className="theme-option" style={{backgroundColor: '#22a6b3'}} value="cyan">
                 <div className="brushIcon-container">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" className="bi bi-brush-fill" viewBox="0 0 16 16">
                     <path d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896.126.007.243.025.348.048.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04z"/>
@@ -614,7 +572,16 @@ const Header = (props) => {
                     </ul>
                   </div>
                 </li>
-                <li className="navbar-menu__item"><Link to="/">RÁDIO</Link></li>
+                <li className="navbar-menu__item especial">
+                  <button className="bg-transparent border-0">RÁDIO</button>
+                  <div className="navbar-menu__item__popover">
+                    <ul className="list-unstyled">
+                      <li>
+                        <Link to="/horarios">Horarios</Link>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
                 <li className="navbar-menu__item especial">
                   <button className="bg-transparent border-0">EXTRAS</button>
                   <div className="navbar-menu__item__popover">

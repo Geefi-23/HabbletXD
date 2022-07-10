@@ -44,16 +44,15 @@ const ProfileEdit = (props) => {
     formData.append('data', JSON.stringify(data));
     
     showProgress();
-    let res = await api.user('update', { method: 'POST', body: formData, credentials: 'include' });
+    let res = await api.user('update', {}, { method: 'POST', body: formData, credentials: 'include' });
     hideProgress();
     if (res.error) {
       sendAlert('danger', res.error);
     } else {
 
-      let r = await api.user('get', { method: 'POST', body: JSON.stringify({ usuario: user.usuario }) });
+      let r = await api.user('get', {}, { method: 'POST', body: JSON.stringify({ usuario: user.usuario }) });
 
-      let avatar = await api.media('get', { filename: r.user.avatar });
-      avatar = URL.createObjectURL(avatar);
+      let avatar = api.getMedia(r.user.avatar);
       r.user.avatar = avatar;
 
       setUser(r.user);

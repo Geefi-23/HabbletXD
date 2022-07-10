@@ -119,7 +119,7 @@ const Team = ({ hideProgress }) => {
                 }}>
                   {role.nome}
                 </div>
-                <div className='d-flex gap-3'>
+                <div className='d-flex gap-3 flex-wrap'>
                   {
                     teamUsers.filter(user => user.cargo_id === role.id).map(user => (
                       <Card refer={user} key={user.id} />

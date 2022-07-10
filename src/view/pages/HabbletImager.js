@@ -52,7 +52,13 @@ const HabbletImager = () => {
               <div className="hxd-bg-color px-5 py-2 rounded">
                 <span className="text-white">Habblet Hotel</span>
               </div>
-              <div className="mt-2 hxd-border rounded overflow-hidden text-center" style={{height: '250px', backgroundImage: 'url(https://i.imgur.com/PAIFiy5.png)'}}>
+              <div 
+                className="mt-2 hxd-border rounded overflow-hidden d-flex justify-content-center align-items-center" 
+                style={{
+                  height: '250px', 
+                  backgroundImage: 'url(https://i.imgur.com/PAIFiy5.png)'
+                }}
+              >
                 <img src={url} alt="" />
               </div>
               <div className="d-flex justify-content-between hxd-border mt-1">
@@ -139,18 +145,18 @@ const HabbletImager = () => {
                 <select defaultValue="" className="hi-menu__input"
                 onChange={evt => handleUrlParamsChange('crr', evt.target.value)}>
                   <option value="">Nenhum</option>
-                  <option value="0">Nada (Objeto imaginário)</option>
-                  <option value="1">Água</option>
+                  <option value="-1">Nada (Objeto imaginário)</option>
+                  <option value="2">Água</option>
                   <option value="44">Bebida Tóxica</option>
-                  <option value="6">Café</option>
-                  <option value="2">Cenoura</option>
-                  <option value="42">Chá Japonês</option>
-                  <option value="667">Coquetel</option>
-                  <option value="5">Habbo Refri</option>
-                  <option value="9">Poção do Amor</option>
-                  <option value="3">Sorvete</option>
-                  <option value="33">Sorvete (Callipo)</option>
-                  <option value="43">Suco de Tomate</option>
+                  <option value="1">Café</option>
+                  <option value="3">Cenoura</option>
+                  <option value="28">Chá Japonês</option>
+                  <option value="31">Coquetel</option>
+                  <option value="49">Habbo Refri</option>
+                  <option value="25">Poção do Amor</option>
+                  <option value="77">Sorvete</option>
+                  <option value="26">Sorvete (Callipo)</option>
+                  <option value="29">Suco de Tomate</option>
                 </select>
               </label>
               <label className="hi-menu__label">

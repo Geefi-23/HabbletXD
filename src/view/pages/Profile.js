@@ -28,24 +28,17 @@ const Profile = ({ type, user, hideProgress }) => {
 
       if (getArts.success) {
         let pixels = getArts.arts;
-        pixels = pixels.map(async (pixel) => {
-          let blob = await api.media('get', { filename: pixel.imagem });
-          let link = URL.createObjectURL(blob);
-
-          pixel.imagem = link;
+        pixels = pixels.map((pixel) => {
+          pixel.imagem = api.getMedia(pixel.imagem);
           return pixel
         });
 
         setArts(pixels);
       }
-
-      /*let avatar = await api.media('get', { filename: user.avatar });
-      avatar = URL.createObjectURL(avatar);
-      user.avatar = avatar;*/
       setProfile(user);
     } else {
     
-      let res = await api.user('get', {
+      let res = await api.user('get', {}, {
         method: 'POST',
         body: JSON.stringify({
           usuario: name
@@ -66,19 +59,16 @@ const Profile = ({ type, user, hideProgress }) => {
 
       if (getArts.success) {
         let pixels = getArts.arts;
-        /*pixels = await pixels.map(async (pixel) => {
-          let blob = await api.media('get', { filename: pixel.imagem });
-          let link = URL.createObjectURL(blob);
-
-          pixel.linkimagem = link;
+        pixels = pixels.map((pixel) => {
+          pixel.imagem = api.getMedia(pixel.imagem);
           return pixel
-        });*/
+        });
 
         setArts(pixels);
       }
     }
     hideProgress();
-  }, [user, name, type]);
+  }, []);
 
   useEffect(() => {
 
@@ -88,8 +78,7 @@ const Profile = ({ type, user, hideProgress }) => {
         perView: 4
       }).mount();
     loadProfile(); 
-    //slider.create({ slider: '#mobis-slider', slidesToShow: 4, gap: 8, arrows: { left: '#mobs-arrowLeft', right: '#mobs-arrowRight' }})
-  }, [hideProgress, loadProfile, badges.length]);
+  }, []);
   return (
     <>
     { 
@@ -116,19 +105,19 @@ const Profile = ({ type, user, hideProgress }) => {
                   <div className="hxd-bg-color d-flex align-items-center justify-content-center fw-bold text-white"
                     style={{height: '35px'}}
                   >
-                    {user?.usuario}
+                    {profile?.usuario}
                   </div>
                   <div className="text-center" 
                     style={{
                       height: '125px',
-                      background: user?.avatar !== '' ? `url('${user?.avatar}')` : '#cacad9',
+                      background: profile?.avatar !== '' ? `url('${profile?.avatar}')` : '#cacad9',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat'
                     }}
                   >
                     <img 
-                      src={`https://avatar.blet.in/${user?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                      src={`https://avatar.blet.in/${profile?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
                       style={{objectPosition: '0 -30px' }}
                       alt=""
                     />
@@ -205,7 +194,7 @@ const Profile = ({ type, user, hideProgress }) => {
                                 className="me-1"
                                 src="https://img.icons8.com/ios-glyphs/20/dc3545/like--v1.png"
                               />
-                              100
+                              {timeline?.likes}
                             </div>
                           </div>
                         </Link>
@@ -223,13 +212,12 @@ const Profile = ({ type, user, hideProgress }) => {
                       arts?.map((art) => (
                         <Link to={`/arte/${art.url}`} className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
                           <div className="bg-secondary h-100 hxd-border rounded" style={{width: '70px', flexShrink: '0'}}>
-                            <img src={`${art?.linkimagem}`} alt=" " />
-                            {console.log(art)}
+                            <img src={`${art?.imagem}`} alt="" />
                           </div>
                           <div style={{width: '172px'}}>
                             <div className="h-75 w-100 ps-1 hxd-border-bottom" style={{lineHeight: '1'}}>
-                              <span className="d-block w-100 fw-bold text-secondary text-truncate" >{art.titulo}</span>  
-                              <small className="d-block w-100 text-secondary text-truncate">Descrição da arte</small>
+                              <span className="d-block w-100 fw-bold text-secondary text-truncate" >{art?.titulo}</span>  
+                              <small className="d-block w-100 text-secondary text-truncate">{art?.descricao}</small>
                             </div>
                             <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
                           </div>
@@ -270,7 +258,7 @@ const Profile = ({ type, user, hideProgress }) => {
                 <span className="d-block hxd-bg-color text-white text-center fw-bold rounded" 
                 style={{height: '30px', lineHeight: '30px'}}
                 >
-                  Web master
+                  {profile?.cargo}
                 </span>
               </div>
             </div>

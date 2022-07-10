@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 
 import FileUpload from './FileUpload';
 import api from '../../static/js/api';
 
 const ArtUploadModal = (props) => {
-  const [showing, setShowing] = useState(false);
   const [upload, setUpload] = useState(null);
+  const navigate = useNavigate();
 
-  const { showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing, categories } = props;
+  const { showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing, categories, setAllArts, allArts } = props;
 
   const handleImageInput = (file) => {
     setUpload(file);
@@ -41,6 +42,11 @@ const ArtUploadModal = (props) => {
     } else if (res.success) {
       sendAlert('success', res.success);
       setArtModalIsShowing(false);
+      const url = res.url;
+      const art = await api.art('get', { key: url });
+      setAllArts([...allArts, art.object]);
+
+      navigate(`/arte/${url}`);
     }
 
     hideProgress();

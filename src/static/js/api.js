@@ -18,6 +18,7 @@ const radioPath = 'radio/';
 const valuesPath = 'values/';
 const teamPath = 'team/';
 const eventPath = 'event/';
+const rankingPath = 'ranking/';
 const searchPath = 'search.php';
 
 /* BUG: Em modo de desenvolvimento, a rota para buscar imagens ou qualquer outro tipo de mídia
@@ -158,6 +159,20 @@ const api = {
 
   team: async (action, queryparams = {}, init = {}) => {
     let url = URL+teamPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
+  ranking: async (action, queryparams = {}, init = {}) => {
+    let url = URL+rankingPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
     if (Object.entries(queryparams).length !== 0) {
       for (let param in queryparams) {

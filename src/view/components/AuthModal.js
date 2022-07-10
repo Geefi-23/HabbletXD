@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Modal, CloseButton } from 'react-bootstrap';
 import api from '../../static/js/api';
 
 const AuthModal = (props) => {
   const [type, setType] = useState('login');
-  const { setUser, hideModal, sendAlert, showProgress, hideProgress } = props;
+  const { setUser, handleModalHide, sendAlert, showProgress, hideProgress } = props;
 
   const regex = {
     nick: /^[A-Za-z0-9 ]{5,40}$/,
@@ -34,25 +34,27 @@ const AuthModal = (props) => {
       let res = await api.user('login', {}, init);
       hideProgress();
 
-      if (res.error){
+      if (res.error) {
         sendAlert('danger', res.error);
       } else {
         sendAlert('success', res.success);
 
-        let avatar = await api.media('get', { filename: res.user.avatar });
-        avatar = URL.createObjectURL(avatar);
+        let avatar = api.getMedia(res.user.avatar);
         res.user.avatar = avatar;
 
         setUser(res.user);
-        hideModal();
+        handleModalHide();
       }
     };
 
     return (
       <>
-        <div className="d-flex justify-content-center align-items-center hxd-bg-color w-100 text-white fw-bold" 
+        <div className="position-relative d-flex justify-content-center align-items-center hxd-bg-color w-100 text-white fw-bold" 
         style={{height: '50px'}}>
           CLUBE XD - LOGIN
+          <div className="position-absolute" style={{ right: '.5rem' }}>
+            <CloseButton variant="white" onClick={handleModalHide} />
+          </div>
         </div>
         <div className="d-flex flex-column gap-2 p-2">
           <div className="d-flex gap-2">
@@ -84,8 +86,7 @@ const AuthModal = (props) => {
     const sendRegisterRequest = useCallback(async () => {
       let user = {
         nick: document.querySelector('#registerForm #input-nick').value,
-        senha: document.querySelector('#registerForm #input-senha').value,
-        missao: document.querySelector('#registerForm #input-missao').value
+        senha: document.querySelector('#registerForm #input-senha').value
       };
       
       for (let key in regex){
@@ -110,9 +111,12 @@ const AuthModal = (props) => {
 
     return (
       <>
-        <div className="d-flex justify-content-center align-items-center hxd-bg-color w-100 text-white fw-bold" 
+        <div className="position-relative d-flex justify-content-center align-items-center hxd-bg-color w-100 text-white fw-bold" 
         style={{height: '50px'}}>
           CLUBE XD - REGISTRO
+          <div className="position-absolute" style={{ right: '.5rem' }}>
+            <CloseButton variant="white" onClick={handleModalHide}/>
+          </div>
         </div>
         <div className="d-flex flex-column gap-2 p-2">
           <div className="d-flex gap-2">
@@ -130,10 +134,6 @@ const AuthModal = (props) => {
             <label className="w-100 hxd-input__wrapper">
               <input id="input-senha" className="hxd-input" type="password" placeholder=" " />
               <span className="hxd-input__label">Senha</span>
-            </label>
-            <label className="w-100 hxd-input__wrapper">
-              <input id="input-missao" className="hxd-input" />
-              <span className="hxd-input__label">Código de missão</span>
             </label>
             <button className="hxd-btn w-100" style={{height: '45px'}} type="submit">Registrar-se</button>
           </form>
@@ -155,12 +155,12 @@ const AuthModal = (props) => {
 
 const TheModal = (props) => {
 
-  const { setUser, sendAlert, handleModalHide, showProgress, hideProgress, isModalShowing } = props;
+  const { show, setUser, sendAlert, handleModalHide, showProgress, hideProgress } = props;
   
   return (
-    <Modal show={isModalShowing} onHide={handleModalHide}>
+    <Modal show={show} onHide={handleModalHide}>
       <AuthModal
-        setUser={setUser} sendAlert={sendAlert} hideModal={handleModalHide}
+        setUser={setUser} sendAlert={sendAlert} handleModalHide={handleModalHide}
         showProgress={showProgress} hideProgress={hideProgress}
       />
     </Modal>

@@ -62,7 +62,7 @@
 #txtComment {
     position: relative;
     margin-left: .5rem;
-    border: solid 1px #30336b;
+    border: solid 1px rgb(var(--hxd-theme-color));
     background: #fff;
     width: 974px;
     height: 38px;
@@ -109,7 +109,7 @@
     left: -25px;
     margin-left: 10px;
     width: 120px;
-    background: #30336b;
+    background: rgb(var(--hxd-theme-color));
     /* position: relative; */
     border: 0px solid #222;
     color: #FFF;

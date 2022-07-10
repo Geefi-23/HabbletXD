@@ -7,23 +7,24 @@ import '../../static/css/forum.css';
 
 const Comment = (props) => {
   const [comment, setComment] = useState({});
-  const { refer, type, sendAlert, showProgress, hideProgress, onDelete, isAuth } = props;
+  const { refer, type, sendAlert, showProgress, hideProgress, onDelete, user } = props;
 
   const adjustDate = (el) => {
+    let ad = el;
     let date = new Date(parseInt(el.data)*1000);
     let day = date.getDate();
     day = day < 10 ? '0'+day : day;
     let month = date.getUTCMonth() + 1;
     month = month < 10 ? '0'+month : month;
-    el.data = `${day}/${month}`;
+    ad.dia = `${day}/${month}`;
 
     let hour = date.getHours();
     hour = hour < 10 ? '0'+hour : hour;
     let minutes = date.getMinutes();
     minutes = minutes < 10 ? '0'+minutes : minutes;
-    el.hora = `${hour}:${minutes}`;
+    ad.hora = `${hour}:${minutes}`;
 
-    return el;
+    return ad;
   };
 
   const handleDelete = async () => {
@@ -61,9 +62,9 @@ const Comment = (props) => {
       </div>
       <div className="d-flex flex-column" style={{flex: '1 0 0'}}>
         <div className="comentario-info">
-          <h1>Por {comment.autor} no dia {comment.data} as {comment.hora}</h1>
+          <h1>Por {comment.autor} no dia {comment.dia} as {comment.hora}</h1>
           {
-            comment.autor === JSON.parse(localStorage.getItem('hxd-user-object'))?.info?.usuario ?
+            comment.autor === user?.usuario ?
             <button className="bg-transparent border-0" onClick={handleDelete}>
               <img src="https://img.icons8.com/material-rounded/16/ffffff/trash--v1.png" alt="" />
             </button>
@@ -125,8 +126,7 @@ const Forum = (props) => {
     let date = new Date();
     let comment = {
       url: key,
-      comentario: comentario.value,
-      data: date.getTime() / 1000
+      comentario: comentario.value
     };
     let init = {
       method: 'POST',
@@ -134,13 +134,19 @@ const Forum = (props) => {
       credentials: 'include'
     };
     let res = await api[type]('sendcomment', {}, init);
+
     if (res.error) {
       sendAlert('danger', res.error);
       hideProgress();
     } else {
       sendAlert('success', res.success);
+
+      comment.data = Math.round(date.getTime() / 1000);
+      comment.autor = user.usuario;
+
       setComentarios([...comentarios, adjustDate(comment)]);
       hideProgress();
+      console.log('mano')
       console.log(res?.award);
       comentario.value = '';
     }
@@ -335,6 +341,7 @@ const Forum = (props) => {
                       sendAlert={sendAlert} 
                       showProgress={showProgress} 
                       hideProgress={hideProgress} 
+                      user={user}
                       onDelete={() => {
                         let clist = comentarios.filter(c => c.id !== comentario.id);
                         setComentarios(clist);

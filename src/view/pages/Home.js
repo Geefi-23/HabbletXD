@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import useInterval from '../../hooks/useInterval';
-import { FixedSizeList as Virtualization } from 'react-window';
 
 import BuyConfirmationModal from '../components/BuyConfirmationModal';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -13,12 +12,17 @@ import '@glidejs/glide/dist/css/glide.core.css';
 
 import { NewsCard, ArtCard, TimelineCard, SpotlightCard } from '../components/Cards';
 import Glide from '@glidejs/glide';
+import { useNavigate } from 'react-router-dom';
 
 const Home = (props) => {
-  const { user, showProgress, hideProgress, sendAlert } = props;
+  const navigate = useNavigate();
+  
+  const { user, showProgress, hideProgress, sendAlert, currentTheme } = props;
 
   // preload data
-  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values } = props;
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, setAllTimelines, ranking } = props;
+
+  const rankCardTypes = ['gold', 'platinum', 'silver', 'bronze'];
 
   const [buyConfirmationShow, setBuyConfirmationShow] = useState(false);
   const [confirmationForBuyShow, setConfirmationForBuyShow] = useState(false);
@@ -38,7 +42,7 @@ const Home = (props) => {
     }
   };
 
-  const rgbToHex = (rgbString) => {
+  /*const rgbToHex = (rgbString) => {
     let values = rgbString.replaceAll(',', '').split(' ');
 
     if (values.length !== 3) return;
@@ -49,7 +53,7 @@ const Home = (props) => {
     };
 
     return componentToHex(values[0]) + componentToHex(values[1]) + componentToHex(values[2]);
-  };
+  };*/
 
   /**
    * @author Milton R. (Geefi)
@@ -179,6 +183,17 @@ const Home = (props) => {
       sendAlert('success', res.success);
       console.log(res?.award)
       writer.textContent = '';
+      
+      const url = res.url;
+      const timeline = await api.timeline('get', { key: url });
+
+      setAllTimelines(oldTimelines => {
+        let timelines = oldTimelines;
+        timelines.unshift(timeline.object);
+        return timelines;
+      });
+
+      navigate(`/timeline/${url}`);
     } else if (res.error)
       sendAlert('danger', res.error);
   };
@@ -208,7 +223,7 @@ const Home = (props) => {
               <div className='d-flex'>
                 <img 
                   className="align-self-start"
-                  src={`https://img.icons8.com/material-rounded/42/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/news.png`}
+                  src={`https://img.icons8.com/material-rounded/42/${currentTheme['theme-colorDark-hex'] || '000'}/news.png`}
                   alt=""
                 />
                 <div className="ms-3">
@@ -294,7 +309,7 @@ const Home = (props) => {
             <div className="section__header">
               <img 
                 className="align-self-start"
-                src={`https://img.icons8.com/ios-filled/42/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/star--v1.png`}
+                src={`https://img.icons8.com/ios-filled/42/${currentTheme['theme-colorDark-hex'] || '000'}/star--v1.png`}
                 alt=""
               />
               <div className='ms-3'>
@@ -695,7 +710,7 @@ const Home = (props) => {
             <div className="section__header">
               <img 
                 className="align-self-start"
-                src={`https://img.icons8.com/fluency-systems-filled/42/${rgbToHex(document.querySelector(':root').style.getPropertyValue('--hxd-theme-colorDark'))}/trophy.png`}
+                src={`https://img.icons8.com/fluency-systems-filled/42/${currentTheme['theme-colorDark-hex'] || '000'}/trophy.png`}
                 alt=""
               />
               <div className="ms-3">
@@ -704,40 +719,24 @@ const Home = (props) => {
               </div>
             </div>
             <div className="section__content">
+              
               <div className="d-flex flex-row justify-content-evenly w-100">
                 <div className="ranking-card d-flex flex-column">
                   <div className="d-flex align-items-center hxd-bg-colorDark w-100 px-4" style={{height: '50px'}}>
                     <h5 className="text-white fw-bold">Comentários</h5>
                   </div>
                   <div className="d-flex flex-column w-100 p-1 gap-1" style={{flex: '1 0 0%'}}>
-                    <div className="rankUser-card rankUser-card--gold">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Comentários</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--platinum">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Comentários</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--silver">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Comentários</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--bronze">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Comentários</small>
-                      </div>
-                    </div>
+                    {
+                      ranking?.comentarios?.map((rank, i) => (
+                        <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`}>
+                          <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
+                          <div>
+                            <h5 className="hxd-primary-text fw-bold mb-0">{rank?.usuario}</h5>
+                            <small className="hxd-secondary-text fw-bold">{rank?.comentarios} Comentários</small>
+                          </div>
+                        </div>
+                      ))
+                    }
                   </div>
                 </div>
                 <div className="ranking-card">
@@ -745,34 +744,17 @@ const Home = (props) => {
                     <h5 className="text-white fw-bold">Curtidas</h5>
                   </div>
                   <div className="d-flex flex-column w-100 p-1 gap-1" style={{flex: '1 0 0%'}}>
-                    <div className="rankUser-card rankUser-card--gold">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Curtidas</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--platinum">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Curtidas</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--silver">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Curtidas</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--bronze">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Curtidas</small>
-                      </div>
-                    </div>
+                    {
+                      ranking?.likes?.map((rank, i) => (
+                        <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`}>
+                          <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
+                          <div>
+                            <h5 className="hxd-primary-text fw-bold mb-0">{rank?.usuario}</h5>
+                            <small className="hxd-secondary-text fw-bold">{rank?.likes} Curtidas</small>
+                          </div>
+                        </div>
+                      ))
+                    }
                   </div>
                 </div>
                 <div className="ranking-card">
@@ -780,34 +762,17 @@ const Home = (props) => {
                     <h5 className="text-white fw-bold">Presença Marcada</h5>
                   </div>
                   <div className="d-flex flex-column w-100 p-1 gap-1" style={{flex: '1 0 0%'}}>
-                    <div className="rankUser-card rankUser-card--gold">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Presença Marcada</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--platinum">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Presença Marcada</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--silver">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Presença Marcada</small>
-                      </div>
-                    </div>
-                    <div className="rankUser-card rankUser-card--bronze">
-                      <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
-                      <div>
-                        <h5 className="hxd-primary-text fw-bold mb-0">Geefi</h5>
-                        <small className="hxd-secondary-text fw-bold">100 Presença Marcada</small>
-                      </div>
-                    </div>
+                    {
+                      ranking?.presencas?.map((rank, i) => (
+                        <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`}>
+                          <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
+                          <div>
+                            <h5 className="hxd-primary-text fw-bold mb-0">{rank?.usuario}</h5>
+                            <small className="hxd-secondary-text fw-bold">{rank?.presencas} Presencas marcadas</small>
+                          </div>
+                        </div>
+                      ))
+                    }
                   </div>
                 </div>
               </div>
