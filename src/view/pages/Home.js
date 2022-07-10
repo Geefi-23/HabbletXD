@@ -17,19 +17,21 @@ import { useNavigate } from 'react-router-dom';
 const Home = (props) => {
   const navigate = useNavigate();
   
-  const { user, showProgress, hideProgress, sendAlert, currentTheme } = props;
+  const { user, showProgress, hideProgress, sendAlert, getCurrentTheme, currentTheme } = props;
 
   // preload data
-  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, setAllTimelines, ranking } = props;
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, setAllTimelines, ranking, trendingTopics } = props;
 
   const rankCardTypes = ['gold', 'platinum', 'silver', 'bronze'];
 
   const [buyConfirmationShow, setBuyConfirmationShow] = useState(false);
   const [confirmationForBuyShow, setConfirmationForBuyShow] = useState(false);
-  
+  const [hashtagInputShow, setHashtagInputShow] = useState(false);
   const [beingBought, setBeingBought] = useState({});
+  const [timelineHashtags, setTimelineHashtags] = useState([]);
 
   const btnScrollTopRef = useRef(null);
+  const hashtagInputRef = useRef(null);
   const handleScrollTopBtn = () => {
     try {
       if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
@@ -41,19 +43,6 @@ const Home = (props) => {
       //do nothing
     }
   };
-
-  /*const rgbToHex = (rgbString) => {
-    let values = rgbString.replaceAll(',', '').split(' ');
-
-    if (values.length !== 3) return;
-    
-    const componentToHex = (x) => {
-      var hex = x.toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
-    };
-
-    return componentToHex(values[0]) + componentToHex(values[1]) + componentToHex(values[2]);
-  };*/
 
   /**
    * @author Milton R. (Geefi)
@@ -164,7 +153,8 @@ const Home = (props) => {
     let form = document.forms['timeline_sender'];
     let writer = form.querySelector('div[contenteditable]');
     let data = {
-      texto: writer.textContent
+      texto: writer.textContent,
+      hashtags: timelineHashtags.join(';')
     };
 
     if (data.texto === '')
@@ -183,6 +173,7 @@ const Home = (props) => {
       sendAlert('success', res.success);
       console.log(res?.award)
       writer.textContent = '';
+      setTimelineHashtags([]);
       
       const url = res.url;
       const timeline = await api.timeline('get', { key: url });
@@ -223,7 +214,7 @@ const Home = (props) => {
               <div className='d-flex'>
                 <img 
                   className="align-self-start"
-                  src={`https://img.icons8.com/material-rounded/42/${currentTheme['theme-colorDark-hex'] || '000'}/news.png`}
+                  src={`https://img.icons8.com/material-rounded/42/${getCurrentTheme('theme-colorDark-hex')}/news.png`}
                   alt=""
                 />
                 <div className="ms-3">
@@ -309,7 +300,7 @@ const Home = (props) => {
             <div className="section__header">
               <img 
                 className="align-self-start"
-                src={`https://img.icons8.com/ios-filled/42/${currentTheme['theme-colorDark-hex'] || '000'}/star--v1.png`}
+                src={`https://img.icons8.com/ios-filled/42/${getCurrentTheme('theme-colorDark-hex')}/star--v1.png`}
                 alt=""
               />
               <div className='ms-3'>
@@ -388,14 +379,91 @@ const Home = (props) => {
                           </div>
                         </div>
                         <div className="d-flex justify-content-between p-2">
-                          <div className="d-flex gap-1 h-100">
-                            <span className="fw-bold">Nenhuma hashtag</span>
-                            <button className="h-100 border-0 text-white fw-bold hxd-bg-color rounded" type="button">+</button>
+                          <div className="d-flex gap-1 h-100" style={{ maxWidth: '75%' }}>
+                            <div className="w-100">
+                              {
+                                timelineHashtags.length === 0 ?
+                                <strong className="hxd-primary-text">Nenhuma hashtag</strong>
+                                :
+                                timelineHashtags.map((hash, i) => (
+                                  <button 
+                                    key={i}
+                                    type="button"
+                                    className="bg-transparent border-0 hxd-primary-text"
+                                    onClick={evt => {
+                                      let hashtags = [...timelineHashtags.slice(0, i), ...timelineHashtags.slice(i+1)];
+                                      setTimelineHashtags(hashtags);
+                                    }}
+                                  >
+                                    <h6>#{hash}</h6>
+                                  </button>
+                                ))
+                              }
+                              {
+                                timelineHashtags.length !== 0 ?
+                                <small className="d-block hxd-primary-text">
+                                  Dica: clique em alguma hashtag para remove-la
+                                </small>
+                                :
+                                <></>
+                              }
+                              
+                            </div>
+                            <button 
+                              className="h-100 border-0 text-white fw-bold hxd-bg-color rounded" 
+                              type="button"
+                              onClick={() => {
+                                setHashtagInputShow(true); 
+                                hashtagInputRef.current.focus();
+                              }}
+                            >
+                              +
+                            </button>
                           </div>
                           <button 
                             className="h-100 border-0 text-white fw-bold hxd-bg-color px-4 rounded"
                             type="submit"
-                          >Postar</button>
+                          >
+                            Postar
+                          </button>
+                        </div>
+                        <div className={`p-1 ${!hashtagInputShow ? 'd-none' : 'd-flex'}`}>
+                          <div className="hashtag-input-wrapper w-50 bg-white rounded-start border border-secondary px-2">
+                            <input 
+                              type="text" 
+                              className="bg-transparent border-0 ms-1" placeholder="Adicione uma hashtag" 
+                              style={{
+                                flex: 1
+                              }} 
+                              ref={hashtagInputRef}
+                            />
+                            
+                          </div>
+                          <button
+                            className="hxd-bg-color text-white border-0 rounded-end"
+                            type="button"
+                            onClick={() => {
+                              
+                              if (hashtagInputRef.current.value === '') 
+                                return setHashtagInputShow(false);
+
+                              if (hashtagInputRef.current.value.search(' ') !== -1)
+                                return sendAlert('warning', 'Uma hashtag não pode conter espaços.');
+                              
+                              if (timelineHashtags.includes(hashtagInputRef.current.value))
+                                return sendAlert('warning', 'Você não pode adicionar hashtags repetidas.');
+
+                              if (timelineHashtags.length >= 3) 
+                                return sendAlert('warning', 'Uma timeline só pode conter 3 hashtags no máximo.');
+                              
+                              setHashtagInputShow(false)
+                              setTimelineHashtags([...timelineHashtags, hashtagInputRef.current.value]);
+                              hashtagInputRef.current.value = '';
+                            }}
+                          >
+                            Concluir
+                          </button>
+                          
                         </div>
                       </form>
                     </div>
@@ -427,26 +495,14 @@ const Home = (props) => {
                         Semanal
                       </button>
                     </div>
-                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
-                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
-                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
-                    </div>
-                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
-                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
-                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
-                    </div>
-                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
-                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
-                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
-                    </div>
-                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
-                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
-                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
-                    </div>
-                    <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
-                      <h6 className="hxd-primary-text m-0">#HabbletXD</h6>
-                      <small className="hxd-primary-text">1.000 usuarios usaram essa hashtag</small>
-                    </div>
+                    {
+                      trendingTopics.map((trend) => (
+                        <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
+                          <h6 className="hxd-primary-text m-0">#{trend.tag}</h6>
+                          <small className="hxd-primary-text">Essa hashtag foi usada {trend.count} vezes.</small>
+                        </div>
+                      ))
+                    }
                   </div>
                 </div>
               </div>
@@ -710,7 +766,7 @@ const Home = (props) => {
             <div className="section__header">
               <img 
                 className="align-self-start"
-                src={`https://img.icons8.com/fluency-systems-filled/42/${currentTheme['theme-colorDark-hex'] || '000'}/trophy.png`}
+                src={`https://img.icons8.com/fluency-systems-filled/42/${getCurrentTheme('theme-colorDark-hex')}/trophy.png`}
                 alt=""
               />
               <div className="ms-3">

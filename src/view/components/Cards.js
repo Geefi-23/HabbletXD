@@ -112,7 +112,7 @@ const TimelineCard = (props) => {
         </div>
       </div>
       <div className="d-flex justify-content-between">
-        <small className="fw-bold hxd-secondary-text">#HabbletXD</small>
+        <small className="fw-bold hxd-secondary-text">#{timeline?.hashtags?.split(' ')[0]}</small>
         <small className="d-flex align-items-center text-danger">
           <img
             className="me-1"

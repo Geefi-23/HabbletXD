@@ -11,10 +11,10 @@ import Valores from "./view/pages/Valores";
 import Schedules from "./view/pages/Schedules";
 
 const approutes = (props) => {
-  const { user, setUser, sendAlert, showProgress, hideProgress, setAllTimelines, currentTheme } = props;
+  const { user, setUser, sendAlert, showProgress, hideProgress, setAllTimelines, getCurrentTheme, currentTheme } = props;
 
   // preload data
-  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, lastEvent, ranking } = props;
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, lastEvent, ranking, trendingTopics } = props;
   
   return (
     <Routes>
@@ -40,7 +40,9 @@ const approutes = (props) => {
           allSpotlights={allSpotlights}
           values={values}
           ranking={ranking}
+          trendingTopics={trendingTopics}
 
+          getCurrentTheme={getCurrentTheme}
           currentTheme={currentTheme}
         />
         } 

@@ -23,20 +23,20 @@
 }
 
 .info > small {
-    color: #8284a6;
+    color: rgb(var(--hxd-theme-colorLight));
 }
 
 .info>h1 {
     display: inline-block;
     font-size: 15px;
-    color: #8284a6;
+    color: rgb(var(--hxd-theme-colorLight));;
 }
 
 .forum .container-conteudo {
     width: 100%;
     min-height: 325px;
     background-color: #ffffff;
-    border: solid 1px #bcbdd4;
+    border: solid 1px rgb(var(--hxd-theme-colorLight));;
     border-radius: .25rem;
     padding: 1rem;
 }
@@ -147,7 +147,7 @@
 .comentario {
     display: flex;
     border-radius: .25rem;
-    background-color: #30336b;
+    background-color: rgb(var(--hxd-theme-color));
     min-height: 166px;
     width: 100%;
     padding: 10px;

@@ -217,7 +217,9 @@ const Forum = (props) => {
             article !== null ?
             <>
             <div className="info ms-3">
-              <div className="m-0 text-nowrap text-truncate h6" role="heading" aria-level="2">{article?.titulo}</div>
+              <div className="m-0 text-nowrap text-truncate h6" role="heading" aria-level="2">
+                {article?.titulo || '#'+article?.hashtags.split(' ').join(' #') }
+              </div>
               <small className="text-nowrap text-truncate">{article?.resumo}</small>
             </div>
             <div className="d-flex flex-row h-100 gap-2">

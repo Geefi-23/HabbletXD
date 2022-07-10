@@ -18,7 +18,7 @@ import api from '../../static/js/api';
 const Header = (props) => {
   const { user, setUser, showProgress, hideProgress, sendAlert, 
     artCategories, values, schedules, lastEvent, currentAnnouncer,
-    setAllArts, allArts, changeTheme, currentTheme } = props;
+    setAllArts, allArts, changeTheme, getCurrentTheme, currentTheme } = props;
 
   const [artModalIsShowing, setArtModalIsShowing] = useState(false);
   const [isAuthModalShowing, setIsAuthModalShowing] = useState(false);
@@ -75,7 +75,7 @@ const Header = (props) => {
         {/* MODAL ART UPLOAD */}
         <button className="bg-transparent h-100 border-0"
           onClick={() => setArtModalIsShowing(true)}>
-          <img src={`https://img.icons8.com/ios-filled/24/${currentTheme['theme-colorDark-hex'] || '000'}/drawing.png`} alt="" />
+          <img src={`https://img.icons8.com/ios-filled/24/${getCurrentTheme('theme-colorDark-hex')}/drawing.png`} alt="" />
         </button>
         <ArtUploadModal 
           showProgress={showProgress} 
@@ -111,7 +111,7 @@ const Header = (props) => {
             //window.location.href = '/';
           }}
         >
-          <img src={`https://img.icons8.com/material-sharp/24/${currentTheme['theme-colorDark-hex'] || '000'}/exit.png`} alt=""/>
+          <img src={`https://img.icons8.com/material-sharp/24/${getCurrentTheme('theme-colorDark-hex')}/exit.png`} alt=""/>
         </button>
       </>
     );
@@ -259,9 +259,9 @@ const Header = (props) => {
               <img 
                 src={
                   isPaused ?
-                  `https://img.icons8.com/ios-glyphs/15/${currentTheme['theme-colorDark-hex'] || '000'}/pause--v1.png`
+                  `https://img.icons8.com/ios-glyphs/15/${getCurrentTheme('theme-colorDark-hex')}/pause--v1.png`
                   :
-                  `https://img.icons8.com/ios-glyphs/15/${currentTheme['theme-colorDark-hex'] || '000'}/play--v1.png`
+                  `https://img.icons8.com/ios-glyphs/15/${getCurrentTheme('theme-colorDark-hex')}/play--v1.png`
                 } 
                 alt=""
               />
@@ -269,7 +269,7 @@ const Header = (props) => {
             <button className="bg-transparent border-0">
               <img 
                 src={
-                  `https://img.icons8.com/ios-filled/15/${currentTheme['theme-colorDark-hex'] || '000'}/room-sound.png`
+                  `https://img.icons8.com/ios-filled/15/${getCurrentTheme('theme-colorDark-hex')}/room-sound.png`
                 }  
                 alt=""
               />
@@ -285,7 +285,7 @@ const Header = (props) => {
             <button className="bg-transparent border-0" onClick={() => setShowRequestMusicModal(true)}>
               <img 
                 src={
-                `https://img.icons8.com/android/15/${currentTheme['theme-colorDark-hex'] || '000'}/paper-plane.png`
+                `https://img.icons8.com/android/15/${getCurrentTheme('theme-colorDark-hex')}/paper-plane.png`
                 } 
                 style={{transform: 'rotateZ(-45deg)'}}  
                 alt=""
@@ -301,7 +301,7 @@ const Header = (props) => {
             <button className="bg-transparent border-0" onClick={() => setShowPresenceModal(true)}>
               <img 
                 src={
-                  `https://img.icons8.com/ios-glyphs/15/${currentTheme['theme-colorDark-hex'] || '000'}/filled-star.png`
+                  `https://img.icons8.com/ios-glyphs/15/${getCurrentTheme('theme-colorDark-hex')}/filled-star.png`
                 }
                 alt=""
               />

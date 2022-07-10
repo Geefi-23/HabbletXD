@@ -37,6 +37,7 @@ const App = () => {
   const [values, setValues] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [ranking, setRanking] = useState([]);
+  const [trendingTopics, setTrendingTopics] = useState([]);
 
   const [currentTheme, setCurrentTheme] = useState({});
 
@@ -81,7 +82,9 @@ const App = () => {
       'theme-icon-color': '30, 121, 131',
       'theme-iconHover-color': '36, 141, 153',
       'theme-text-color': '28, 108, 116',
-      'theme-text-secondaryColor': '86, 147, 153'
+      'theme-text-secondaryColor': '86, 147, 153',
+
+      'theme-colorDark-hex': '105258'
     }
   };
 
@@ -127,7 +130,6 @@ const App = () => {
   };*/
 
   const changeTheme = (theme) => {
-    console.log('oiieee')
     let root = document.querySelector(':root');
 
     for (let key in themes[theme]){
@@ -135,6 +137,10 @@ const App = () => {
     }
     setCurrentTheme(themes[theme]);
     localStorage.setItem('hxd-colorTheme', theme);
+  };
+
+  const getCurrentTheme = key => {
+    return currentTheme ? currentTheme[key] : '000';
   };
 
   const handleProgressShow = () => {
@@ -216,6 +222,7 @@ const App = () => {
     let values = await api.values('getall');
     let schedules = await api.radioHorarios('getsome', { limit: 3 });
     let ranking = await api.ranking('get');
+    let trendingTopics = await api.timeline('gettrending');
 
     badges.new = badges.new.map(badge => {
       badge.imagem = api.getMedia(badge.imagem);
@@ -253,6 +260,7 @@ const App = () => {
     setValues(values);
     setSchedules(schedules);
     setRanking(ranking);
+    setTrendingTopics(trendingTopics);
     handleProgressHide();
   };
 
@@ -293,6 +301,7 @@ const App = () => {
         setAllArts={setAllArts}
 
         changeTheme={changeTheme}
+        getCurrentTheme={getCurrentTheme}
         currentTheme={currentTheme}
       />
         
@@ -310,12 +319,13 @@ const App = () => {
         allTimelines={allTimelines}
         allSpotlights={allSpotlights}
         artCategories={artCategories}
+        trendingTopics={trendingTopics}
         ranking={ranking}
 
         setAllTimelines={setAllTimelines}
 
         values={values}
-        currentTheme={currentTheme}
+        getCurrentTheme={getCurrentTheme}
       />
       <Footer />
     </Router>

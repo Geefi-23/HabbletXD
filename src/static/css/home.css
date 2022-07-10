@@ -85,6 +85,18 @@ button.arrow-right::after{
   padding-right: 132px !important;
 }
 
+.hashtag-input-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.hashtag-input-wrapper::before {
+  content: "#";
+  font-weight: bold;
+  font-style: italic;
+  font-size: 20px;
+  color: rgb(var(--hxd-color-gray));
+}
 .timeline-container{
   display: grid;
   grid-template-columns: auto auto auto;
