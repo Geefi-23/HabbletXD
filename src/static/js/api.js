@@ -19,11 +19,9 @@ const valuesPath = 'values/';
 const teamPath = 'team/';
 const eventPath = 'event/';
 const rankingPath = 'ranking/';
+const carouselPath = 'carousel/';
+const musicRequestPath = 'requests/';
 const searchPath = 'search.php';
-
-/* BUG: Em modo de desenvolvimento, a rota para buscar imagens ou qualquer outro tipo de mídia
-  não funciona devido ao CORS. Esse bug deixa de existir em modo de produção, ou seja, no app servido
-  pelo 'npm run build' */
 
 /* No parâmetro action, deve se especificar a ação que deve ser realizada pela função. Basicamente,
   O nome da página a qual se quer requisitar. Os nomes das páginas foram escritos como ações para 
@@ -44,8 +42,17 @@ const api = {
     return res;
   },
 
-  buyable: async (action, init = {}) => {
-    let res = await (await fetch(URL+buyablePath+action+'.php', init)).json();
+  buyable: async (action, queryparams = {}, init = {}) => {
+    let url = URL+buyablePath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
     return res;
   },
 
@@ -103,6 +110,20 @@ const api = {
 
   art: async (action, queryparams = {}, init = {}) => {
     let url = URL+artPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
+  musicRequest: async (action, queryparams = {}, init = {}) => {
+    let url = URL+musicRequestPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
     if (Object.entries(queryparams).length !== 0) {
       for (let param in queryparams) {
@@ -187,6 +208,20 @@ const api = {
 
   event: async (action, queryparams = {}, init = {}) => {
     let url = URL+eventPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
+    
+    if (Object.entries(queryparams).length !== 0) {
+      for (let param in queryparams) {
+        url += `${param}=${queryparams[param]}&`;
+      }
+      url = url.substring(0, url.length - 1);
+    }
+
+    let res = await (await fetch(url, init)).json();
+    return res;
+  },
+
+  indexCarousel: async (action, queryparams = {}, init = {}) => {
+    let url = URL+carouselPath+action+`.php${Object.entries(queryparams).length !== 0 ? '?':''}`;
     
     if (Object.entries(queryparams).length !== 0) {
       for (let param in queryparams) {

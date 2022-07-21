@@ -43,8 +43,10 @@ const NewsCard = (props) => {
   }, []);
 
   return (
-    <Link to={'noticia/'+news.url} className="news-card"
-    onClick={onClick}
+    <Link 
+      to={`ler/noticia/${news.url}/${news.id}`} 
+      className={`news-card ${parseInt(news?.lido) ? 'news-card--read' : ''}`}
+      onClick={onClick}
     >
       <div className="news-card__thumbnail">
         <img className="w-100 h-100" src={news.imagem} alt="" onError={(evt) => evt.target.classList.add('d-none')} />
@@ -71,8 +73,8 @@ const NewsCard = (props) => {
         <div className="d-flex w-100 justify-content-between position-absolute fw-bold text-secondary" style={{height: '20px', bottom: 0}}>
           {`${news.dia} às ${news.hora}`}
           <img 
-            style={{ alignSelf: 'center', objectPosition: '0 5px' }}
-            src={`https://avatar.blet.in/${news.criador}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=1`} 
+            style={{ alignSelf: 'center', objectPosition: '10px 5px' }}
+            src={`https://avatar.blet.in/${news.criador}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
             title={news.criador}
           />
         </div>
@@ -102,13 +104,17 @@ const TimelineCard = (props) => {
             }}
           />
         </div>
-        <div className="timeline-card__preview">
-        {
-          timeline.texto.substr(
-            0, 
-            timeline.texto.length < 50 ? timeline.texto.length : 49  
-          )
-        }
+        <div 
+          className="timeline-card__preview" 
+          dangerouslySetInnerHTML={
+            { 
+              __html: timeline.texto.substr(
+                0, 
+                timeline.texto.length < 50 ? timeline.texto.length : 49  
+              ) 
+            }
+          }
+        >
         </div>
       </div>
       <div className="d-flex justify-content-between">
@@ -174,15 +180,29 @@ const ArtCard = (props) => {
   );
 };
 
-const SpotlightCard = () => {
+const SpotlightCard = ({ refer }) => {
   return (
-    <div className="spotlight-card">
-      <div className="spotlight-card__header fw-bold">
-        <div>De: HabbletXD</div>
-        <div>Para: geefi</div>
+    <article className="spotlight-card">
+      <div className="spotlight-card__header d-flex justify-content-between">
+        <div>
+          De: HabbletXD<br />
+          Para: {refer?.usuario}
+        </div>
+        
+        <img 
+          src={`https://avatar.blet.in/${refer?.usuario}&action=std,crr=49&size=b&head_direction=3&direction=4&gesture=sml&headonly=0`} 
+          alt=""
+          style={{
+            width: '4rem',
+            objectFit: 'none',
+            objectPosition: '0 -1.5rem'
+          }}
+        />
       </div>
-      <div className="spotlight-card__content">blaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
-    </div>
+      <p className="spotlight-card__content">
+        {refer?.motivo}
+      </p>
+    </article>
   );
 };
 
@@ -222,7 +242,7 @@ const ResultCard = (props) => {
               </small>
             </div>
             <div class="container-postagem">
-              <span>Postada dia {result?.data} as {result?.hora} </span>
+              <span>Postada dia {result?.dia} as {result?.hora} </span>
             </div>
           </div>
       </Link>
@@ -234,7 +254,7 @@ const ResultCard = (props) => {
         <div className="container-foto">
           <img src="https://img.freepik.com/vetores-gratis/sol-quente-em-um-fundo-amarelo-reflexo-da-luz-solar-estrela-branca-brilhante-com-destaques-bonitos-em-um-fundo-laranja_86826-653.jpg" alt=" "/>
           <div className="container-boneco">
-            <img src={`https://avatar.blet.in/Geefi&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`} alt=" "/>
+            <img src={`https://avatar.blet.in/${result?.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`} alt=" "/>
           </div>
         </div>
         <div className="container-conteudo">

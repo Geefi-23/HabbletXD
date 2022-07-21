@@ -74,9 +74,7 @@ const Comment = (props) => {
             </button>
           }
         </div>
-        <div className="balao rounded-bottom">
-          {comment.comentario}
-        </div>
+        <div className="balao rounded-bottom" dangerouslySetInnerHTML={{ __html: comment.comentario }}></div>
         <div className="icone-img">
           <i style={{ color: '#fff' }} className="fa fa-trash" aria-hidden="true"></i>
         </div>
@@ -168,7 +166,7 @@ const Forum = (props) => {
   });
 
   useServerApi(type, 'updateviews', { key }, () => {
-    setArticle({...article, likes: article.likes+1})
+    setArticle({...article, likes: article?.likes+1 || 1})
   });
 
   const get = useCallback(async () => {
@@ -218,7 +216,7 @@ const Forum = (props) => {
             <>
             <div className="info ms-3">
               <div className="m-0 text-nowrap text-truncate h6" role="heading" aria-level="2">
-                {article?.titulo || '#'+article?.hashtags.split(' ').join(' #') }
+                {article?.titulo || '#'+article?.hashtags?.split(' ').join(' #') }
               </div>
               <small className="text-nowrap text-truncate">{article?.resumo}</small>
             </div>
@@ -227,7 +225,7 @@ const Forum = (props) => {
                 <div>
                   {
                     type !== 'timeline' ?
-                    <img
+                    <img 
                       src={(() => {
                         const image = require(`../../static/icons/${article?.categoria_icone || 'category_icon_art.gif'}`);
                         return image;
@@ -290,14 +288,14 @@ const Forum = (props) => {
             {
               type === 'art' ?
               <div 
-                className="container-conteudo" 
+                className="container-conteudo text-center" 
               >
                 <img src={art} alt="" />
               </div>
               :
               <div 
                 className="container-conteudo" 
-                dangerouslySetInnerHTML={{ __html: article?.texto}}
+                dangerouslySetInnerHTML={{ __html: article.texto}}
               ></div>
             }
             

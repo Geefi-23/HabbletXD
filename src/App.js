@@ -25,7 +25,9 @@ const App = () => {
   const userNotificationsRef = useRef(null);
 
   // preload data
-  const [lastEvent, setLastEvent] = useState({});
+  const [radioInfo, setRadioInfo] = useState({});
+  const [newsHighlight, setNewsHighlight] = useState(null);
+  const [lastEvent, setLastEvent] = useState(null);
   const [currentAnnouncer, setCurrentAnnouncer] = useState({});
   const [badges, setBadges] = useState([]);
   const [loja, setLoja] = useState([]);
@@ -38,8 +40,28 @@ const App = () => {
   const [schedules, setSchedules] = useState([]);
   const [ranking, setRanking] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
+  const [carousel, setCarousel] = useState([]);
 
   const [currentTheme, setCurrentTheme] = useState({});
+  const [radioIsReady, setRadioIsReady] = useState(false);
+
+  const adjustDate = (toAdjust) => {
+    let ad = toAdjust;
+    let date = new Date(parseInt(ad.data)*1000);
+    let day = date.getDate();
+    day = day < 10 ? '0'+day : day;
+    let month = date.getUTCMonth() + 1;
+    month = month < 10 ? '0'+month : month;
+    ad.dia = `${day}/${month}`;
+  
+    let hour = date.getHours();
+    hour = hour < 10 ? '0'+hour : hour;
+    let minutes = date.getMinutes();
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    ad.hora = `${hour}:${minutes}`;
+  
+    return ad;
+  };
 
   // temas
   const themes = {
@@ -162,7 +184,7 @@ const App = () => {
    * por exemplo) quando o alerta sumia da tela, isto porque o componente era atualizado completamente. 
    * Para evitar esse inconveniente, foi optado por fazer um algorítimo mais 'vanilla', usando apenas o useRef do React.
    */
-  const sendAlert = (type, content) => {
+  const sendAlert = (type, content, listeners = { onunload: null }) => {
     containerRef.current.classList.remove('d-none');
     alertRef.current.classList.add('alert-'+type);
     alertRef.current.innerText = content;
@@ -174,6 +196,8 @@ const App = () => {
         containerRef.current.classList.add('d-none');
         alertRef.current.classList.remove('alert-'+type, 'opacity-0');
         alertRef.current.innerText = '';
+
+        listeners.onunload && listeners.onunload();
       }, 1000);
 
     }, 5000)
@@ -211,69 +235,90 @@ const App = () => {
   }, [setUser]);
   
   const pool = async () => {
-    let lastEvent = await api.event('getlast');
-    let currentAnnouncer = await api.radio('getannouncer');
-    let news = await api.news('getall');
-    let timelines = await api.timeline('getall');
-    let arts = await api.art('getall');
-    let badges = await api.badges('getall');
-    let buyables = await api.buyable('getall');
-    let artCategories = await api.art('getallcategories');
-    let values = await api.values('getall');
-    let schedules = await api.radioHorarios('getsome', { limit: 3 });
-    let ranking = await api.ranking('get');
-    let trendingTopics = await api.timeline('gettrending');
 
-    badges.new = badges.new.map(badge => {
-      badge.imagem = api.getMedia(badge.imagem);
-      return badge;
-    });
-    buyables = buyables.map(item => {
-      item.imagem = api.getMedia(item.imagem);
-      return item;
-    });
+    fetch('https://api4.truesecurity.com.br/?ip=stream2.svrdedicado.org&port=8180&simples=last&time=)')
+        .then(res => res.json())
+        .then(json => setRadioInfo(json));
+
+    let lastEvent = await api.event('getlast');
+    lastEvent = adjustDate(lastEvent);
+    setLastEvent(lastEvent);
+
+    let schedules = await api.radioHorarios('getsome', { limit: 3 });
+    setSchedules(schedules);
+
+    let currentAnnouncer = await api.radio('getannouncer', {}, { credentials: 'include' });
+    setCurrentAnnouncer(currentAnnouncer);
+
+    let values = await api.values('getall');
     values = values.map(item => {
       if (item.categoria_id !== "3")
         item.imagem = api.getMedia(item.imagem);
       return item;
     });
+    setValues(values);
 
-    //getting all images
+    let carouselImages = await api.indexCarousel('get');
+    setCarousel(carouselImages);
 
+    let news = await api.news('getall', {}, { credentials: 'include' });
     news = news.map(el => {
       el.imagem = api.getMedia(el.imagem);
       return el;
     });
+    setAllNews(news);
+
+    let spotlights = await api.user('gethighlight');
+    setAllSpotlights(spotlights);
+
+    let newsHighlight = await api.news('gethighlight');
+    setNewsHighlight(adjustDate(newsHighlight));
+
+    let timelines = await api.timeline('getall');
+    setAllTimelines(timelines);
+
+    let trendingTopics = await api.timeline('gettrending');
+    setTrendingTopics(trendingTopics);
+
+    let arts = await api.art('getall');
     arts = arts.map(el => {
       el.imagem = api.getMedia(el.imagem)
       return el;
     });
-
-    setLastEvent(lastEvent);
-    setCurrentAnnouncer(currentAnnouncer);
-    setAllNews(news);
     setAllArts(arts);
-    setLoja(buyables);
-    setAllTimelines(timelines);
+
+    let badges = await api.badges('getall');
     setBadges(badges);
+
+    let buyables = await api.buyable('getall');
+    buyables = buyables.map(item => {
+      item.imagem = api.getMedia(item.imagem);
+      return item;
+    });
+    setLoja(buyables);
+
+    let artCategories = await api.art('getallcategories');
+    let ranking = await api.ranking('get');
+    
     setArtCategories(artCategories);
-    setValues(values);
-    setSchedules(schedules);
     setRanking(ranking);
-    setTrendingTopics(trendingTopics);
+    
+    setRadioIsReady(true);
     handleProgressHide();
   };
 
-  useInterval(async () => {
-    let date = new Date();
-    if (date.getMinutes === 0) {
-      let announcer = await api.radio('getannouncer');
-      setCurrentAnnouncer(announcer);
-    }
+  useInterval(() => {
+    (async () => {
+      let date = new Date();
+      if (date.getMinutes === 0) {
+        let announcer = await api.radio('getannouncer');
+        setCurrentAnnouncer(announcer);
+      }
+    })();
   }, 50000);
 
   useEffect(() => {
-    changeTheme(localStorage.getItem('hxd-ColorTheme') || 'purple');
+    changeTheme(localStorage.getItem('hxd-ColorTheme'));
     handleProgressShow();
     pool();
     checkAuthentication();
@@ -296,6 +341,9 @@ const App = () => {
         schedules={schedules}
         lastEvent={lastEvent}
         currentAnnouncer={currentAnnouncer}
+        setCurrentAnnouncer={setCurrentAnnouncer}
+        carousel={carousel}
+        radioInfo={radioInfo}
 
         allArts={allArts}
         setAllArts={setAllArts}
@@ -303,6 +351,9 @@ const App = () => {
         changeTheme={changeTheme}
         getCurrentTheme={getCurrentTheme}
         currentTheme={currentTheme}
+        radioIsReady={radioIsReady}
+        setRadioIsReady={setRadioIsReady}
+        newsHighlight={newsHighlight}
       />
         
       <Approutes 
@@ -323,6 +374,7 @@ const App = () => {
         ranking={ranking}
 
         setAllTimelines={setAllTimelines}
+        setAllNews={setAllNews}
 
         values={values}
         getCurrentTheme={getCurrentTheme}

@@ -5,6 +5,8 @@ import BuyConfirmationModal from '../components/BuyConfirmationModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 
 import api from '../../static/js/api';
+import newBadges from '../../static/json/badges.json';
+
 
 import '../../static/css/home.css';
 import '../../static/css/cards.css';
@@ -14,13 +16,15 @@ import { NewsCard, ArtCard, TimelineCard, SpotlightCard } from '../components/Ca
 import Glide from '@glidejs/glide';
 import { useNavigate } from 'react-router-dom';
 
+newBadges.reverse();
+
 const Home = (props) => {
   const navigate = useNavigate();
   
-  const { user, showProgress, hideProgress, sendAlert, getCurrentTheme, currentTheme } = props;
+  const { user, setUser, showProgress, hideProgress, sendAlert, getCurrentTheme, currentTheme } = props;
 
   // preload data
-  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, setAllTimelines, ranking, trendingTopics } = props;
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, setAllTimelines, ranking, trendingTopics, setAllNews } = props;
 
   const rankCardTypes = ['gold', 'platinum', 'silver', 'bronze'];
 
@@ -29,6 +33,7 @@ const Home = (props) => {
   const [hashtagInputShow, setHashtagInputShow] = useState(false);
   const [beingBought, setBeingBought] = useState({});
   const [timelineHashtags, setTimelineHashtags] = useState([]);
+  const [scrollToTop, setScrollToTop] = useState(true);
 
   const btnScrollTopRef = useRef(null);
   const hashtagInputRef = useRef(null);
@@ -104,19 +109,19 @@ const Home = (props) => {
 
     let emblemasGratis = new Glide('#emblemasGratis-slider', {
       type: 'slider',
-      perView: 8,
+      perView: 15,
       rewind: false,
       bound: true,
       gap: 8,
     });
 
-    let emblemasNovos = new Glide('#emblemasNovos-slider', {
+    /*let emblemasNovos = new Glide('#emblemasNovos-slider', {
       type: 'slider',
       perView: 8,
       rewind: false,
       bound: true,
       gap: 8,
-    });
+    });*/
 
     let artSlider = new Glide('#artSlider', {
       type: 'slider',
@@ -130,14 +135,14 @@ const Home = (props) => {
     slidersArrowsSetListener(lojaoEmblemas, '#ljem-arrowPrev', '#ljem-arrowNext');
     slidersArrowsSetListener(newsSlider, '#news-arrowPrev', '#news-arrowNext');
     slidersArrowsSetListener(emblemasGratis, '#egs-arrowLeft', '#egs-arrowRight');
-    slidersArrowsSetListener(emblemasNovos, '#ens-arrowLeft', '#ens-arrowRight');
+    //slidersArrowsSetListener(emblemasNovos, '#ens-arrowLeft', '#ens-arrowRight');
     slidersArrowsSetListener(artSlider, '#artslider-arrowLeft', '#artslider-arrowRight');
 
     lojaoXD.mount();
     lojaoEmblemas.mount();
     newsSlider.mount();
     emblemasGratis.mount();
-    emblemasNovos.mount();
+    //emblemasNovos.mount();
     artSlider.mount();
   }, []);
 
@@ -170,8 +175,13 @@ const Home = (props) => {
     submit.disabled = false;
     hideProgress();
     if (res.success){
-      sendAlert('success', res.success);
-      console.log(res?.award)
+      sendAlert('success', res.success, {
+        onunload: !res.award ? null : () => {
+          sendAlert('success', res.award);
+          let xdcoins = res.coins;
+          setUser({ ...user, xdcoins: parseInt(user.xdcoins) + xdcoins });
+        }
+      });
       writer.textContent = '';
       setTimelineHashtags([]);
       
@@ -194,12 +204,17 @@ const Home = (props) => {
     hideProgress();
     configureSliders();
     document.onscroll = handleScrollTopBtn;
-    window.scrollTo(0, 0);
+    if (scrollToTop) {
+      window.scrollTo(0, 0);
+      setScrollToTop(false);
+    }
   }, []);
   
   return (
     <>
       <BuyConfirmationModal 
+        user={user}
+        setUser={setUser}
         isShowing={buyConfirmationShow} 
         setIsShowing={setBuyConfirmationShow} 
         showProgress={showProgress}
@@ -282,7 +297,15 @@ const Home = (props) => {
                             }}
                           >
                             {slide.map((news) => (
-                              <NewsCard refer={news} key={news.id} onClick={() => showProgress()} />
+                              <NewsCard refer={news} key={news.id} 
+                              onClick={() => {
+                                let newAllNews = allNews.map((n) => 
+                                  n.id === news.id ?
+                                  { ...n, lido: 1 } : n
+                                );
+                                setAllNews(newAllNews);
+                                showProgress();
+                              }} />
                             ))}
                           </div>
                         ));
@@ -320,8 +343,8 @@ const Home = (props) => {
                   <div className='spotlight-card skeleton'></div>
                 </>
                 :
-                allSpotlights.map((spotlight, i) => (
-                  <SpotlightCard refer={spotlight} key={i} />
+                allSpotlights.map((spotlight) => (
+                  <SpotlightCard refer={spotlight} key={spotlight?.id} />
                 ))
               }
   
@@ -359,7 +382,7 @@ const Home = (props) => {
                       allTimelines.length === 0 ?
                       new Array(9).fill(<div className='timeline-card skeleton'></div>)
                       :
-                      allTimelines.map((timeline, i) => (
+                      allTimelines.map((timeline) => (
                         <TimelineCard refer={timeline} key={timeline.id} onClick={() => showProgress()} />
                       ))
                     }
@@ -508,7 +531,8 @@ const Home = (props) => {
               </div>
             </div>
           </div>
-          <div className="d-flex flex-row justify-content-between w-100">
+          <div className="d-flex justify-content-between w-100">
+            {/*
             <div className="section" style={{width: '49%'}}>
               <div className="section__header justify-content-between">
                 <div className='d-flex'>
@@ -532,13 +556,18 @@ const Home = (props) => {
                   <div className="glide__track" data-glide-el="track">
                     <div className="glide__slides" style={{ height: '60px' }}>
                       {
-                        badges.new?.map((badge) => (
+                        newBadges.map((badge) => (
                           <div 
-                          className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded p-1" style={{cursor: 'pointer'}} 
-                          onClick={() => console.log(badge)}
-                          title={badge.nome}
+                            className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded p-1" style={{cursor: 'pointer'}} 
+                            onClick={() => console.log(badge)}
+                            title={badge.name}
                           >
-                            <img className="h-100 w-100" style={{ objectFit: 'cover' }} src={badge.imagem} alt="" />
+                            <img 
+                              className="h-100 w-100" 
+                              style={{ objectFit: 'contain' }} 
+                              src={`https://images.habblet.city/c_images/album1584/${badge.code}.gif`} 
+                              alt="" 
+                            />
                           </div>
                         ))
                       }
@@ -547,7 +576,8 @@ const Home = (props) => {
                 </div>
               </div>
             </div>
-            <div className="section" style={{width: '49%'}}>
+            */}
+            <div className="section" style={{/*width: '49%'*/}}>
               <div className="section__header justify-content-between">
                 <div className="d-flex">
                   <img 
@@ -572,9 +602,13 @@ const Home = (props) => {
                     <div className="glide__slides" style={{height: '60px'}}>
                       {
                         badges.free?.map((badge) => (
-                          <div className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded" style={{cursor: 'pointer'}} onClick={() => console.log(badge)}>
-                            <img src={badge.imagem} alt="" />
-                          </div>
+                          <a 
+                            className="glide__slide slider__item justify-content-center align-items-center hxd-bg-color rounded" 
+                            style={{cursor: 'pointer'}} 
+                            href={badge?.tutorial}
+                          >
+                            <img src={badge?.imagem} alt="" />
+                          </a>
                         ))
                       }
 
@@ -610,8 +644,31 @@ const Home = (props) => {
                 text="Você tem certeza de que deseja realizar esta compra?"
                 beingBought={beingBought}
                 userCoins={user?.xdcoins}
-                onAccept={() => {
-                  setBuyConfirmationShow(true);
+                onAccept={async () => {
+                  if (beingBought.tipo === 'emblema') {
+                    const init = {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        item: beingBought
+                      }),
+                      credentials: 'include'
+                    };
+
+                    showProgress();
+                    const res = await api.buyable('buy', {}, init);
+                    hideProgress();
+
+                    if (res.success) {
+                      sendAlert('success', res.success);
+                      setConfirmationForBuyShow(false);
+                      let xdcoins = parseInt(user.xdcoins) - beingBought.valor;
+                      setUser({ ...user, xdcoins});
+                    } else {
+                      sendAlert('danger', res.error);
+                    }
+                  } else {
+                    setBuyConfirmationShow(true);
+                  }
                   setConfirmationForBuyShow(false);
                 }}
                 onDeny={() => setConfirmationForBuyShow(false)} 
@@ -623,8 +680,18 @@ const Home = (props) => {
                       loja.filter(item => item.tipo !== 'emblema').map((item) => (
                         <div className="glide__slide lojao-card">
                           <div className="info-wrapper">
-                            <div className="hxd-bg-color rounded-top text-center" style={{flex: '1 0 0'}}>
-                              <img src={item?.imagem} alt="" />
+                            <div 
+                              className="hxd-bg-color rounded-top d-flex justify-content-center align-items-center px-2" 
+                              style={{height: '200px'}}
+                            >
+                              <img 
+                                className="w-100 h-100"
+                                src={item?.imagem} 
+                                alt="" 
+                                style={{
+                                  objectFit: 'contain'
+                                }}
+                              />
                             </div>
                             <div 
                               className='d-flex align-items-center justify-content-center bg-white rounded-bottom hxd-primary-text' 
@@ -657,10 +724,17 @@ const Home = (props) => {
           </div>
           <div className="section">
             <div className="section__header justify-content-between">
-              <div>
-                <h4 className="mb-0 text-white"><span className="fw-bold">Lojão</span> de emblemas</h4>
-                <span className="text-white">Venha gastar seus XD's comprando emblemas exclusivos para o seu perfil</span>
+              <div className="d-flex ">
+                <img 
+                src="https://cdn.discordapp.com/attachments/933862913532391454/937166167129325618/icon_shop2.png"
+                alt=""
+                />
+                <div className='ms-3'>
+                  <h4 className="mb-0 text-white"><span className="fw-bold">Lojão</span> de emblemas</h4>
+                  <span className="text-white">Venha gastar seus XD's comprando emblemas exclusivos para o seu perfil</span>
+                </div>
               </div>
+              
               <div className="section__nav-tools">
                 <button id="ljem-arrowPrev" className="arrow-left"></button>
                 <button className="reload"></button>
@@ -672,18 +746,27 @@ const Home = (props) => {
                 <div className="glide__track" data-glide-el="track">
                   <div className="glide__slides">
                     {
-                      badges.normal?.map((badge) => (
+                      loja.filter(item => item.tipo === 'emblema').map((badge) => (
                         <div className="glide__slide lojao-card--square">
                           <div className="info-wrapper">
-                            <div className="hxd-bg-color rounded-top" style={{flex: '1 0 0'}}></div>
+                            <div 
+                              className="d-flex justify-content-center align-items-center hxd-bg-color rounded-top"
+                              style={{height: '70px'}}
+                            >
+                              <img src={badge.imagem} alt="" />
+                            </div>
                             <div className='d-flex justify-content-center align-items-center bg-white rounded-bottom' style={{height: '40px'}}>
-                              <small>
+                              <small className='text-center' style={{ lineHeight: 1.1 }}>
                                 <strong>{badge.nome}</strong>
                               </small>
                             </div>
                             <div className="d-flex flex-row align-items-center justify-content-between mt-2">
-                              <span className="hxd-bg-color px-2 text-white rounded">100 XD's</span>
-                              <button className='btn btn-success p-0 px-2'>Comprar</button>
+                              <span className="hxd-bg-color px-2 text-white rounded">{badge.valor} XD's</span>
+                              <button className='btn btn-success p-0 px-2'
+                              onClick={() => {
+                                setBeingBought(badge);
+                                setConfirmationForBuyShow(true);
+                              }}>Comprar</button>
                             </div>
                           </div>
                         </div>
@@ -785,7 +868,14 @@ const Home = (props) => {
                     {
                       ranking?.comentarios?.map((rank, i) => (
                         <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`}>
-                          <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
+                          <div className="d-inline-block overflow-hidden me-3" style={{height: '100%', width: '46px'}}>
+                            <img 
+                              src={`https://avatar.blet.in/${rank?.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                              style={{
+                                objectPosition: '-10px -25px'
+                              }}
+                            />
+                          </div>
                           <div>
                             <h5 className="hxd-primary-text fw-bold mb-0">{rank?.usuario}</h5>
                             <small className="hxd-secondary-text fw-bold">{rank?.comentarios} Comentários</small>
@@ -803,7 +893,14 @@ const Home = (props) => {
                     {
                       ranking?.likes?.map((rank, i) => (
                         <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`}>
-                          <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
+                          <div className="d-inline-block overflow-hidden me-3" style={{height: '100%', width: '46px'}}>
+                            <img 
+                              src={`https://avatar.blet.in/${rank?.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                              style={{
+                                objectPosition: '-10px -25px'
+                              }}
+                            />
+                          </div>
                           <div>
                             <h5 className="hxd-primary-text fw-bold mb-0">{rank?.usuario}</h5>
                             <small className="hxd-secondary-text fw-bold">{rank?.likes} Curtidas</small>
@@ -821,7 +918,14 @@ const Home = (props) => {
                     {
                       ranking?.presencas?.map((rank, i) => (
                         <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`}>
-                          <div className="d-inline-block" style={{height: '100%', width: '46px'}}></div>
+                          <div className="d-inline-block overflow-hidden me-3" style={{height: '100%', width: '46px'}}>
+                            <img 
+                              src={`https://avatar.blet.in/${rank?.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                              style={{
+                                objectPosition: '-10px -25px'
+                              }}
+                            />
+                          </div>
                           <div>
                             <h5 className="hxd-primary-text fw-bold mb-0">{rank?.usuario}</h5>
                             <small className="hxd-secondary-text fw-bold">{rank?.presencas} Presencas marcadas</small>

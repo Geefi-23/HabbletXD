@@ -7,10 +7,10 @@
 .spinner .track{
   height: 100%;
   width: 100%;
-  border: 10px solid #dee2e6;
-  border-top-color: rgb(var(--hxd-theme-color));
+  border: 2px solid rgb(var(--hxd-theme-color));
+  border-top-color: transparent;
   border-radius: 50%;
-  animation: spin infinite 1s ease;
+  animation: spin infinite .75s ease;
 }
 
 @keyframes spin {

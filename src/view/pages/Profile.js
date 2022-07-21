@@ -11,8 +11,27 @@ const Profile = ({ type, user, hideProgress }) => {
   const [profile, setProfile] = useState({});
   const [badges, setBadges] = useState([]);
   const [timelines, setTimelines] = useState([]);
+  const [trending, setTrending] = useState([]);
   const [arts, setArts] = useState([]);
   let { name } = useParams();
+
+  const adjustDate = (toAdjust) => {
+    let ad = toAdjust;
+    let date = new Date(parseInt(ad.data)*1000);
+    let day = date.getDate();
+    day = day < 10 ? '0'+day : day;
+    let month = date.getUTCMonth() + 1;
+    month = month < 10 ? '0'+month : month;
+    ad.dia = `${day}/${month}`;
+  
+    let hour = date.getHours();
+    hour = hour < 10 ? '0'+hour : hour;
+    let minutes = date.getMinutes();
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    ad.hora = `${hour}:${minutes}`;
+  
+    return ad;
+  };
 
   const loadProfile = useCallback(async () => {
 
@@ -21,6 +40,9 @@ const Profile = ({ type, user, hideProgress }) => {
     } else if (type === 'myself' && user) {
       let getTimelines = await api.timeline('getsome', { quantity: 4, user: user.usuario });
       let getArts = await api.art('getsome', { quantity: 2, user: user.usuario });
+      let getBadges = await api.buyable('getsome', { user: user.usuario, type: 'emblema' })
+      let trending = await api.timeline('gettrending', { user: user.usuario });
+      setTrending(trending);
 
       if (getTimelines.success) {
         setTimelines(getTimelines.timelines);
@@ -29,12 +51,18 @@ const Profile = ({ type, user, hideProgress }) => {
       if (getArts.success) {
         let pixels = getArts.arts;
         pixels = pixels.map((pixel) => {
+          pixel = adjustDate(pixel);
           pixel.imagem = api.getMedia(pixel.imagem);
           return pixel
         });
 
         setArts(pixels);
       }
+      getBadges = getBadges.map((badge) => {
+        badge.item_imagem = api.getMedia(badge.item_imagem);
+        return badge;
+      });
+      setBadges(getBadges);
       setProfile(user);
     } else {
     
@@ -47,11 +75,15 @@ const Profile = ({ type, user, hideProgress }) => {
       if (res.error) {
         setProfile({ error: true });
       }else if (res.success) {
+        res.user.avatar = api.getMedia(res.user.avatar);
         setProfile(res.user);
       }
 
       let getTimelines = await api.timeline('getsome', { quantity: 4, user: name });
       let getArts = await api.art('getsome', { quantity: 2, user: name });
+      let getBadges = await api.buyable('getsome', { user: name, type: 'emblema' })
+      let trending = await api.timeline('gettrending', { user: name });
+      setTrending(trending);
 
       if (getTimelines.success) {
         setTimelines(getTimelines.timelines);
@@ -60,23 +92,35 @@ const Profile = ({ type, user, hideProgress }) => {
       if (getArts.success) {
         let pixels = getArts.arts;
         pixels = pixels.map((pixel) => {
+          pixel = adjustDate(pixel);
           pixel.imagem = api.getMedia(pixel.imagem);
           return pixel
         });
 
         setArts(pixels);
       }
+      getBadges = getBadges.map((badge) => {
+        badge.item_imagem = api.getMedia(badge.item_imagem);
+        return badge;
+      });
+      setBadges(getBadges);
     }
     hideProgress();
   }, []);
 
   useEffect(() => {
 
-    if (badges.length !== 0)
+    if (badges?.length !== 0)
       new Glide('#badges-slider', {
         type: 'slider',
-        perView: 4
+        perView: 4,
+        bound: true,
+        rewind: false
       }).mount();
+    
+  }, [badges]);
+
+  useEffect(() => {
     loadProfile(); 
   }, []);
   return (
@@ -110,17 +154,20 @@ const Profile = ({ type, user, hideProgress }) => {
                   <div className="text-center" 
                     style={{
                       height: '125px',
-                      background: profile?.avatar !== '' ? `url('${profile?.avatar}')` : '#cacad9',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
+                      
+                      background: `url('${profile?.avatar}') #cacad9 no-repeat center center / cover` 
+                      
                     }}
                   >
-                    <img 
-                      src={`https://avatar.blet.in/${profile?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
-                      style={{objectPosition: '0 -30px' }}
-                      alt=""
-                    />
+                    {
+                      profile.usuario ?
+                      <img 
+                        src={`https://avatar.blet.in/${profile?.usuario}&action=std&size=l&head_direction=3&direction=2&gesture=sml&headonly=0`}
+                        style={{objectPosition: '0 -30px' }}
+                        alt=""
+                      />
+                      : <></>
+                    }
                   </div>
                 </div>
                 {
@@ -137,21 +184,26 @@ const Profile = ({ type, user, hideProgress }) => {
                             let iterations = Math.round(badges.length / 2);
       
                             for (let i = 0; i < iterations; i++){
-                              let news1 = badges[y++];
-                              let news2 = badges[y++];
+                              let badge1 = badges[y++];
+                              let badge2 = badges[y++];
       
                               let slide;
       
-                              if (news2 === undefined) {
-                                slide = [news1];
+                              if (badge2 === undefined) {
+                                slide = [badge1];
                               } else {
-                                slide = [news1, news2];
+                                slide = [badge1, badge2];
                               }
       
                               slides.push((
                                 <div className="glide__slide d-flex flex-column gap-2">
-                                  {slide.map(() => (
-                                    <div className="hxd-border bg-white" style={{height: '50px', width: '50px'}}></div>
+                                  {slide.map((badge) => (
+                                    <div className="d-flex justify-content-center align-items-center hxd-border rounded bg-white" 
+                                    style={{height: '50px', width: '50px', cursor: 'pointer'}}
+                                    title={badge.item_nome}
+                                    >
+                                      <img src={badge.item_imagem} alt="" />
+                                    </div>
                                   ))}
                                 </div>
                               ));
@@ -188,7 +240,7 @@ const Profile = ({ type, user, hideProgress }) => {
                             {timeline.texto.substring(0, 30)}
                           </div>
                           <div className="d-flex justify-content-between px-2">
-                            <small className="hxd-secondary-text fw-bold">#HabbletXD</small>
+                            <small className="hxd-secondary-text fw-bold">#{timeline.hashtags.split(' ')[0]}</small>
                             <div className="d-flex align-items-center text-danger">
                               <img
                                 className="me-1"
@@ -212,14 +264,22 @@ const Profile = ({ type, user, hideProgress }) => {
                       arts?.map((art) => (
                         <Link to={`/arte/${art.url}`} className="hxd-border d-flex flex-row text-decoration-none p-1 rounded" style={{width: '252px', height: '80px'}}>
                           <div className="bg-secondary h-100 hxd-border rounded" style={{width: '70px', flexShrink: '0'}}>
-                            <img src={`${art?.imagem}`} alt="" />
+                            <img 
+                            src={`${art?.imagem}`} 
+                            alt="" 
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover'
+                            }}
+                            />
                           </div>
                           <div style={{width: '172px'}}>
                             <div className="h-75 w-100 ps-1 hxd-border-bottom" style={{lineHeight: '1'}}>
                               <span className="d-block w-100 fw-bold text-secondary text-truncate" >{art?.titulo}</span>  
                               <small className="d-block w-100 text-secondary text-truncate">{art?.descricao}</small>
                             </div>
-                            <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
+                            <small className="d-block hxd-secondary-text text-end fw-bold">{art?.dia} às {art?.hora}</small>
                           </div>
                         </Link>
                       ))
@@ -250,10 +310,20 @@ const Profile = ({ type, user, hideProgress }) => {
                   >
                     Trending topics mais usados
                   </small>
-                  <small className="p-1 overflow-hidden" 
+                  <div className="p-1 overflow-hidden" 
                   style={{display: '-webkit-box', wordBreak: 'break-word', WebkitLineClamp: 3, 
                   WebkitBoxOrient: 'vertical', lineHeight: '1'}}>
-                  </small>
+                    {
+                      trending.map(t => (
+                        <div className="hxd-primary-text hxd-border p-1 rounded">
+                          <h6 className="m-0">#{t?.tag}</h6>
+                          <p className="m-0">
+                            <small>Usou essa hashtag {t?.count} vezes</small>
+                          </p>
+                        </div>
+                      ))
+                    }
+                  </div>
                 </div>
                 <span className="d-block hxd-bg-color text-white text-center fw-bold rounded" 
                 style={{height: '30px', lineHeight: '30px'}}

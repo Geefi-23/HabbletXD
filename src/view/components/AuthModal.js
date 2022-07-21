@@ -7,8 +7,8 @@ const AuthModal = (props) => {
   const { setUser, handleModalHide, sendAlert, showProgress, hideProgress } = props;
 
   const regex = {
-    nick: /^[A-Za-z0-9 ]{5,40}$/,
-    senha: /^[^ ]{6,16}$/,
+    nick: /^[^\b]{5,40}$/,
+    senha: /^[^\b]{6,16}$/,
   };
 
   const Login = () => {

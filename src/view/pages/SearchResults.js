@@ -11,7 +11,8 @@ const SearchResults = () => {
   const [results, setResults] = useState({noticias: [], usuarios: []});
 
   const getResults = useCallback(async (q) => {
-    let res = await api.search(q);
+    if (q.trim() === '') return setResults([]);
+    let res = await api.search(q.trim());
     setResults(res);
   });
 
@@ -41,17 +42,21 @@ const SearchResults = () => {
           <h1>Resultados de pesquisa: {results.count}</h1>
         </div>
         {/*CONTAINERS DOS RESULTADO*/}
-        <section className="d-flex flex-wrap gap-3 pt-2">
-          {
-            results.usuarios.map(usuario => (
-              <ResultCard refer={usuario} type="Perfil" />
-            ))
-          }
-          {
-            results.noticias.map(noticia => (
-              <ResultCard refer={noticia} type="Noticia" />
-            ))
-          }
+        <section className="d-flex gap-3 pt-2">
+          <div className="d-flex flex-column gap-2">
+            {
+              results.usuarios.map(usuario => (
+                <ResultCard refer={usuario} type="Perfil" />
+              ))
+            }
+          </div>
+          <div className="d-flex flex-column gap-2">
+            {
+              results.noticias.map(noticia => (
+                <ResultCard refer={noticia} type="Noticia" />
+              ))
+            }
+          </div>
           
         </section>
       </section>

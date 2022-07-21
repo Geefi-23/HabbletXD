@@ -6,6 +6,7 @@ import { Dropdown } from 'react-bootstrap';
 import AuthModal from './AuthModal';
 import PresenceModal from './PresenceModal';
 import RequestMusicModal from './RequestMusicModal';
+import useInterval from '../../hooks/useInterval';
 
 import ArtUploadModal from './ArtUploadModal';
 
@@ -13,12 +14,17 @@ import '@glidejs/glide/dist/css/glide.core.css';
 import slider from '../../static/js/slider';
 
 import '../../static/css/header.css';
+import '../../static/css/loadSpinner.css';
 import api from '../../static/js/api';
 
 const Header = (props) => {
   const { user, setUser, showProgress, hideProgress, sendAlert, 
     artCategories, values, schedules, lastEvent, currentAnnouncer,
-    setAllArts, allArts, changeTheme, getCurrentTheme, currentTheme } = props;
+    setCurrentAnnouncer,
+    setAllArts, allArts, changeTheme, getCurrentTheme, currentTheme, 
+    carousel, radioInfo, newsHighlight } = props;
+
+  const { radioIsReady, setRadioIsReady } = props;
 
   const [artModalIsShowing, setArtModalIsShowing] = useState(false);
   const [isAuthModalShowing, setIsAuthModalShowing] = useState(false);
@@ -78,6 +84,8 @@ const Header = (props) => {
           <img src={`https://img.icons8.com/ios-filled/24/${getCurrentTheme('theme-colorDark-hex')}/drawing.png`} alt="" />
         </button>
         <ArtUploadModal 
+          user={user}
+          setUser={setUser}
           showProgress={showProgress} 
           hideProgress={hideProgress} 
           sendAlert={sendAlert} 
@@ -192,29 +200,52 @@ const Header = (props) => {
   };
 
   const RadioPlayer = (props) => {
-    const [isPaused, setIsPaused] = useState(false);
-    const stream = useRef(null);
+    const radio = useRef(null);
+    const [info, setInfo] = useState({});
+    const [isPaused, setIsPaused] = useState(true);
+    const [radioLikes, setRadioLikes] = useState(0);
 
+    const { isReady } = props;
+
+    const poolInfo = () => {
+      fetch('https://api4.truesecurity.com.br/?ip=stream2.svrdedicado.org&port=8180&simples=last&time=)')
+        .then(res => res.json())
+        .then(json => setInfo(json));
+    };
     const handleStreamPP = () => {
-      setIsPaused(!isPaused);
-      if (!isPaused) stream.current.play();
-      else stream.current.pause();
+      
+      let paused = !isPaused;
+      if (!paused) radio.current.play() && console.log('PLAY');
+      else radio.current.pause();
+      setIsPaused(paused);
     };
 
     const handleStreamVolume = (newVol) => {
-      stream.current.volume = newVol;
+      radio.current.volume = newVol;
     };
 
+    useInterval(() => {
+      poolInfo();
+    }, 60000);
+
+    useEffect(() => {
+      if (!isPaused) {
+        radio.current.play();
+        setIsPaused(false);
+      }
+
+      setRadioLikes(currentAnnouncer?.likes);
+    }, [info]);
     return (
       <div id="radio-player">
-        <audio preload="auto" className="d-none" ref={stream}>
-          <source src="http://192.95.30.147/8180/stream" type="audio/mpeg" />
+        <audio preload="auto" class="d-none" ref={radio}>
+          <source src="https://stream2.svrdedicado.org/8180/stream;" type="audio/mpeg" />
         </audio>
         <div className="d-flex flex-row hxd-bg-color w-100 mt-2 rounded overflow-hidden" 
         style={{height: '60px'}}>
           <div className="h-100 w-25 text-center">
             <img 
-              src={`https://avatar.blet.in/${currentAnnouncer?.nome}&action=std&size=b&head_direction=3&direction=2&gesture=spk&headonly=0`} 
+              src={`https://avatar.blet.in/${currentAnnouncer?.nome || 'DjXD'}&action=std&size=b&head_direction=3&direction=2&gesture=spk&headonly=0`} 
               alt="" 
               style={{
                 objectPosition: '0 -20px'
@@ -227,7 +258,7 @@ const Header = (props) => {
                 <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"/>
                 <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
               </svg>
-              <span className="ps-2 fw-bold">{currentAnnouncer?.nome}</span>
+              <span className="ps-2">{currentAnnouncer?.nome || 'DjXD'}</span>
             </div>
             <div className="d-flex align-items-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-music-note-beamed" viewBox="0 0 16 16">
@@ -235,15 +266,27 @@ const Header = (props) => {
                 <path fillRule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z"/>
                 <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4V2.905z"/>
               </svg>
-              <span className="ps-2 fw-bold">A melhor</span>
+              <span className="ps-2">{currentAnnouncer?.programa}</span>
             </div>
           </div>
           <div className="d-flex flex-column justify-content-center gap-1 h-100 text-white" style={{width: '20%'}}>
-            <button className="d-flex flex-row align-items-center justify-content-center btn btn-success w-100 shadow-none" style={{height: '25px'}}>
+            <button 
+              className={`d-flex flex-row align-items-center justify-content-center rate-btn btn btn-success w-100 shadow-none ${currentAnnouncer?.liked ? 'active' : ''}`} 
+              style={{height: '25px'}}
+              onClick={async (evt) => {
+                setRadioLikes(radioLikes + 1);
+                evt.target.disabled = true;
+                evt.target.classList.add('active');
+                const res = await api.radio('sendlike', {}, { credentials: 'include' });
+              }}
+              disabled={currentAnnouncer?.liked}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
                 <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
               </svg>
-              <span className="ps-1">100</span>
+              <span className="ps-1">
+                {radioLikes}
+              </span>
             </button>
             <button className="d-flex flex-row align-items-center justify-content-center btn btn-danger w-100 shadow-none" style={{height: '25px'}}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-hand-thumbs-down" viewBox="0 0 16 16">
@@ -254,18 +297,29 @@ const Header = (props) => {
         </div>
         <div className="d-flex flex-row w-100" style={{height: '30px'}}>
           <div className="w-50 h-100 rounded bg-white">
-            <button className="bg-transparent border-0"
-            onClick={() => handleStreamPP()}>
-              <img 
-                src={
-                  isPaused ?
-                  `https://img.icons8.com/ios-glyphs/15/${getCurrentTheme('theme-colorDark-hex')}/pause--v1.png`
-                  :
-                  `https://img.icons8.com/ios-glyphs/15/${getCurrentTheme('theme-colorDark-hex')}/play--v1.png`
-                } 
-                alt=""
-              />
-            </button>
+            {
+              !isReady ?
+              <div className="spinner d-inline-block ms-2" style={{
+                width: '15px',
+                height: '15px',
+                
+              }}>
+                <div className="track"></div>
+              </div>
+              :
+              <button className="bg-transparent border-0"
+              onClick={() => handleStreamPP()}>
+                <img 
+                  src={
+                    !isPaused ?
+                    `https://img.icons8.com/ios-glyphs/15/${getCurrentTheme('theme-colorDark-hex')}/pause--v1.png`
+                    :
+                    `https://img.icons8.com/ios-glyphs/15/${getCurrentTheme('theme-colorDark-hex')}/play--v1.png`
+                  } 
+                  alt=""
+                />
+              </button>
+            }
             <button className="bg-transparent border-0">
               <img 
                 src={
@@ -275,13 +329,7 @@ const Header = (props) => {
               />
             </button>
             <input className="volume-handler" defaultValue={1} onChange={evt => handleStreamVolume(evt.target.value)} type="range" min="0" max="1" step=".01" />
-            <RequestMusicModal 
-              show={showRequestMusicModal} 
-              setShow={setShowRequestMusicModal} 
-              sendAlert={sendAlert}
-              showProgress={showProgress}
-              hideProgress={hideProgress}
-            />
+            
             <button className="bg-transparent border-0" onClick={() => setShowRequestMusicModal(true)}>
               <img 
                 src={
@@ -291,13 +339,7 @@ const Header = (props) => {
                 alt=""
               />
             </button>
-            <PresenceModal 
-              show={showPresenceModal} 
-              setShow={setShowPresenceModal} 
-              sendAlert={sendAlert} 
-              showProgress={showProgress}
-              hideProgress={hideProgress}
-            />
+            
             <button className="bg-transparent border-0" onClick={() => setShowPresenceModal(true)}>
               <img 
                 src={
@@ -309,23 +351,26 @@ const Header = (props) => {
             
           </div>
           <div className="w-50 h-100 ps-2 text-white">
-            <span className="fw-bold">100</span>
+            <span className="fw-bold">{radioInfo?.stream_status?.unique}</span>
             <small> estão ouvindo a rádio</small>
           </div>
         </div>
         <div className="d-flex flex-row justify-content-evenly w-100 py-2 text-white" style={{height: '50px'}}>
           {
             schedules.map((s, i) => (
-              <div className={`next-schedule__card opacity-${i === 0 ? '100' : i === 1 ? '75' : i === 2 ? '50' : ''}`}>
+              <div 
+              className={`next-schedule__card opacity-${i === 0 ? '100' : i === 1 ? '75' : i === 2 ? '50' : ''}`}
+              key={s.id}
+              >
                 <div className="overflow-hidden ps-2" style={{width: '45px', height: '34px'}}>
-                  <img src={`https://avatar.blet.in/${s.usuario}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=0`} />
+                  <img src={`https://avatar.blet.in/${s.usuario || 'DjXD'}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=0`} />
                 </div>
                 <div style={{lineHeight: 1.1}}>
                   <small className="d-block text-white opacity-75">
                     {i === 0 ? 'Depois' : `às ${s.comeca}`}
                   </small>
                   <span className="text-white">
-                    {s.usuario}
+                    {s.usuario || 'DjXD'}
                   </span>
                 </div>
               </div>
@@ -359,22 +404,25 @@ const Header = (props) => {
     };
 
     const configSliders = () => {
-      const carousel = new Glide('#portal-carousel', {
+      const carousell = new Glide('#portal-carousel', {
         type: 'carousel',
         perView: 1,
         autoplay: 3000
       });
 
       const valores = new Glide('#valores-glide', {
-        perView: 8,
+        perView: 7,
         gap: 8,
+        rewind: false,
+        bound: true,
         peek: {
           before: 0,
           after: 16
         }
       });
       valores.mount();
-      carousel.mount();
+      if (carousel.length !== 0)
+      carousell.mount();
       
     };
 
@@ -385,30 +433,67 @@ const Header = (props) => {
     return (
       <div id="basic-portal">
         <div className="row gx-0">
-          <div className="col p-1">
-            <div className="top-card d-flex flex-row hxd-bg-color h-100 w-100 p-1 rounded">
-              <div className="w-25 bg-dark rounded"></div>
-              <div className="w-75 text-white px-1">
-                <div className=''>Último evento</div>
-                <span className="mb-0">{lastEvent?.titulo}</span>
-                <small className="d-block text-truncate">{lastEvent?.resumo}</small>
-                <small className="d-block text-end fw-bold">00/00 às 00:00</small>
-              </div>
-            </div>
+          <div className="col col-6 p-1">
+            {
+              lastEvent?.length !== 0 &&
+              <Link 
+                to={`/evento/${lastEvent?.url}`}
+                className="top-card d-flex flex-row hxd-bg-color h-100 w-100 p-1 rounded text-decoration-none"
+              >
+                <div className="bg-dark rounded overflow-hidden" style={{ width: '100px' }}>
+                  <img 
+                    src={api.getMedia(lastEvent?.imagem)}
+                    alt=""
+                    className="w-100 h-100"
+                    style={{
+                      objectFit: 'cover',
+                      objectPosition: 'center'
+                    }}
+                  />
+                </div>
+                <div className="text-white px-1" style={{ width: '230px' }}>
+                  <div className=''>Último evento</div>
+                  <span className="mb-0">{lastEvent?.titulo}</span>
+                  <small className="d-block text-truncate">{lastEvent?.resumo}</small>
+                  <small className="d-block text-end fw-bold">{lastEvent?.dia} às {lastEvent?.hora}</small>
+                </div>
+              </Link>
+            }
           </div>
-          <div className="col p-1">
-            <div className="top-card d-flex flex-row h-100 w-100 p-1 rounded" style={{backgroundColor: 'white'}}>
-            <div className="w-25 bg-dark rounded"></div>
-              <div className="w-75 px-1">
-                <div className='hxd-secondary-text'>Notícia destaque</div>
-                <span className="mb-0 hxd-primary-text">Agora fudeu!</span>
-                <small className="d-block hxd-secondary-text text-truncate">O bagulho fico lokooooooo</small>
-                <small className="d-block hxd-secondary-text text-end fw-bold">00/00 às 00:00</small>
-              </div>
-            </div>
+          <div className="col col-6 p-1">
+            {
+              newsHighlight?.length !== 0 &&
+              <Link 
+                to={`/ler/noticia/${newsHighlight?.url}/${newsHighlight?.id}`}
+                className="top-card d-flex flex-row h-100 w-100 p-1 rounded text-decoration-none" 
+                style={{backgroundColor: 'white'}}
+              >
+                <div className="bg-dark rounded overflow-hidden" style={{ width: '100px' }}>
+                  <img 
+                    src={api.getMedia(newsHighlight?.imagem)} 
+                    alt=""
+                    className="w-100 h-100"
+                    style={{
+                      objectFit: 'cover',
+                      objectPosition: 'center'
+                    }}
+                  />
+                </div>
+                <div className="px-1" style={{ width: '230px' }}>
+                  <div className='hxd-secondary-text'>Notícia destaque</div>
+                  <div className="mb-0 hxd-primary-text" style={{lineHeight: 1.1}}>{newsHighlight?.titulo}</div>
+                  <small className="d-block hxd-secondary-text text-truncate">{newsHighlight?.resumo}</small>
+                  <small className="d-block hxd-secondary-text text-end fw-bold">
+                    {newsHighlight?.dia} às {newsHighlight?.hora}
+                  </small>
+                </div>
+              </Link>
+            }
           </div>
         </div>
-        <div className="w-100">
+        <div class="mx-auto "style={{
+          width: '80%'
+        }}>
           <strong className="text-white">Valores</strong>
           <div id="valores-glide" className="glide mt-1 d-flex">
             <div data-glide-el="controls">
@@ -421,9 +506,15 @@ const Header = (props) => {
             <div className="glide__track" data-glide-el="track" style={{ flex: 1 }}>
               <div className="glide__slides" style={{ height: '60px' }}>
                 {
-                  values?.map(v => (
-                    <Link to="/valores" className="glide__slide slider__item" title={v.nome}>
-                      <img className="w-100 h-100 align-self-center" src={v.imagem} alt="" style={{ objectFit: 'contain' }} />
+                  values.slice(0, 20).map(v => (
+                    <Link 
+                      to="/valores" 
+                      className={`glide__slide slider__item arrow-${v.situacao === 'Em alta' ?
+                      'down' : v.situacao === "Baixa" ? 'up' : 'neutral'}`}
+                      title={v.nome}
+                      key={v.id}
+                    >
+                      <img className="w-100 h-100 align-self-center" src={v.icone} alt="" style={{ objectFit: 'contain' }} />
                     </Link>
                   ))
                 }
@@ -438,17 +529,39 @@ const Header = (props) => {
             </div>
           </div>
         </div>
-        <div id="portal-carousel" className="glide mt-2">
-          <div className="glide__track rounded" data-glide-el="track">
-            <div className="glide__slides" style={{ height: '125px' }}>
-              <div className="glide__slide bg-secondary">1</div>
-              <div className="glide__slide bg-secondary">2</div>
-              <div className="glide__slide bg-secondary">3</div>
-              <div className="glide__slide bg-secondary">4</div>
-              <div className="glide__slide bg-secondary">5</div>
+        {
+          carousel.length !== 0 &&
+          <div id="portal-carousel" className="glide mt-2 mx-auto w-75">
+            <div className="glide__track rounded" data-glide-el="track">
+              <div className="glide__slides" style={{ height: '125px' }}>
+                
+                {
+                  
+                  carousel.map((c) => (
+                    <a
+                      href={c?.destino}
+                      target="_blank"
+                      className="glide__slide bg-secondary"
+                      key={c?.id}
+                    >
+                      <img 
+                        src={api.getMedia(c?.imagem)} 
+                        alt=""
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'fill',
+                          objectPosition: 'center'
+                        }} 
+                      />
+                    </a>
+                  ))
+                }
+                
+              </div>
             </div>
           </div>
-        </div>
+        }
       </div>
     );
   };
@@ -517,34 +630,6 @@ const Header = (props) => {
                   <Link to="/" onClick={() => showProgress()}>INICIO</Link>
                 </li>
                 <li className="navbar-menu__item especial">
-                  <button className="bg-transparent border-0">HABBLET XD</button>
-                  <div className="navbar-menu__item__popover">
-                    <ul className="list-unstyled">
-                      <li>
-                        <Link to="/equipe">Equipe</Link>
-                      </li>
-                      <li>
-                        <Link to="/timeline/historia">Historia</Link>
-                      </li>
-                      <li>
-                        <Link to="/timeline/seja-da-equipe">Seja da equipe</Link>
-                      </li>
-                      <li>
-                        <Link to="/timeline/redes-sociais">Redes sociais</Link>
-                      </li>
-                      <li>
-                        <Link to="/timeline/parceiros">Parceiros</Link>
-                      </li>
-                      <li>
-                        <Link to="/timeline/escolinha-xd">Escolinha XD</Link>
-                      </li>
-                      <li>
-                        <Link to="/timeline/seja-parceiro">Seja parceiro</Link>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-                <li className="navbar-menu__item especial">
                   <button className="bg-transparent border-0">HABBLET</button>
                   <div className="navbar-menu__item__popover">
                     <ul className="list-unstyled">
@@ -573,11 +658,39 @@ const Header = (props) => {
                   </div>
                 </li>
                 <li className="navbar-menu__item especial">
+                  <button className="bg-transparent border-0">HABBLET XD</button>
+                  <div className="navbar-menu__item__popover">
+                    <ul className="list-unstyled">
+                      <li>
+                        <Link to="/equipe">Equipe</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/historia">Historia</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/seja-da-equipe">Seja da equipe</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/redes-sociais">Redes sociais</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/parceiros">Parceiros</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/escolinha-xd">Escolinha XD</Link>
+                      </li>
+                      <li>
+                        <Link to="/timeline/seja-parceiro">Seja parceiro</Link>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li className="navbar-menu__item especial">
                   <button className="bg-transparent border-0">RÁDIO</button>
                   <div className="navbar-menu__item__popover">
                     <ul className="list-unstyled">
                       <li>
-                        <Link to="/horarios">Horarios</Link>
+                        <Link to="/horarios">Horários</Link>
                       </li>
                     </ul>
                   </div>
@@ -588,6 +701,12 @@ const Header = (props) => {
                     <ul className="list-unstyled">
                       <li>
                         <Link to="/habbletimager">Habblet Imager</Link>
+                      </li>
+                      <li>
+                        <Link to="/emblemas">Emblemas raros</Link>
+                      </li>
+                      <li>
+                        <Link to="/valores">Valores dos raros</Link>
                       </li>
                     </ul>
                   </div>
@@ -601,17 +720,32 @@ const Header = (props) => {
           </div>
         </div>
       </header>
-      <div className="position-relative w-100" style={{height: '340px'}}>
+      <div className="position-relative w-100 mb-5" style={{height: '340px'}}>
         <div style={{height: '268px', width: '100%', background: '#000 url("https://habbletxd.com.br/media/img/header.png")', filter: 'blur(2px)' }}>
           <div className="w-100 h-100 bg-dark opacity-75"></div>
         </div>
         <div className="position-absolute d-flex flex-row justify-content-around w-100" style={{top: 0}}>
           <div style={{width: '450px', top: 0, left: '100px'}}>
-            <RadioPlayer />
+            <RadioPlayer info={radioInfo} isReady={radioIsReady} />
+            <RequestMusicModal 
+              show={showRequestMusicModal} 
+              setShow={setShowRequestMusicModal} 
+              sendAlert={sendAlert}
+              showProgress={showProgress}
+              hideProgress={hideProgress}
+            />
+            <PresenceModal 
+              show={showPresenceModal} 
+              setShow={setShowPresenceModal} 
+              sendAlert={sendAlert} 
+              showProgress={showProgress}
+              hideProgress={hideProgress}
+            />
             <FastMenu />
           </div>
-          <div className="basic-portal-wrapper" style={{width: '600px', top: 0, left: '100px'}}>
+          <div className="basic-portal-wrapper" style={{width: '700px', top: 0, left: '100px'}}>
             <BasicPortal />
+            
           </div>
         </div>
       </div>

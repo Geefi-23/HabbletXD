@@ -15,7 +15,7 @@ const Card = (props) => {
       style={{ height: '50px' }}
     >
       <img 
-        src={`https://avatar.blet.in/${schedule.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`} 
+        src={`https://avatar.blet.in/${schedule.usuario || 'DjXD'}&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`} 
         alt="" 
         style={{
           objectPosition: '0 15px'

@@ -14,7 +14,8 @@ const approutes = (props) => {
   const { user, setUser, sendAlert, showProgress, hideProgress, setAllTimelines, getCurrentTheme, currentTheme } = props;
 
   // preload data
-  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, lastEvent, ranking, trendingTopics } = props;
+  const { badges, loja, allNews, allTimelines, allArts, allSpotlights, values, 
+    lastEvent, ranking, trendingTopics, setAllNews } = props;
   
   return (
     <Routes>
@@ -27,6 +28,7 @@ const approutes = (props) => {
         element={
         <Home 
           user={user}
+          setUser={setUser}
           showProgress={showProgress} 
           hideProgress={hideProgress} 
           sendAlert={sendAlert} 
@@ -36,6 +38,7 @@ const approutes = (props) => {
           allNews={allNews}
           allTimelines={allTimelines}
           setAllTimelines={setAllTimelines}
+          setAllNews={setAllNews}
           allArts={allArts}
           allSpotlights={allSpotlights}
           values={values}
@@ -47,9 +50,9 @@ const approutes = (props) => {
         />
         } 
       /> 
-      <Route path="/emblemas" element={<GridEmblem />} /> 
+      <Route path="/emblemas" element={<GridEmblem hideProgress={hideProgress} badges={badges} />} /> 
       <Route path="/search" element={<SearchResults />} />
-      <Route path="/valores" element={<Valores hideProgress={hideProgress} />} />
+      <Route path="/valores" element={<Valores hideProgress={hideProgress} getCurrentTheme={getCurrentTheme} values={values} />} />
       <Route path="/horarios" element={<Schedules hideProgress={hideProgress} />} />
       <Route path="/equipe" element={<Team hideProgress={hideProgress} />} />
       <Route path="/habbletimager" element={<HabbletImager />} />
@@ -69,7 +72,18 @@ const approutes = (props) => {
       <Route path="/perfil/*">
         <Route path=":name" element={<Profile hideProgress={hideProgress} />} />
       </Route>
-      <Route path="/noticia/*" >
+      <Route 
+        path="/ler/noticia/:key/:id" 
+        element={
+          <Forum 
+            user={user} 
+            sendAlert={sendAlert} 
+            showProgress={showProgress} 
+            hideProgress={hideProgress} type='news' 
+          />
+        }
+      />
+      <Route path="/evento/*" >
         <Route 
           path=":key" 
           element={
@@ -77,7 +91,7 @@ const approutes = (props) => {
               user={user} 
               sendAlert={sendAlert} 
               showProgress={showProgress} 
-              hideProgress={hideProgress} type='news' 
+              hideProgress={hideProgress} type='event' 
             />
           }
         />

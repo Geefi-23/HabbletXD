@@ -109,7 +109,7 @@ const ProfileEdit = (props) => {
               <div className="d-flex flex-column w-75 ps-2">
                 <label className="w-100 hxd-input__wrapper pt-3">
                   <input className="hxd-input" placeholder=" " name="twitter" defaultValue={user.twitter} />
-                  <span className="hxd-input__label">Link do seu perfil do twitter</span>
+                  <span className="hxd-input__label">Perfil do twitter</span>
                 </label>
                 <div className="d-flex flex-column gap-3">
                   <label className="w-100 hxd-input__wrapper mt-3">

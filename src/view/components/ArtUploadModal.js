@@ -9,7 +9,7 @@ const ArtUploadModal = (props) => {
   const [upload, setUpload] = useState(null);
   const navigate = useNavigate();
 
-  const { showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing, categories, setAllArts, allArts } = props;
+  const { user, setUser, showProgress, hideProgress, sendAlert, artModalIsShowing, setArtModalIsShowing, categories, setAllArts, allArts } = props;
 
   const handleImageInput = (file) => {
     setUpload(file);
@@ -40,7 +40,13 @@ const ArtUploadModal = (props) => {
     if (res.error) {
       sendAlert('danger', res.error);
     } else if (res.success) {
-      sendAlert('success', res.success);
+      sendAlert('success', res.success, {
+        onunload: !res.award ? null : () => {
+          sendAlert('success', res.award);
+          let xdcoins = parseInt(user.xdcoins) + res.coins;
+          setUser({...user, xdcoins})
+        }
+      });
       setArtModalIsShowing(false);
       const url = res.url;
       const art = await api.art('get', { key: url });

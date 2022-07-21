@@ -3,16 +3,24 @@ import api from '../../static/js/api';
 
 const BuyConfirmationModal = (props) => {
 
-  const { isShowing, setIsShowing, beingBought, showProgress, hideProgress, sendAlert } = props;
+  const { user, setUser, isShowing, setIsShowing, beingBought, showProgress, hideProgress, sendAlert } = props;
 
   const handleBuy = async evt => {
     evt.preventDefault();
 
     const form = evt.target;
+    const submit = evt.target.querySelector('button[type="submit"]');
     const data = {
       item: beingBought,
       discord: form.discord.value
     };
+
+    if (data.discord === '')
+      return sendAlert('warning', 'Você precisa especificar o seu discord para receber sua compra!');
+
+    if (!/^.*#\d{4}$/g.test(data.discord)) 
+      return sendAlert('warning', 'Seu discord não está no formato correto.');
+    
 
     const init = {
       method: 'POST',
@@ -20,13 +28,17 @@ const BuyConfirmationModal = (props) => {
       credentials: 'include'
     };
 
+    submit.disabled = true;
     showProgress();
-    const res = await api.buyable('buy', init);
+    const res = await api.buyable('buy', {}, init);
     hideProgress();
+    submit.disabled = false;
 
     if (res.success) {
       sendAlert('success', res.success);
       setIsShowing(false);
+      let xdcoins = parseInt(user.xdcoins) - beingBought.valor;
+      setUser({ ...user, xdcoins});
     } else {
       sendAlert('danger', res.error);
     }

@@ -237,6 +237,28 @@ input[type=range]:focus::-webkit-slider-runnable-track {
   background-color: rgb(var(--hxd-theme-colorDark));
 }
 
+.arrow-down::before, .arrow-up::before, .arrow-neutral::before {
+  position: absolute;
+  right: 0;
+  transform: translateX(50%);
+  top: 0;
+}
+
+.arrow-down::before {
+  content: url('https://img.icons8.com/material-outlined/24/40C057/down--v1.png') !important;
+}
+
+.arrow-up::before {
+  content: url('https://img.icons8.com/material-outlined/24/FA5252/up--v1.png') !important;
+}
+
+.arrow-neutral::before {
+  content: "";
+  background-color: #fff;
+  height: .75rem;
+  width: .75rem;
+  border-radius: 50%;
+}
 
 #radio-player .volume-handler:focus {
   outline: none;
@@ -325,15 +347,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 }
 
 @media screen and (max-width: 1366px){
-  .basic-portal-wrapper{
-    width: 500px !important;
-  }
-
-  #basic-portal .top-card{
-    height: 80px !important;
-    width: 240px !important;
-  }
-
   #basic-portal .top-card{
     font-size: 14px;
   }

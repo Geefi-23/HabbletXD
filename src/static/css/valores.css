@@ -10,7 +10,6 @@
     overflow: hidden;
     background-color: rgb(var(--hxd-theme-color));
     height: 300px;
-    width: 200px;
     border: 1px solid rgb(var(--hxd-theme-color));
     border-radius: .25rem;
 }
