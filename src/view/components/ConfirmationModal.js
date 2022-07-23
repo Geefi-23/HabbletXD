@@ -2,7 +2,7 @@ import { Modal } from 'react-bootstrap';
 
 const ConfirmationModal = (props) => {
 
-  const { isShowing, setIsShowing, text, onAccept, onDeny, beingBought, userCoins } = props;
+  const { user, isShowing, setIsShowing, text, onAccept, onDeny, beingBought, userCoins } = props;
 
   return (
     <Modal show={isShowing}>
@@ -11,12 +11,21 @@ const ConfirmationModal = (props) => {
         CONFIRMAÇÃO
       </div>
       {
+        !user ? 
+          <div className="p-2 text-center">
+            <h5 className='hxd-primary-text'>Você precisa estar logado para realizar uma compra no site!</h5>
+            <button className="hxd-border-2 bg-white rounded w-100 mt-5" type="submit" style={{height: '40px'}}
+            onClick={() => setIsShowing(false)}>
+              Fechar
+            </button>
+          </div>
+        :
         parseInt(userCoins) < parseInt(beingBought?.valor) ?
           <div className="p-2 text-center">
             <h5 className='hxd-primary-text'>Você não tem xd's suficientes para realizar esta compra!</h5>
             <button className="hxd-border-2 bg-white rounded w-100 mt-5" type="submit" style={{height: '45px'}}
             onClick={() => setIsShowing(false)}>
-              Ok
+              Fechar
             </button>
           </div>
         :

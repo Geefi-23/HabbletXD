@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import useInterval from '../../hooks/useInterval';
 
 import BuyConfirmationModal from '../components/BuyConfirmationModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 
 import api from '../../static/js/api';
-import newBadges from '../../static/json/badges.json';
+import Slider from '../../static/js/slider';
 
+import newBadges from '../../static/json/badges.json';
 
 import '../../static/css/home.css';
 import '../../static/css/cards.css';
@@ -83,6 +85,16 @@ const Home = (props) => {
       gap: 8
     });
 
+    /*let newsSlider = Slider({
+      slider: '#news-slider',
+      perView: 1,
+      apiRoute: 'news',
+      paginationOffset: '6',
+      arrowPrev: '#news-arrowPrev',
+      arrowNext: '#news-arrowNext',
+      paginationCallback:
+    });*/
+
     let lojaoXD = new Glide('#ljxd-slider', {
       type: 'slider',
       perView: 5,
@@ -125,7 +137,7 @@ const Home = (props) => {
 
     let artSlider = new Glide('#artSlider', {
       type: 'slider',
-      perView: 3,
+      perView: 1,
       rewind: false,
       bound: true,
       gap: 8,
@@ -242,14 +254,14 @@ const Home = (props) => {
               </div>
               <div className="section__nav-tools">
                 <button id="news-arrowPrev">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-left" viewBox="0 0 16 16">
+                    <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
                   </svg>
                 </button>
                 <button className="reload"></button>
                 <button id="news-arrowNext">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-right" viewBox="0 0 16 16">
+                    <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
                   </svg>
                 </button>
               </div>
@@ -389,8 +401,8 @@ const Home = (props) => {
                   </div>
                   <div className='w-100 pe-2 mt-2' style={{flex: '1 0 0'}}>
                     <div className="w-100 rounded overflow-hidden">
-                      <div className="d-flex align-items-center ps-3 h-25 hxd-bg-color">
-                        <h4 className="text-white">Postar timeline</h4>
+                      <div className="d-flex align-items-center ps-3 py-2 h-25 hxd-bg-color">
+                        <h5 className="text-white">Postar timeline</h5>
                       </div>
                       <form className="d-flex flex-column h-75 hxd-bg-color-gray" onSubmit={handleTimelinePost}
                       name="timeline_sender">
@@ -520,7 +532,7 @@ const Home = (props) => {
                     </div>
                     {
                       trendingTopics.map((trend) => (
-                        <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }}>
+                        <div className="p-2 rounded" style={{ height: '60px', boxShadow: '0 2px .5rem rgb(0, 0, 0, .2)' }} key={trend?.id}>
                           <h6 className="hxd-primary-text m-0">#{trend.tag}</h6>
                           <small className="hxd-primary-text">Essa hashtag foi usada {trend.count} vezes.</small>
                         </div>
@@ -639,6 +651,7 @@ const Home = (props) => {
             </div>
             <div className="section__content">
               <ConfirmationModal 
+                user={user}
                 isShowing={confirmationForBuyShow} 
                 setIsShowing={setConfirmationForBuyShow}
                 text="Você tem certeza de que deseja realizar esta compra?"
@@ -698,7 +711,7 @@ const Home = (props) => {
                               style={{height: '40px'}}
                             >
                               <small className="text-center">
-                                <strong>
+                                <strong className="hxd-primary-color">
                                   {item.tipo.toUpperCase()}
                                   &nbsp;
                                   {item.nome}
@@ -747,7 +760,7 @@ const Home = (props) => {
                   <div className="glide__slides">
                     {
                       loja.filter(item => item.tipo === 'emblema').map((badge) => (
-                        <div className="glide__slide lojao-card--square">
+                        <div className="glide__slide lojao-card--square" key={badge?.id}>
                           <div className="info-wrapper">
                             <div 
                               className="d-flex justify-content-center align-items-center hxd-bg-color rounded-top"
@@ -757,7 +770,7 @@ const Home = (props) => {
                             </div>
                             <div className='d-flex justify-content-center align-items-center bg-white rounded-bottom' style={{height: '40px'}}>
                               <small className='text-center' style={{ lineHeight: 1.1 }}>
-                                <strong>{badge.nome}</strong>
+                                <strong className="hxd-primary-text">{badge.nome}</strong>
                               </small>
                             </div>
                             <div className="d-flex flex-row align-items-center justify-content-between mt-2">
@@ -808,23 +821,19 @@ const Home = (props) => {
                     :
                     (() => {
                       let slides = [];
-                      let y = 0;
-                      let iterations = Math.round(allArts.length / 2);
-
-                      for (let i = 0; i < iterations; i++){
-                        let art1 = allArts[y++];
-                        let art2 = allArts[y++];
-
-                        let slide;
-
-                        if (art2 === undefined) {
-                          slide = [art1];
-                        } else {
-                          slide = [art1, art2];
-                        }
+                      for (let i = 0; i < allArts.length; i+=6){
+                        
+                        let slide = allArts.slice(i, i+6);
 
                         slides.push((
-                          <div className="glide__slide d-flex flex-column gap-2">
+                          <div 
+                            className="glide__slide gap-2"
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(3, auto)',
+                              gridTemplateRows: 'auto auto',
+                            }}
+                          >
                             {slide.map((art) => (
                               <ArtCard refer={art} key={art.id} onClick={() => showProgress()} />
                             ))}
@@ -917,7 +926,7 @@ const Home = (props) => {
                   <div className="d-flex flex-column w-100 p-1 gap-1" style={{flex: '1 0 0%'}}>
                     {
                       ranking?.presencas?.map((rank, i) => (
-                        <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`}>
+                        <div className={`rankUser-card rankUser-card--${rankCardTypes[i]}`} key={rank?.id}>
                           <div className="d-inline-block overflow-hidden me-3" style={{height: '100%', width: '46px'}}>
                             <img 
                               src={`https://avatar.blet.in/${rank?.usuario}&action=std&size=b&head_direction=3&direction=2&gesture=sml&headonly=0`}

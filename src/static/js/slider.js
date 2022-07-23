@@ -1,3 +1,4 @@
+
 import api from "./api";
 
 /**
@@ -23,10 +24,14 @@ const Slider = (config) => {
   let arrowPrev = null;
 
   let sliderChildWidth = null;
+  let order = null;
+  let filter = null;
+  //let slideClasses = null;
 
-  let MAX_OFFSET = null;
-  let MIN_OFFSET = 0;
-  let resultOffset = 0;
+  let MARGIN_OFFSET = null;
+  let resultOffset = null;
+
+  let paginationCallback = null;
 
   /**
    * @description indice atual do slider baseado em 0
@@ -49,12 +54,27 @@ const Slider = (config) => {
   let apiRoute = null;
   
   const requestPagination = async () => {
-    const pag = api[apiRoute]('pagination', { offset: index * resultOffset});
+    const pag = await api[apiRoute]('pagination', { offset: (index ) * resultOffset, limit: resultOffset, order, filter });
+
+    const slide = document.createElement('div');
+    slide.style.width = sliderChildWidth + 'px';
+
+    paginationCallback(pag, slide, slidesWrapper);
   };
 
   const goNext = () => {
     if (index === (length - 1)) {
-
+      index += 1;
+      requestPagination().then(() => {
+        let currentMargin = parseInt(getComputedStyle(slidesWrapper).marginLeft);
+        slidesWrapper.style.marginLeft = (currentMargin - sliderChildWidth) + 'px';
+        
+        length += 1;
+      });
+    } else {
+      let currentMargin = parseInt(getComputedStyle(slidesWrapper).marginLeft);
+      slidesWrapper.style.marginLeft = (currentMargin - sliderChildWidth) + 'px';
+      index += 1;
     }
   };
 
@@ -73,29 +93,57 @@ const Slider = (config) => {
     slider = document.querySelector(config.slider);
     track = slider.querySelector('.slider__track');
     slidesWrapper = slider.querySelector('.slider__slides');
-    arrowNext = slider.querySelector(config.arrowNext);
-    arrowPrev = slider.querySelector(config.arrowPrev);
+    arrowNext = document.querySelector(config.arrowNext);
+    arrowPrev = document.querySelector(config.arrowPrev);
 
-
+    
     /**
      * @description slider configs
      */
     const perView = config.perView;
     apiRoute = config.apiRoute;
-    resultOffset = config.apiRoute;
+    resultOffset = config.paginationOffset;
+    paginationCallback = config.paginationCallback;
+    order = config.order;
+    filter = config.filter;
 
     const sliderChilds = slidesWrapper.querySelectorAll('.slider__item');
     const sliderChildsQuantity = sliderChilds.length;
-    sliderChildWidth = parseInt(getComputedStyle(sliderChilds[0]).width);
-    
-    MAX_OFFSET = -((sliderChildsQuantity * sliderChildWidth) - sliderChildWidth);
-    MIN_OFFSET = 0;
+    sliderChildWidth = parseInt(getComputedStyle(slider).width) / perView;
+    //slideClasses = config.sliderClassName;
 
     length = sliderChildsQuantity + 1;
+
+    //listeners to controls
+
+    arrowNext.onclick = goNext;
+    arrowPrev.onclick = goPrev;
+
+    /*if (sliderChilds.length !== 0) {
+      
+      length = sliderChilds.length;
+      Array.from(sliderChilds).forEach((child) => {
+        child.style.width = sliderChildWidth;
+      });
+    }*/
+
+    requestPagination();
+  };
+
+  const reload = (newConfig) => {
+    let newConfigs = { ...config, ...newConfig };
+    slidesWrapper.innerHTML = '';
+    index = 0;
+    length = 0;
+    configure(newConfigs);
   };
 
   const mount = () => {
-    
+    configure(config);
+
+    return {
+      reload
+    }
   };
 
   return {
@@ -103,4 +151,4 @@ const Slider = (config) => {
   };
 };
 
-export default Slider();
+export default Slider;

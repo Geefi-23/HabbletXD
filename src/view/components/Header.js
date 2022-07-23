@@ -238,11 +238,17 @@ const Header = (props) => {
     }, [info]);
     return (
       <div id="radio-player">
-        <audio preload="auto" class="d-none" ref={radio}>
+        <audio preload="auto" className="d-none" ref={radio}>
           <source src="https://stream2.svrdedicado.org/8180/stream;" type="audio/mpeg" />
         </audio>
-        <div className="d-flex flex-row hxd-bg-color w-100 mt-2 rounded overflow-hidden" 
-        style={{height: '60px'}}>
+        <div 
+          className="position-relative d-flex flex-row hxd-bg-color w-100 mt-2 rounded overflow-hidden" 
+          style={{
+            height: '60px', 
+            zIndex: 2, 
+            boxShadow: '0 2px 2px rgb(0, 0, 0, .4)'
+          }}
+        >
           <div className="h-100 w-25 text-center">
             <img 
               src={`https://avatar.blet.in/${currentAnnouncer?.nome || 'DjXD'}&action=std&size=b&head_direction=3&direction=2&gesture=spk&headonly=0`} 
@@ -275,6 +281,7 @@ const Header = (props) => {
               style={{height: '25px'}}
               onClick={async (evt) => {
                 setRadioLikes(radioLikes + 1);
+                setCurrentAnnouncer({ ...currentAnnouncer, liked: true })
                 evt.target.disabled = true;
                 evt.target.classList.add('active');
                 const res = await api.radio('sendlike', {}, { credentials: 'include' });
@@ -295,7 +302,14 @@ const Header = (props) => {
             </button>
           </div>
         </div>
-        <div className="d-flex flex-row w-100" style={{height: '30px'}}>
+        <div 
+          className="d-flex flex-row w-100"
+          style={{
+            height: '30px',
+            transform: 'translateY(-2px)',
+            zIndex: 0
+          }}
+        >
           <div className="w-50 h-100 rounded bg-white">
             {
               !isReady ?
@@ -359,8 +373,8 @@ const Header = (props) => {
           {
             schedules.map((s, i) => (
               <div 
-              className={`next-schedule__card opacity-${i === 0 ? '100' : i === 1 ? '75' : i === 2 ? '50' : ''}`}
-              key={s.id}
+                className={`next-schedule__card opacity-${i === 0 ? '100' : i === 1 ? '75' : i === 2 ? '50' : ''}`}
+                key={i}
               >
                 <div className="overflow-hidden ps-2" style={{width: '45px', height: '34px'}}>
                   <img src={`https://avatar.blet.in/${s.usuario || 'DjXD'}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=0`} />
@@ -435,7 +449,7 @@ const Header = (props) => {
         <div className="row gx-0">
           <div className="col col-6 p-1">
             {
-              lastEvent?.length !== 0 &&
+              !lastEvent || lastEvent?.length !== 0 &&
               <Link 
                 to={`/evento/${lastEvent?.url}`}
                 className="top-card d-flex flex-row hxd-bg-color h-100 w-100 p-1 rounded text-decoration-none"
@@ -462,7 +476,7 @@ const Header = (props) => {
           </div>
           <div className="col col-6 p-1">
             {
-              newsHighlight?.length !== 0 &&
+              !newsHighlight || newsHighlight?.length !== 0 &&
               <Link 
                 to={`/ler/noticia/${newsHighlight?.url}/${newsHighlight?.id}`}
                 className="top-card d-flex flex-row h-100 w-100 p-1 rounded text-decoration-none" 
@@ -491,7 +505,7 @@ const Header = (props) => {
             }
           </div>
         </div>
-        <div class="mx-auto "style={{
+        <div className="mx-auto "style={{
           width: '80%'
         }}>
           <strong className="text-white">Valores</strong>
@@ -509,12 +523,17 @@ const Header = (props) => {
                   values.slice(0, 20).map(v => (
                     <Link 
                       to="/valores" 
-                      className={`glide__slide slider__item arrow-${v.situacao === 'Em alta' ?
-                      'down' : v.situacao === "Baixa" ? 'up' : 'neutral'}`}
-                      title={v.nome}
-                      key={v.id}
+                      className={`glide__slide slider__item arrow-${v?.situacao === 'Em alta' ?
+                      'down' : v?.situacao === "Baixa" ? 'up' : 'neutral'}`}
+                      title={v?.nome}
+                      key={v?.id}
                     >
-                      <img className="w-100 h-100 align-self-center" src={v.icone} alt="" style={{ objectFit: 'contain' }} />
+                      <img 
+                        className="w-100 h-100 align-self-center" 
+                        src={v?.icone} 
+                        alt="" 
+                        style={{ objectFit: 'none' }} 
+                      />
                     </Link>
                   ))
                 }

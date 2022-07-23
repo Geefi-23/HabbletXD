@@ -52,7 +52,7 @@ const NewsCard = (props) => {
         <img className="w-100 h-100" src={news.imagem} alt="" onError={(evt) => evt.target.classList.add('d-none')} />
         <div className="news-card__thumbnail--hover">
           <div className="h4 fw-bold">IR</div>
-          <small className="d-block fw-bold">
+          <small className="d-block">
             {
               news.visualizacao && news.visualizacao === "0" ? 'Sem visualizações' :
               news.visualizacao === "1" ? news.visualizacao + ' visualização' : 
@@ -60,7 +60,7 @@ const NewsCard = (props) => {
             
             }
           </small>
-          <small className="d-block fw-bold">{news.likes} likes</small>
+          <small className="d-block">{news.likes} likes</small>
           <img
             src={require(`../../static/icons/${news?.categoria_icone || 'category_icon_art.gif'}`)}
           />
@@ -68,10 +68,10 @@ const NewsCard = (props) => {
         </div>
       </div>
       <div className="news-card__content">
-        <span className="news-card__title">{news.titulo}</span>
-        <small className='news-card__resume'>{news.resumo}</small>
-        <div className="d-flex w-100 justify-content-between position-absolute fw-bold text-secondary" style={{height: '20px', bottom: 0}}>
-          {`${news.dia} às ${news.hora}`}
+        <h6 className="news-card__title">{news.titulo}</h6>
+        <small className='news-card__resume' role="paragraph">{news.resumo}</small>
+        <div className="d-flex w-100 justify-content-between position-absolute hxd-primary-text" style={{height: '20px', bottom: 0}}>
+          <small>{`${news.dia} às ${news.hora}`}</small>
           <img 
             style={{ alignSelf: 'center', objectPosition: '10px 5px' }}
             src={`https://avatar.blet.in/${news.criador}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
@@ -104,18 +104,18 @@ const TimelineCard = (props) => {
             }}
           />
         </div>
-        <div 
+        <small 
           className="timeline-card__preview" 
           dangerouslySetInnerHTML={
             { 
-              __html: timeline.texto.substr(
+              __html: timeline.texto.substring(
                 0, 
                 timeline.texto.length < 50 ? timeline.texto.length : 49  
               ) 
             }
           }
         >
-        </div>
+        </small>
       </div>
       <div className="d-flex justify-content-between">
         <small className="fw-bold hxd-secondary-text">#{timeline?.hashtags?.split(' ')[0]}</small>
@@ -143,7 +143,7 @@ const ArtCard = (props) => {
 
   return (
     <Link to={"/arte/"+art.url} className="art-card" onClick={onClick}>
-      <div className="art-card__thumbnail overflow-hidden">
+      <div className="art-card__thumbnail">
         <img className="w-100 h-100" style={{objectFit: 'cover'}} src={art.imagem} alt="" onError={(evt) => evt.target.classList.add('d.none')} />
         <div className="art-card__thumbnail--hover">
           <span className="display-6 fw-bold">IR</span>
@@ -155,25 +155,41 @@ const ArtCard = (props) => {
           </span>
         </div>
       </div>
-      <div className="art-card__info" style={{height: '30%'}}>
-        <div className="d-flex flex-column h-100 overflow-hidden" style={{width: '80%'}}>
-          <h6 className="mb-0 hxd-primary-text text-truncate fw-bold">{art.titulo}</h6>
-          <small className="hxd-secondary-text text-truncate">{art.descricao}</small>
-          <small className="hxd-secondary-text text-end pe-2">{art.dia} às {art.hora}</small>
+      <div className="art-card__info">
+        <div className="position-relative d-flex flex-column h-100 overflow-hidden" style={{flex: '1 0 0'}}>
+          <h6 className="hxd-primary-text text-truncate">{art.titulo}</h6>
+          <small 
+            className="hxd-secondary-text overflow-hidden"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: '2',
+              WebkitBoxOrient: 'vertical',
+              wordBreak: 'normal',
+              wordWrap: 'break-word'
+            }}
+            role="paragraph"
+          >
+            {art.descricao}
+          </small>
+          <small className="position-absolute bottom-0 w-100 hxd-secondary-text text-end pe-1">{art.dia} às {art.hora}</small>
         </div>
-        <div className="p-1" style={{flex: '1 0 0'}}>
-          <div className='w-100 h-100 hxd-bg-colorLight rounded'>
-            <img 
-              style={{
-                height: '100%',
-                width: '100%',
-                objectFit: 'none',
-                objectPosition: 'center 5px'
-              }}
-              src={`https://avatar.blet.in/${art.autor}&action=std&size=s&head_direction=3&direction=2&gesture=std&headonly=1`} 
-              title={art.autor}
-            />
-          </div>
+        <div 
+          className='hxd-bg-colorLight rounded overflow-hidden'
+          style={{
+            width: '60px',
+            height: '60px'
+          }}
+        >
+          <img 
+            style={{
+              height: '100%',
+              width: '100%',
+              objectFit: 'none',
+              objectPosition: 'center -10px'
+            }}
+            src={`https://avatar.blet.in/${art.autor}&action=std&size=b&head_direction=3&direction=2&gesture=std&headonly=1`} 
+            title={art.autor}
+          />
         </div>
       </div>
     </Link>

@@ -5,6 +5,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import Glide from '@glidejs/glide';
 import api from '../../static/js/api';
+import Slider from '../../static/js/slider';
 import '../../static/css/valores.css';
 
 const Card = props => {
@@ -13,6 +14,7 @@ const Card = props => {
 
   useEffect(() => {
     setValue(refer);
+
   }, [refer]);
 
   return (
@@ -69,9 +71,17 @@ const Card = props => {
   );
 };
 
-const Valores = ({ hideProgress, getCurrentTheme, values }) => {
+const Valores = ({ hideProgress, getCurrentTheme }) => {
+  const [values, setValues] = useState([]);
   const [searchedValues, setSearchedValues] = useState([]);
   const [valuesAreReversed, setValuesAreReversed] = useState(false);
+  const [slider, setSlider] = useState(null);
+
+  const pool = async () => {
+    const values = await api.values('pagination', {offset: 0, limit: 5});
+    values.map((v) => v.imagem = api.getMedia(v.imagem));
+    setValues(values);
+  };
 
   const mountSlider = () => {
     let slider = new Glide('#slider', {
@@ -103,26 +113,96 @@ const Valores = ({ hideProgress, getCurrentTheme, values }) => {
 
     let q = evt.target.q.value.toLowerCase();
     
-    if (q !== '') {
-      let searchedValues = values.filter((v) => v?.nome.toLowerCase().search(q) !== -1);
-      setSearchedValues(searchedValues);
-      
-    } else {
-      setSearchedValues([]);
-    }
+    slider.reload({ filter: q });
     
   };
 
   const handleFilter = evt => {
-    let value = parseInt(evt.target.value);
+    let order = evt.target.value;
 
-    setValuesAreReversed(!!value);
+    slider.reload({ order });
   };
 
   useEffect(() => {
     hideProgress();
-    mountSlider();
+    //mountSlider();
+    //pool();
   }, [searchedValues]);
+
+  useEffect(() => {
+    let slider = Slider({
+      slider: '#slider',
+      perView: 1,
+      apiRoute: 'values',
+      paginationOffset: 5,
+      arrowPrev: '#slider-arrowPrev',
+      arrowNext: '#slider-arrowNext',
+      order: 'desc',
+      filter: '',
+      paginationCallback: (pag, slide, slidesWrapper) => {
+        let cards = pag.map((value) => {
+          const card = `<article class="card-valores" style="flex: 1 0 0">
+            <div class="card-valores__view">
+              <div 
+                class="position-relative d-flex justify-content-center align-items-center" 
+                style="flex: 1 0 0"
+              >
+                <img src="${api.getMedia(value?.imagem)}" alt="" />
+      
+                ${
+                  value?.categoria_id === '3' && value?.emblema !== '' ?
+                    `<div 
+                      class="position-absolute d-flex justify-content-center align-items-center hxd-bg-colorDark rounded"
+                      style="width: 50px; height: 50px; top: .5rem; right: .5rem"
+                    >
+                      <img src="${value?.emblema}" alt="" />
+                    </div>`
+                    : ''
+                }
+      
+              </div>
+      
+              <div style="height: 50px" class="d-flex justify-content-center align-items-center bg-white">
+                <small class="hxd-primary-text text-center">${value?.nome}</small>
+              </div>
+            </div>
+            <div class="d-flex flex-column gap-1 mt-1 text-center">
+              <small class="hxd-bg-color text-white p-1 rounded" style="font-size: 11px">
+                Valor na loja: ${value?.preco?.split(/(?=(?:\d{3})*$)/g).join('.')} ${value?.moeda}s 
+                <img 
+                  class='ms-2'
+                  src="
+                    ${{
+                      asinha: 'https://images-ext-2.discordapp.net/external/ggUUhqIdZB9KgVJs1Nrt21n1LtDC1eZ80eLhgQDw3EI/https/www.habblet.city/assets/images/icons/asinhas.gif',
+                      diamante: 'https://media.discordapp.net/attachments/933862913532391454/939682758765182996/icon_diamante.png'
+                    }[value?.moeda]}
+                  "
+                />
+              </small>
+              <small class="bg-white hxd-primary-text hxd-border p-1 rounded">
+                Valor em LTD: ${value?.valorltd}
+              </small>
+              <small class="hxd-bg-color text-white p-1 rounded">
+                Situação: ${value?.situacao}
+              </small>
+            </div>
+          </article>`
+
+          // convertendo a string em um elemento html
+          const template = document.createElement('template');
+          template.innerHTML = card.trim();
+
+          return template.content.firstChild;
+          
+        });
+
+        slide.classList.add('d-flex', 'gap-1');
+        slide.append(...cards);
+        slidesWrapper.append(slide);
+      }
+    }).mount();
+    setSlider(slider);
+  }, []);
 
   return (
     <main className="container">
@@ -146,8 +226,8 @@ const Valores = ({ hideProgress, getCurrentTheme, values }) => {
 
               <div className="d-flex gap-2" style={{ height: '40px' }}>
                 <select className="hxd-border bg-transparent rounded p-2 hxd-primary-text" onChange={handleFilter}>
-                  <option value="0">Mais recente</option>
-                  <option value="1">Mais antigo</option>
+                  <option value="desc">Mais recente</option>
+                  <option value="asc">Mais antigo</option>
                 </select>
                 <form action="#" onSubmit={handleSearch} className="d-flex hxd-border rounded">
                   <button className="bg-transparent border-0 hxd-primary-text">
@@ -159,7 +239,7 @@ const Valores = ({ hideProgress, getCurrentTheme, values }) => {
                 </form>
               </div>
             </div>
-            <div className="section__content justify-content-end">
+            <div className="section__content align-items-end flex-column">
               <div className="section__nav-tools mb-3">
                 <button id="slider-arrowPrev">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
@@ -172,7 +252,33 @@ const Valores = ({ hideProgress, getCurrentTheme, values }) => {
                   </svg>
                 </button>
               </div>
-              <div id="slider" className='glide'>
+              <div id="slider" className="slider">
+                <div className="slider__track">
+                  <div className='slider__slides'>
+                    {/*
+                      (() => {
+                        let slides = [];
+
+                        for (let i = 0; i < values.length; i+=6) {
+                          let slide = values.slice(i, i+6);
+                          slides.push((
+                            <div className="slider__item d-flex gap-1">
+                              {
+                                slide.map((value) => (
+                                  <Card refer={value} />
+                                ))
+                              }
+                            </div>
+                          ));
+                        }
+
+                        return slides;
+                      })()
+                    */}
+                  </div>
+                </div>
+              </div>
+              {/*<div id="slider" className='glide'>
                 <div className='glide__track' data-glide-el="track">
                   <div className='glide__slides'>
                   {
@@ -195,7 +301,17 @@ const Valores = ({ hideProgress, getCurrentTheme, values }) => {
                   }
                   </div>
                 </div>
-              </div>
+                </div>
+                <div id="slider" className='slider'>
+                  <div className="slider__track">
+                    <div className="slider__slides">
+                      <div className="slider__item">
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>*/}
             </div>
           </section>
         </div>

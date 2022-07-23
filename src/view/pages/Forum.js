@@ -144,8 +144,6 @@ const Forum = (props) => {
 
       setComentarios([...comentarios, adjustDate(comment)]);
       hideProgress();
-      console.log('mano')
-      console.log(res?.award);
       comentario.value = '';
     }
     evt.target.querySelector('button[type="submit"]').disabled = false;
@@ -162,14 +160,15 @@ const Forum = (props) => {
     let article = adjustDate(res.object);
     setArticle(article);
     setComentarios(res.comentarios);
+    if (type === 'art') {
+      setArt(api.getMedia(article?.imagem));
+    }
     hideProgress();
   });
 
-  useServerApi(type, 'updateviews', { key }, () => {
-    setArticle({...article, likes: article?.likes+1 || 1})
-  });
+  useServerApi(type, 'updateviews', { key }, () => {});
 
-  const get = useCallback(async () => {
+  const get = async () => {
     showProgress();
     let res = await api[type]('get', {key});
     let article = adjustDate(res.object);
@@ -177,14 +176,12 @@ const Forum = (props) => {
     setArticle(article);
     setComentarios(res.comentarios);
     if (type === 'art') {
-      let blob = await api.media('get', { filename: article.imagem });
-      setArt(URL.createObjectURL(blob));
+      setArt(api.getMedia(article?.imagem));
     }
-
-      api[type]('updateviews', { key }, { credentials: 'include' });
+    api[type]('updateviews', { key }, { credentials: 'include' });
 
     hideProgress();
-  }, [setArticle, setArt, setComentarios, showProgress, key, type, hideProgress]);
+  }
 
   useEffect(() => { 
     if (scrollToTop) {
@@ -196,16 +193,13 @@ const Forum = (props) => {
       let imagem = api.getMedia(article?.imagem);
       setArt(imagem);
     }
-  }, [article, scrollToTop, get, firstLoad, type]);
+  }, [scrollToTop, type]);
 
   useEffect(() => {
-    console.log(firstLoad);
-    if (!firstLoad) {
+    if (type === 'timeline')
       get();
-    } else {
-      setFirstLoad(false);
-    }
   }, [location]);
+
   return (
     <>
       <section className="w-100 forum">
@@ -216,7 +210,14 @@ const Forum = (props) => {
             <>
             <div className="info ms-3">
               <div className="m-0 text-nowrap text-truncate h6" role="heading" aria-level="2">
-                {article?.titulo || '#'+article?.hashtags?.split(' ').join(' #') }
+                {
+                  type !== 'timeline' ?
+                  article?.titulo : 
+                  !article?.hashtags || article?.hashtags === null ?
+                  <></>
+                  :
+                  '#'+article?.hashtags?.split(' ').join(' #') 
+                }
               </div>
               <small className="text-nowrap text-truncate">{article?.resumo}</small>
             </div>
@@ -295,7 +296,7 @@ const Forum = (props) => {
               :
               <div 
                 className="container-conteudo" 
-                dangerouslySetInnerHTML={{ __html: article.texto}}
+                dangerouslySetInnerHTML={{ __html: article?.texto}}
               ></div>
             }
             
@@ -336,6 +337,7 @@ const Forum = (props) => {
                   :
                   comentarios.map((comentario) => (
                     <Comment 
+                      key={comentario.id}
                       refer={comentario} 
                       type={type} 
                       sendAlert={sendAlert} 
